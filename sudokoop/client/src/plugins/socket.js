@@ -1,9 +1,7 @@
 import { io } from "socket.io-client";
 
 // Crea un'istanza del client Socket.IO con disconnessione automatica disabilitata
-const socket = io("http://localhost:5000", {
-  reconnection: false, // Disabilita la riconnessione automatica
-});
+const socket = io("http://localhost:5000");
 
 // Puoi aggiungere qui eventuali configurazioni o listener globali
 socket.on("connect", () => {

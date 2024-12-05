@@ -30,19 +30,8 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 
 // Socket.IO
-io.on('connection', (socket) => {
-  console.log('New client connected'); // Questo viene stampato quando un client si connette
+require('./sockets')(io);
 
-  // Gestione della disconnessione
-  socket.on('disconnect', () => {
-    console.log('Client disconnected'); // Questo viene stampato quando un client si disconnette
-  });
-
-  // Eventuali altri eventi da gestire
-  socket.on('message', (msg) => {
-    console.log('Message from client:', msg);
-  });
-});
 
 // Start Server
 const PORT = process.env.PORT || 5000;
