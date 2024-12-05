@@ -46,7 +46,7 @@ export default {
   },
   beforeUnmount() {
     // Rimuovi i listener per evitare duplicazioni
-    socket.off("message");
+    socket.off("message");ò
     socket.off("sudoku");
   },
 };
