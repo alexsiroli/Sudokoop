@@ -1,3 +1,4 @@
+/*
 // Importa le librerie necessarie
 const express = require('express');
 const http = require('http');
@@ -39,3 +40,4 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
     console.log('Server avviato su http://localhost:3000');
 });
+*/

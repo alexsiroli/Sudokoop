@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import socket from "@/plugins/socket";
+import socket from "../router/socket.js";
 
 export default {
   data() {
@@ -46,7 +46,7 @@ export default {
   },
   beforeUnmount() {
     // Rimuovi i listener per evitare duplicazioni
-    socket.off("message");ò
+    socket.off("message");
     socket.off("sudoku");
   },
 };

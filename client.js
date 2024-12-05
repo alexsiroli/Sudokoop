@@ -1,3 +1,4 @@
+/*
 // Importa la libreria Socket.IO per il client
 const { io } = require("socket.io-client");
 const readline = require('readline');
@@ -49,3 +50,6 @@ socket.on("disconnect", () => {
     console.log("Disconnesso dal server.");
     rl.close(); // Chiudi l'interfaccia di lettura quando il server si disconnette
 });
+
+
+ */
