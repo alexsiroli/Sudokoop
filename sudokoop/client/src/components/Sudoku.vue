@@ -2,7 +2,7 @@
   <div>
     <h1>Sudoku Game</h1>
     <!-- Sudoku Grid Component (to be implemented) -->
-    <SudokuGrid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
+    <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
 
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      sudokuGrid: [], // The Sudoku grid data
+      sudokuGrid: [[0,0]], // The Sudoku grid data
       messages: [], // List of messages or game updates
       isMultiplayer: false, // Flag to check if in multiplayer mode
     };
