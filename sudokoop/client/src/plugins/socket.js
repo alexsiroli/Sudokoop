@@ -1,15 +1,15 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 
-// Crea un'istanza del client Socket.IO con disconnessione automatica disabilitata
-const socket = io("http://localhost:5000");
-
-// Puoi aggiungere qui eventuali configurazioni o listener globali
-socket.on("connect", () => {
-  console.log("Connesso al server!");
+const socket = io('http://localhost:5000', {
+  reconnection: true,
 });
 
-socket.on("disconnect", () => {
-  console.log("Disconnesso dal server!");
+socket.on('connect', () => {
+  console.log('Connesso al server!');
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnesso dal server!');
 });
 
 export default socket;

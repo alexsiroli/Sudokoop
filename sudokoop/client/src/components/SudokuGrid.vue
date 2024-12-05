@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     onCellInput(rowIndex, colIndex, value) {
-      // Validate input (ensure it's a number between 1 and 9)
+      // Valida l'input (solo numeri da 1 a 9)
       if (!/^[1-9]$/.test(value)) {
         this.grid[rowIndex][colIndex].value = '';
         return;
@@ -40,9 +40,9 @@ export default {
       const cellData = {
         row: rowIndex,
         col: colIndex,
-        value: parseInt(value),
+        value: parseInt(value, 10),
       };
-      // Emit the cell update event to the parent component
+      // Emetti l'evento al componente padre
       this.$emit('cell-updated', cellData);
     },
     getCellClass(rowIndex, colIndex) {

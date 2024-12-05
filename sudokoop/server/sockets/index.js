@@ -1,27 +1,67 @@
-// server/sockets/index.js
+// Importa la classe Game
+const Game = require('../models/Game');
 
 module.exports = (io) => {
+    // Oggetto per tenere traccia dei giochi per ogni socket (giocatore)
+    const games = {};
+
     io.on('connection', (socket) => {
-        console.log('New client connected:', socket.id);
+        console.log('Nuovo client connesso:', socket.id);
 
-        // Handle cell updates from clients
+        // Quando un giocatore avvia una nuova partita
+        socket.on('startGame', (difficolta) => {
+            // Verifica la difficoltà fornita o imposta 'easy' di default
+            const diff = ['easy', 'medium', 'hard'].includes(difficolta) ? difficolta : 'easy';
+
+            // Crea una nuova istanza del gioco con la difficoltà scelta
+            const game = new Game(diff);
+            games[socket.id] = game;
+
+            // Invia il puzzle al client
+            socket.emit('gameData', {
+                puzzle: game.sudoku.puzzle,
+                vite: game.vite,
+                emptyPlace: game.emptyPlace,
+            });
+        });
+
+        // Gestione degli aggiornamenti delle celle
         socket.on('cellUpdate', (cellData) => {
-            // Optionally, validate the cell data here
+            const game = games[socket.id];
 
-            // Broadcast the cell update to other clients
-            socket.broadcast.emit('gridUpdate', cellData);
+            if (!game) {
+                socket.emit('message', 'Nessuna partita in corso.');
+                return;
+            }
 
-            // Update the game state in the database if necessary
+            const { row, col, value } = cellData;
+
+            // Chiama il metodo insertNumber della classe Game
+            const result = game.insertNumber(row, col, value);
+
+            // Invia l'aggiornamento al client
+            socket.emit('cellResult', {
+                message: result,
+                vite: game.vite,
+                emptyPlace: game.emptyPlace,
+                puzzle: game.sudoku.puzzle,
+            });
+
+            // Controlla se il gioco è terminato
+            if (game.vite === 0) {
+                socket.emit('gameOver', 'Hai perso! Vite terminate.');
+                delete games[socket.id]; // Rimuove il gioco dall'elenco
+            } else if (game.emptyPlace === 0) {
+                socket.emit('gameWon', 'Complimenti! Hai completato il Sudoku.');
+                delete games[socket.id]; // Rimuove il gioco dall'elenco
+            }
         });
 
-        // Handle chat messages
-        socket.on('chatMessage', (msg) => {
-            io.emit('message', msg); // Broadcast to all connected clients
-        });
-
-        // Handle disconnection
+        // Gestione della disconnessione
         socket.on('disconnect', () => {
-            console.log('Client disconnected:', socket.id);
+            console.log('Client disconnesso:', socket.id);
+            // Rimuove il gioco dall'elenco se esiste
+            delete games[socket.id];
         });
     });
 };
