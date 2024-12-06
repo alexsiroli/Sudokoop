@@ -1,46 +1,46 @@
 <template>
   <div>
     <h1>Sudoku Game</h1>
-    <!-- Sudoku Grid Component (to be implemented) -->
+    <!-- Componente Griglia Sudoku -->
     <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
-
   </div>
 </template>
 
 <script>
+// Importa l'istanza del socket dalla cartella plugins
 import socket from "../plugins/socket.js";
 import SudokuGrid from "./SudokuGrid.vue";
 
 export default {
   components: {
     SudokuGrid,
-
   },
   data() {
     return {
-      sudokuGrid: [[0,0]], // The Sudoku grid data
-      messages: [], // List of messages or game updates
-      isMultiplayer: false, // Flag to check if in multiplayer mode
+      sudokuGrid: [[0,0]], // Dati della griglia del Sudoku
+      messages: [], // Lista dei messaggi o aggiornamenti di gioco
+      isMultiplayer: false, // Flag per verificare se si è in modalità multiplayer
     };
   },
   methods: {
     handleCellUpdate(cellData) {
-      // Emit the cell update to the server
+      // Emette l'aggiornamento della cella al server
       socket.emit("cellUpdate", cellData);
     },
   },
   mounted() {
-    // Listen for updates from the server
+    // Ascolta gli aggiornamenti dalla parte server
     socket.on("gridUpdate", (gridData) => {
       this.sudokuGrid = gridData;
     });
 
+    // Ascolta i messaggi dal server
     socket.on("message", (msg) => {
       this.messages.push({ id: Date.now(), text: msg });
     });
   },
   beforeUnmount() {
-    // Clean up socket listeners
+    // Rimuove i listener del socket quando il componente viene smontato
     socket.off("gridUpdate");
     socket.off("message");
   },
@@ -48,5 +48,5 @@ export default {
 </script>
 
 <style scoped>
-/* Add your styles here */
+/* Aggiungi i tuoi stili qui */
 </style>
