@@ -7,7 +7,7 @@ import SinglePlayer from '../views/SinglePlayer.vue';
 import Lobby from '../views/Lobby.vue';
 import CoopGame from '../views/CoopGame.vue';
 import VersusGame from '../views/VersusGame.vue';
-
+import CreateLobby  from "../views/CreateLobby.vue";
 const routes = [
   { path: '/', name: 'Home', component: Home },
   // Rotta per single player: qui l'utente sceglie la difficoltà prima di iniziare
@@ -21,6 +21,7 @@ const routes = [
   { path: '/versusgame', name: 'VersusGame', component: VersusGame },
   // Rotta vecchia per multiplayer (puoi rimuoverla o mantenerla)
   { path: '/multiplayer', name: 'Multiplayer', component: Multiplayer },
+  {path: '/createLobby', name: 'CreateLobby', component: CreateLobby },
 ];
 
 const router = createRouter({

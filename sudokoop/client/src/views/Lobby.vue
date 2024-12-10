@@ -65,6 +65,8 @@ export default {
   },
   methods: {
     createLobby() {
+      this.$router.push({ name: 'CreateLobby' });
+
       // Logica per creare una lobby
     },
     joinLobby() {

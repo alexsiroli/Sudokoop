@@ -57,6 +57,10 @@ module.exports = (io) => {
             }
         });
 
+        socket.on("lobbyName", (name) => {
+            console.log("Received " + name );
+
+        })
         // Gestione della disconnessione
         socket.on('disconnect', () => {
             console.log('Client disconnesso:', socket.id);
