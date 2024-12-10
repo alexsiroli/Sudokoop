@@ -1,10 +1,10 @@
 // Importa la classe Game
 const Game = require('../models/Game');
-
+const UserController = require('../controllers/UserController');
 module.exports = (io) => {
     // Oggetto per tenere traccia dei giochi per ogni socket (giocatore)
     const games = {};
-
+    const userController = new UserController();
     io.on('connection', (socket) => {
         console.log('Nuovo client connesso:', socket.id);
 
@@ -59,6 +59,7 @@ module.exports = (io) => {
 
         socket.on("lobbyName", (name) => {
             console.log("Received " + name );
+            userController.createLobby(name, socket.id);
 
         })
         // Gestione della disconnessione
