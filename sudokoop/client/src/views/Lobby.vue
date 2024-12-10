@@ -1,8 +1,59 @@
+<script>
+import CreateLobby from "./CreateLobby.vue";
+export default {
+  name: 'Lobby',
+  data() {
+    return {
+      inLobby: false,
+      isMaster: false,
+      lobbyCode: '',
+      currentLobbyCode: '',
+      players: [],
+      selectedMode: 'coop',
+      selectedDifficulty: 'easy',
+      showLobbyForm: false,
+    };
+  },
+  components: {
+    CreateLobby
+  },
+  methods: {
+    createLobby() {
+      this.showLobbyForm = true;
+
+      // Logica per creare una lobby
+    },
+    onLobbyCreated(lobbyName) {
+      console.log("Created" + lobbyName)
+      this.showLobbyForm = false;
+      this.inLobby = true;
+      this.currentLobbyCode = lobbyName;
+
+
+    },
+    joinLobby() {
+      // Logica per unirsi a una lobby
+    },
+    startMultiplayerGame() {
+      if (this.selectedMode === 'coop') {
+        this.$router.push({ name: 'CoopGame', query: { difficulty: this.selectedDifficulty } });
+      } else {
+        this.$router.push({ name: 'VersusGame' });
+      }
+    },
+    goBack() {
+      this.$router.push('/');
+    }
+  },
+};
+</script>
 <template>
   <div class="centered-container">
     <div class="rounded-box lobby-container">
       <button class="back-button" @click="goBack" title="Torna Indietro">&#8592;</button>
       <h1 class="title">Lobby</h1>
+      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>
+      <div v-show="!showLobbyForm">
       <div v-if="!inLobby">
         <h2 class="subtitle">Crea o Unisciti a una Lobby</h2>
         <div class="create-lobby">
@@ -22,6 +73,7 @@
               {{ player.username }}
             </li>
           </ul>
+        </div>
         </div>
         <div v-if="isMaster" class="game-settings">
           <h3 class="subtitle">Impostazioni Partita</h3>
@@ -44,48 +96,10 @@
             <button @click="startMultiplayerGame" class="button">Avvia Partita</button>
           </div>
         </div>
-      </div>
+    </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'Lobby',
-  data() {
-    return {
-      inLobby: false,
-      isMaster: false,
-      lobbyCode: '',
-      currentLobbyCode: '',
-      players: [],
-      selectedMode: 'coop',
-      selectedDifficulty: 'easy',
-    };
-  },
-  methods: {
-    createLobby() {
-      this.$router.push({ name: 'CreateLobby' });
-
-      // Logica per creare una lobby
-    },
-    joinLobby() {
-      // Logica per unirsi a una lobby
-    },
-    startMultiplayerGame() {
-      if (this.selectedMode === 'coop') {
-        this.$router.push({ name: 'CoopGame', query: { difficulty: this.selectedDifficulty } });
-      } else {
-        this.$router.push({ name: 'VersusGame' });
-      }
-    },
-    goBack() {
-      this.$router.push('/');
-    }
-  },
-};
-</script>
-
 <style scoped>
 .player-item {
   padding: 5px;

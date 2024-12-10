@@ -7,10 +7,12 @@ export default {
       lobbyName: "",
     }
   },
+  props: ["onLobbyCreated"],
   methods: {
     sendLobbyName() {
       console.log("sending " + this.lobbyName);
       socket.emit("lobbyName", this.lobbyName)
+      this.onLobbyCreated(this.lobbyName);
     }
   }
 }
