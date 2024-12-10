@@ -61,6 +61,10 @@ module.exports = (io) => {
             console.log("Received " + name );
             userController.createLobby(name, socket.id);
 
+        });
+
+        socket.on("lobbyPlayers", (lobbyName) => {
+            socket.emit('lobbyPlayers', userController.getPlayersOfLobby(lobbyName));
         })
         // Gestione della disconnessione
         socket.on('disconnect', () => {

@@ -8,18 +8,29 @@ class UserController {
     constructor() {
         this.lobbies = [];
     }
+    findLobby(name) {
+        return this.lobbies.find(x => x.name === name)
+    }
     createLobby(name, player) {
         console.log("lobby presenti: " + this.lobbies)
         console.log("creating lobby" + name)
-        if (this.lobbies.find(x => x.name === name) === undefined) {
+        if (this.findLobby(name) === undefined) {
             this.lobbies.push(new Lobby(name, player));
         } else {
             console.log("lobby "+name + " already exists!");
         }
     }
+    getPlayersOfLobby(name) {
+        const lobby = this.findLobby(name);
+        if (lobby === undefined) {
+            console.log("This lobby doesn't exists")
+        } else {
+            return lobby.players;
+        }
+    }
     joinLobby(name, player) {
-        const lobby = this.lobbies.find(x => x.name === name);
-        if (lobby == null) {
+        const lobby = this.findLobby(name);
+        if (lobby === undefined) {
             console.log("This lobby doesn't exists")
         } else {
             console.log("adding " +player + "to " + name);

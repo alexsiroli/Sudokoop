@@ -1,5 +1,6 @@
 <script>
 import CreateLobby from "./CreateLobby.vue";
+import socket from "../plugins/socket";
 export default {
   name: 'Lobby',
   data() {
@@ -28,8 +29,10 @@ export default {
       this.showLobbyForm = false;
       this.inLobby = true;
       this.currentLobbyCode = lobbyName;
-
-
+      socket.emit("lobbyPlayers", this.currentLobbyCode)
+      socket.on("lobbyPlayers", (lobbyPlayers) => {
+        this.players = lobbyPlayers
+      })
     },
     joinLobby() {
       // Logica per unirsi a una lobby
@@ -69,8 +72,8 @@ export default {
         <div class="players-list">
           <h3>Giocatori:</h3>
           <ul>
-            <li v-for="player in players" :key="player.id" class="player-item">
-              {{ player.username }}
+            <li v-for="player in players"  class="player-item">
+              {{ player }}
             </li>
           </ul>
         </div>
