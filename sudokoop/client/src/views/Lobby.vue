@@ -19,11 +19,22 @@ export default {
     CreateLobby
   },
   methods: {
-    createLobby() {
-      this.showLobbyForm = true;
 
-      // Logica per creare una lobby
+    createLobby() {
+      console.log("creating new lobby");
+      socket.emit("createLobby");
+      socket.on("onLobbyCreated", (res) =>
+        {
+          if (res !== "") {
+            this.currentLobbyCode = res
+            this.inLobby = true;
+          }
+          else {
+            console.log("Lobby creation failed");
+          }
+        } )
     },
+
     onLobbyCreated(lobbyName) {
       console.log("Created" + lobbyName)
       this.showLobbyForm = false;
@@ -35,6 +46,12 @@ export default {
       })
     },
     joinLobby() {
+      socket.emit("joinLobby", this.lobbyCode);
+      this.inLobby = true;
+      this.currentLobbyCode = this.lobbyCode;
+      socket.on("lobbyPlayers", (lobbyPlayers) => {
+        this.players = lobbyPlayers
+      })
       // Logica per unirsi a una lobby
     },
     startMultiplayerGame() {
@@ -55,7 +72,7 @@ export default {
     <div class="rounded-box lobby-container">
       <button class="back-button" @click="goBack" title="Torna Indietro">&#8592;</button>
       <h1 class="title">Lobby</h1>
-      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>
+<!--      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>-->
       <div v-show="!showLobbyForm">
       <div v-if="!inLobby">
         <h2 class="subtitle">Crea o Unisciti a una Lobby</h2>

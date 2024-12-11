@@ -57,10 +57,19 @@ module.exports = (io) => {
             }
         });
 
-        socket.on("lobbyName", (name) => {
-            console.log("Received " + name );
-            userController.createLobby(name, socket.id);
+        socket.on("createLobby", () => {
+            console.log("Received "  );
+            const name = userController.createLobby(socket.id);
+            socket.emit("onLobbyCreated", name)
 
+        });
+
+        socket.on("joinLobby", (name) => {
+            if (userController.joinLobby(name, socket.id)) {
+                socket.emit('lobbyPlayers', userController.getPlayersOfLobby(name));
+            } else {
+                socket.emit("joinLobby", "Not valid")
+            }
         });
 
         socket.on("lobbyPlayers", (lobbyName) => {
