@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 const socket = io('http://localhost:5000', {
   reconnection: true,
 });
-
+socket.username = "";
 socket.on('connect', () => {
   console.log('Connesso al server!');
 });

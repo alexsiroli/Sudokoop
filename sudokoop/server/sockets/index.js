@@ -8,6 +8,7 @@ module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('Nuovo client connesso:', socket.id);
 
+        socket.on("username", (username) => socket.username = username)
         // Quando un giocatore avvia una nuova partita
         socket.on('startGame', (difficolta) => {
             // Verifica la difficoltà fornita o imposta 'easy' di default
@@ -59,14 +60,15 @@ module.exports = (io) => {
 
         socket.on("createLobby", () => {
             console.log("Received "  );
-            const name = userController.createLobby(socket.id);
+            const name = userController.createLobby(socket.username);
+            console.log("username " + socket.username)
             socket.emit("onLobbyCreated", name)
             socket.join(name)
             io.to(name).emit("players", userController.getPlayersOfLobby(name))
         });
 
         socket.on("joinLobby", (name) => {
-            if (userController.joinLobby(name, socket.id)) {
+            if (userController.joinLobby(name, socket.username)) {
                 socket.emit("joinLobby", "Ok")
                 socket.join(name)
                 io.to(name).emit("players", userController.getPlayersOfLobby(name))
