@@ -28,6 +28,9 @@ export default {
           if (res !== "") {
             this.currentLobbyCode = res
             this.inLobby = true;
+            socket.on("players", (lobbyPlayers) => {
+              this.players = lobbyPlayers
+            })
           }
           else {
             console.log("Lobby creation failed");
@@ -35,21 +38,11 @@ export default {
         } )
     },
 
-    onLobbyCreated(lobbyName) {
-      console.log("Created" + lobbyName)
-      this.showLobbyForm = false;
-      this.inLobby = true;
-      this.currentLobbyCode = lobbyName;
-      socket.emit("lobbyPlayers", this.currentLobbyCode)
-      socket.on("lobbyPlayers", (lobbyPlayers) => {
-        this.players = lobbyPlayers
-      })
-    },
     joinLobby() {
       socket.emit("joinLobby", this.lobbyCode);
       this.inLobby = true;
       this.currentLobbyCode = this.lobbyCode;
-      socket.on("lobbyPlayers", (lobbyPlayers) => {
+      socket.on("players", (lobbyPlayers) => {
         this.players = lobbyPlayers
       })
       // Logica per unirsi a una lobby

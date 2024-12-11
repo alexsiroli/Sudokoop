@@ -16,9 +16,11 @@ class UserController {
     createLobby(player) {
         console.log("lobby presenti: " + this.lobbies)
         const lobbyName = this.lobbyNames.pop();
-        this.lobbies += new Lobby(lobbyName, player)
+        this.lobbies.push(new Lobby(lobbyName, player))
         return lobbyName;
     }
+
+
     getPlayersOfLobby(name) {
         const lobby = this.findLobby(name);
         if (lobby === undefined) {

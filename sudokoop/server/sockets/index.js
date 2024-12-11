@@ -61,12 +61,14 @@ module.exports = (io) => {
             console.log("Received "  );
             const name = userController.createLobby(socket.id);
             socket.emit("onLobbyCreated", name)
-
+            socket.join(name)
+            io.to(name).emit("players", userController.getPlayersOfLobby(name))
         });
 
         socket.on("joinLobby", (name) => {
             if (userController.joinLobby(name, socket.id)) {
-                socket.emit('lobbyPlayers', userController.getPlayersOfLobby(name));
+                socket.join(name)
+                io.to(name).emit("players", userController.getPlayersOfLobby(name))
             } else {
                 socket.emit("joinLobby", "Not valid")
             }
