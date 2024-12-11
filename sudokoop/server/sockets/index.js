@@ -67,10 +67,11 @@ module.exports = (io) => {
 
         socket.on("joinLobby", (name) => {
             if (userController.joinLobby(name, socket.id)) {
+                socket.emit("joinLobby", "Ok")
                 socket.join(name)
                 io.to(name).emit("players", userController.getPlayersOfLobby(name))
             } else {
-                socket.emit("joinLobby", "Not valid")
+                socket.emit("joinLobby", "Not exists")
             }
         });
 

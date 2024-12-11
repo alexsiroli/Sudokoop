@@ -1,6 +1,7 @@
 <script>
 import CreateLobby from "./CreateLobby.vue";
 import socket from "../plugins/socket";
+
 export default {
   name: 'Lobby',
   data() {
@@ -13,6 +14,7 @@ export default {
       selectedMode: 'coop',
       selectedDifficulty: 'easy',
       showLobbyForm: false,
+      lobbyCodeIncorrect: false,
     };
   },
   components: {
@@ -21,37 +23,44 @@ export default {
   methods: {
 
     createLobby() {
-      console.log("creating new lobby");
       socket.emit("createLobby");
-      socket.on("onLobbyCreated", (res) =>
-        {
-          if (res !== "") {
-            this.currentLobbyCode = res
-            this.inLobby = true;
-            socket.on("players", (lobbyPlayers) => {
-              this.players = lobbyPlayers
-            })
-          }
-          else {
-            console.log("Lobby creation failed");
-          }
-        } )
+      socket.on("onLobbyCreated", (lobbyCode) => {
+        this.currentLobbyCode = lobbyCode;
+        this.inLobby = true;
+        this.isMaster = true;
+        socket.on("players", (lobbyPlayers) => {
+          this.players = lobbyPlayers
+        })
+      })
     },
 
     joinLobby() {
       socket.emit("joinLobby", this.lobbyCode);
-      this.inLobby = true;
-      this.currentLobbyCode = this.lobbyCode;
-      socket.on("players", (lobbyPlayers) => {
-        this.players = lobbyPlayers
+      socket.on("joinLobby", (res) =>
+      {
+        switch (res) {
+          case "Ok": {
+            this.inLobby = true;
+            this.currentLobbyCode = this.lobbyCode;
+            socket.on("players", (lobbyPlayers) => {
+              this.players = lobbyPlayers
+            });
+            break
+          }
+          case "Not exists": {
+            this.lobbyCodeIncorrect = true;
+          }
+        }
       })
-      // Logica per unirsi a una lobby
+
+
     },
+
     startMultiplayerGame() {
       if (this.selectedMode === 'coop') {
-        this.$router.push({ name: 'CoopGame', query: { difficulty: this.selectedDifficulty } });
+        this.$router.push({name: 'CoopGame', query: {difficulty: this.selectedDifficulty}});
       } else {
-        this.$router.push({ name: 'VersusGame' });
+        this.$router.push({name: 'VersusGame'});
       }
     },
     goBack() {
@@ -65,28 +74,29 @@ export default {
     <div class="rounded-box lobby-container">
       <button class="back-button" @click="goBack" title="Torna Indietro">&#8592;</button>
       <h1 class="title">Lobby</h1>
-<!--      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>-->
+      <!--      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>-->
       <div v-show="!showLobbyForm">
-      <div v-if="!inLobby">
-        <h2 class="subtitle">Crea o Unisciti a una Lobby</h2>
-        <div class="create-lobby">
-          <button @click="createLobby" class="button">Crea Lobby</button>
+        <div v-if="!inLobby">
+          <h2 class="subtitle">Crea o Unisciti a una Lobby</h2>
+          <div class="create-lobby">
+            <button @click="createLobby" class="button">Crea Lobby</button>
+          </div>
+          <div class="join-lobby" style="margin-top:20px;">
+            <input v-model="lobbyCode" placeholder="Inserisci codice lobby" class="input"/>
+            <p class="text-bg-danger" v-show="this.lobbyCodeIncorrect">Non esiste una lobby con questo codice!</p>
+            <button @click="joinLobby" class="button" style="margin-top:10px;">Unisciti</button>
+          </div>
         </div>
-        <div class="join-lobby" style="margin-top:20px;">
-          <input v-model="lobbyCode" placeholder="Inserisci codice lobby" class="input" />
-          <button @click="joinLobby" class="button" style="margin-top:10px;">Unisciti</button>
-        </div>
-      </div>
-      <div v-else>
-        <p class="lobby-code">Codice Lobby: {{ currentLobbyCode }}</p>
-        <div class="players-list">
-          <h3>Giocatori:</h3>
-          <ul>
-            <li v-for="player in players"  class="player-item">
-              {{ player }}
-            </li>
-          </ul>
-        </div>
+        <div v-else>
+          <p class="lobby-code">Codice Lobby: {{ currentLobbyCode }}</p>
+          <div class="players-list">
+            <h3>Giocatori:</h3>
+            <ul>
+              <li v-for="player in players" class="player-item">
+                {{ player }}
+              </li>
+            </ul>
+          </div>
         </div>
         <div v-if="isMaster" class="game-settings">
           <h3 class="subtitle">Impostazioni Partita</h3>
@@ -109,7 +119,7 @@ export default {
             <button @click="startMultiplayerGame" class="button">Avvia Partita</button>
           </div>
         </div>
-    </div>
+      </div>
     </div>
   </div>
 </template>

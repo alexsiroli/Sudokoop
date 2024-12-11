@@ -19,7 +19,7 @@ export default {
 </script>
 
 <template>
-  <form @submit.prevent = "this.sendLobbyName">
+  <form @submit.prevent="this.sendLobbyName">
     <div class="mb-3">
       <label for="lobbyNameTxt" class="form-label">Name of lobby</label>
       <input type="text" class="form-control" id="lobbyNameTxt" v-model="this.lobbyName">
