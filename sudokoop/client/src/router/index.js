@@ -8,8 +8,10 @@ import Lobby from '../views/Lobby.vue';
 import CoopGame from '../views/CoopGame.vue';
 import VersusGame from '../views/VersusGame.vue';
 import CreateLobby  from "../views/CreateLobby.vue";
+import Login from "../views/Login.vue";
 const routes = [
-  { path: '/', name: 'Home', component: Home },
+  { path: '/', name: 'Login', component: Login },
+  { path: '/Home', name: 'Home', component: Home },
   // Rotta per single player: qui l'utente sceglie la difficoltà prima di iniziare
   { path: '/singleplayer', name: 'SinglePlayer', component: SinglePlayer },
   // Rotta di gioco single player effettivo (accetta un query param ?difficulty=easy|medium|hard)
