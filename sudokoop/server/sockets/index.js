@@ -59,17 +59,13 @@ module.exports = (io) => {
             }
         });
 
-        socket.on("registerUser", (name, password) => {
-            axios.post('http://localhost:5000/api/users', {
-                name: name,
-                password: password,
-            })
-                .then(response => {
-                    console.log('Utente creato:', response.data);
-                })
-                .catch(error => {
-                    console.error('Errore:', error.response.data);
-                });
+        socket.on("registerUser", async (name, password) => {
+            try {
+                await axios.post('http://localhost:5000/api/register', {name, password});
+                socket.emit("registerSuccess"); // Successo
+            } catch (error) {
+                socket.emit("registerFailed", error.response.data.error); // Fallimento
+            }
         });
 
         socket.on("createLobby", () => {

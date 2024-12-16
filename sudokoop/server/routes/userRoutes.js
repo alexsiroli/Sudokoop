@@ -5,14 +5,18 @@ const bcrypt = require('bcrypt'); // Utilizzo di bcrypt per la gestione delle pa
 const router = express.Router();
 
 // Crea un nuovo utente
-router.post('/users', async (req, res) => {
+router.post('/register', async (req, res) => {
     const { name, password } = req.body;
     try {
+        // Cerca l'utente per username
+        const user = await User.findOne({ name: name });
+        if (user) {
+            return res.status(401).json({ error: 'Utente già presente. Effettua un login' }); // Utente non trovato
+        }
         const hashedPassword = await bcrypt.hash(password, 10); // '10' è il numero di sali (rounds)
-
         const newUser = new User({ name,  hashedPassword });
         await newUser.save();
-        res.status(201).json(newUser);
+        res.status(201);
     } catch (err) {
         res.status(500).json({ error: 'Errore nel salvataggio dell\'utente' });
     }
