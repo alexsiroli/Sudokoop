@@ -5,15 +5,20 @@ export default {
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      loginError: "",
     }
   },
   methods: {
     onSubmit() {
       console.log(this.username)
       console.log(this.password)
-      socket.emit("username", this.username)
-      this.$router.push({name: 'Home'});
+      socket.emit("login", this.username, this.password)
+      socket.on("loginSuccess",  () =>  {
+        console.log("loginSuccess")
+        this.$router.push({name: 'Home'})
+        });
+      socket.on("loginFailed", (res) => this.loginError = res)
 
     }
   }
@@ -37,6 +42,7 @@ export default {
             Please provide a valid city.
           </div>
         </div>
+        <h3 class="text-bg-danger"> {{this.loginError}} </h3>
         <div class="row">
           <a class="col fs-5">Registrati</a>
           <button type="submit" class="btn btn-primary col">Accedi</button>

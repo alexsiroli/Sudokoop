@@ -3,6 +3,8 @@ const http = require('http');
 const cors = require('cors');
 const socketIo = require('socket.io');
 const connectDB  = require('./db');
+const userRoutes = require('./routes/userRoutes');
+
 require('dotenv').config();
 
 const app = express();
@@ -23,6 +25,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Server è in esecuzione');
 });
+app.use('/api', userRoutes);
 
 // Socket.IO
 require('./sockets')(io);

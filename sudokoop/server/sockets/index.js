@@ -1,4 +1,5 @@
 // Importa la classe Game
+const axios = require('axios')
 const Game = require('../models/Game');
 const UserController = require('../controllers/UserController');
 module.exports = (io) => {
@@ -58,6 +59,19 @@ module.exports = (io) => {
             }
         });
 
+        socket.on("registerUser", (name, password) => {
+            axios.post('http://localhost:5000/api/users', {
+                name: name,
+                password: password,
+            })
+                .then(response => {
+                    console.log('Utente creato:', response.data);
+                })
+                .catch(error => {
+                    console.error('Errore:', error.response.data);
+                });
+        });
+
         socket.on("createLobby", () => {
             console.log("Received "  );
             const name = userController.createLobby(socket.username);
@@ -65,6 +79,16 @@ module.exports = (io) => {
             socket.emit("onLobbyCreated", name)
             socket.join(name)
             io.to(name).emit("players", userController.getPlayersOfLobby(name))
+        });
+
+        socket.on("login", async (userName, password) => {
+            try {
+                await axios.post('http://localhost:5000/api/login', {userName, password});
+                socket.emit("loginSuccess"); // Successo
+            } catch (error) {
+                console.log("loginFailed")
+                socket.emit("loginFailed", error.response.data.error); // Fallimento
+            }
         });
 
         socket.on("joinLobby", (name) => {
