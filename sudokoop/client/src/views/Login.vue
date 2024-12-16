@@ -29,7 +29,6 @@ export default {
         <div class="mb-3">
           <input type="text" v-model="this.username" id="usernameInput" class="form-control" placeholder="Username"
                  required>
-
         </div>
         <div class="mb-3">
           <input type="password" v-model="this.password" id="passwordInput" class="form-control" placeholder="Password"

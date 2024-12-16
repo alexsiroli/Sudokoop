@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const socketIo = require('socket.io');
+const connectDB  = require('./db');
 require('dotenv').config();
 
 const app = express();
@@ -13,6 +14,7 @@ const io = socketIo(server, {
   },
 });
 
+connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
