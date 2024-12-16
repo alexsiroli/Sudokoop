@@ -1,0 +1,16 @@
+FROM node:18
+
+# Imposta la working directory nel container
+WORKDIR /app
+
+# Copia i file del server
+COPY ./server /app
+
+# Installa le dipendenze del server
+RUN npm install
+
+# Espone la porta (ad esempio 3000 se il tuo server gira su 3000)
+EXPOSE 5000
+
+# Comando di start del server
+CMD ["npm", "start"]
