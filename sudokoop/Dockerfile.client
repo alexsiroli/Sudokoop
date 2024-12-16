@@ -1,0 +1,17 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY ./client /app
+
+RUN npm install
+RUN npm run build
+
+# Usa un semplice server statico per il frontend
+# Installiamo serve per servire i file statici della build Vue
+RUN npm install -g serve
+
+# Porta 8080, se vuoi servire il frontend su questa porta
+EXPOSE 8080
+
+CMD ["serve", "-s", "dist", "-l", "8080"]
