@@ -73,9 +73,9 @@ export default {
       }
     },
     goToHome() {
-      window.location.href = 'http://localhost:8080/';
-    },
+      window.location.href = 'http://localhost:8080/Home';
   },
+},
   mounted() {
     const diff = this.$route.query.difficulty;
     if (['easy', 'medium', 'hard'].includes(diff)) {
