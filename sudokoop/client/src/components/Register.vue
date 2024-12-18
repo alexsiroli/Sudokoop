@@ -14,6 +14,7 @@ export default {
   },
   methods: {
     onSubmit() {
+      this.registerError = ""
       if (this.password !== this.confirmPassword) {
         this.confirmPasswordError = "Le password non sono uguali"
       }
@@ -22,6 +23,7 @@ export default {
         socket.on("registerSuccess", () => {
           console.log("Registrazione a buon fine")
           this.$router.push({name: 'Home'})
+          socket.emit("username", this.username)
         });
         socket.on("registerFailed", (res) => this.registerError = res)
       }

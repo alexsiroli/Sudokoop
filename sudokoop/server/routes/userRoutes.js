@@ -9,6 +9,8 @@ router.post('/register', async (req, res) => {
     const { name, password } = req.body;
     try {
         // Cerca l'utente per usern
+        console.log("name "+ name)
+        console.log("password" + password)
         const user = await User.findOne({ userName: name });
         console.log("cerco user" + user)
         if (user) {
@@ -16,9 +18,12 @@ router.post('/register', async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10); // '10' è il numero di sali (rounds)
         console.log("hashedPass" + hashedPassword)
-        const newUser = new User({ userName: name, password: hashedPassword });
-        await newUser.save();
-        res.status(201);
+        const newUser = await User.create({
+            userName: name,
+            password: password,
+        });
+        console.log("utenten registrato")
+        return res.status(200).json(newUser);
     } catch (err) {
         console.error('Errore durante il salvataggio dell\'utente:', err); // Log dettagliato nel terminale
         res.status(500).json({ error: 'Errore nel salvataggio dell\'utente', details: err.message });

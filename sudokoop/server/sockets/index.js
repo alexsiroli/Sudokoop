@@ -62,10 +62,16 @@ module.exports = (io) => {
         socket.on("registerUser", async (name, password) => {
             console.log("registro user " + name + password)
             try {
-                await axios.post('http://localhost:5000/api/register', {name, password});
-                socket.emit("registerSuccess"); // Successo
+                await axios.post('http://localhost:5000/api/register', { name, password });
+                // Se la richiesta ha successo
+                console.log("Utente registrato con successo");
+                socket.emit("registerSuccess");
+
             } catch (error) {
-                socket.emit("registerFailed", error.response.data.error); // Fallimento
+                // Gestione degli errori
+                const errorMessage = error.response?.data?.error || "Errore imprevisto durante la registrazione.";
+                socket.emit("registerFailed", errorMessage);
+                console.error("Errore durante la registrazione dell'utente:", errorMessage);
             }
         });
 

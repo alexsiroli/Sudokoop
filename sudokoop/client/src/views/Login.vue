@@ -17,6 +17,7 @@ export default {
       socket.emit("login", this.username, this.password)
       socket.on("loginSuccess",  () =>  {
         console.log("loginSuccess")
+        socket.emit("username", this.username)
         this.$router.push({name: 'Home'})
         });
       socket.on("loginFailed", (res) => this.loginError = res)
