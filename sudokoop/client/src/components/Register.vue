@@ -2,6 +2,7 @@
 import socket from "../plugins/socket";
 
 export default {
+  props: ["turnBack"],
   data() {
     return {
       username: "",
@@ -19,6 +20,7 @@ export default {
       else {
         socket.emit("registerUser", this.username, this.password)
         socket.on("registerSuccess", () => {
+          console.log("Registrazione a buon fine")
           this.$router.push({name: 'Home'})
         });
         socket.on("registerFailed", (res) => this.registerError = res)
@@ -29,7 +31,9 @@ export default {
 </script>
 
 <template>
-      <h3>Register</h3>
+  <button class="back-button" @click="this.turnBack" title="Torna Indietro">&#8592;</button>
+
+  <h3>Register</h3>
       <form @submit.prevent="onSubmit()">
         <div class="mb-3">
           <input type="text" v-model="this.username" id="usernameInput" class="form-control" placeholder="Username"

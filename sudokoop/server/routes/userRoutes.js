@@ -8,17 +8,20 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     const { name, password } = req.body;
     try {
-        // Cerca l'utente per username
-        const user = await User.findOne({ name: name });
+        // Cerca l'utente per usern
+        const user = await User.findOne({ userName: name });
+        console.log("cerco user" + user)
         if (user) {
             return res.status(401).json({ error: 'Utente già presente. Effettua un login' }); // Utente non trovato
         }
         const hashedPassword = await bcrypt.hash(password, 10); // '10' è il numero di sali (rounds)
-        const newUser = new User({ name,  hashedPassword });
+        console.log("hashedPass" + hashedPassword)
+        const newUser = new User({ userName: name, password: hashedPassword });
         await newUser.save();
         res.status(201);
     } catch (err) {
-        res.status(500).json({ error: 'Errore nel salvataggio dell\'utente' });
+        console.error('Errore durante il salvataggio dell\'utente:', err); // Log dettagliato nel terminale
+        res.status(500).json({ error: 'Errore nel salvataggio dell\'utente', details: err.message });
     }
 });
 // Route per ottenere tutti gli utenti
@@ -38,7 +41,7 @@ router.post('/login', async (req, res) => {
     console.log("try login of " + userName + password)
     try {
         // Cerca l'utente per username
-        const user = await User.findOne({ name: userName });
+        const user = await User.findOne({ userName: userName });
         if (!user) {
             return res.status(401).json({ error: 'Username non trovato' }); // Utente non trovato
         }

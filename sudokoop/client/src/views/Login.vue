@@ -21,6 +21,9 @@ export default {
         });
       socket.on("loginFailed", (res) => this.loginError = res)
 
+    },
+    hidRegister() {
+      this.register = false
     }
   },
   components: {
@@ -33,7 +36,7 @@ export default {
   <div class="centered-container">
     <div class="rounded-box lobby-container">
       <h1 class="title">SudoKoop</h1>
-      <RegisterComponent v-if="this.register"></RegisterComponent>
+      <RegisterComponent v-if="this.register" :turnBack="this.hidRegister"></RegisterComponent>
       <div v-else>
       <h3>Login</h3>
       <form @submit.prevent="onSubmit()">

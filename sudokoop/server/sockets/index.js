@@ -60,6 +60,7 @@ module.exports = (io) => {
         });
 
         socket.on("registerUser", async (name, password) => {
+            console.log("registro user " + name + password)
             try {
                 await axios.post('http://localhost:5000/api/register', {name, password});
                 socket.emit("registerSuccess"); // Successo
