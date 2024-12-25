@@ -73,8 +73,8 @@ export default {
       }
     },
     goToHome() {
-      window.location.href = 'http://localhost:8080/Home';
-  },
+      this.$router.push('/home');
+    },
 },
   mounted() {
     const diff = this.$route.query.difficulty;

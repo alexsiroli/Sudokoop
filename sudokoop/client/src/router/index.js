@@ -9,6 +9,8 @@ import CoopGame from '../views/CoopGame.vue';
 import VersusGame from '../views/VersusGame.vue';
 import CreateLobby  from "../views/CreateLobby.vue";
 import Login from "../views/Login.vue";
+import Register from '../views/Register.vue';
+
 const routes = [
   { path: '/', name: 'Login', component: Login },
   { path: '/Home', name: 'Home', component: Home },
@@ -21,9 +23,8 @@ const routes = [
   // Rotte per le modalità multiplayer vere e proprie
   { path: '/coopgame', name: 'CoopGame', component: CoopGame },
   { path: '/versusgame', name: 'VersusGame', component: VersusGame },
-  // Rotta vecchia per multiplayer (puoi rimuoverla o mantenerla)
-  { path: '/multiplayer', name: 'Multiplayer', component: Multiplayer },
   {path: '/createLobby', name: 'CreateLobby', component: CreateLobby },
+  { path: '/register', name: 'Register', component: Register },
 ];
 
 const router = createRouter({
