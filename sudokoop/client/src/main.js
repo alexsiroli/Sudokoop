@@ -3,9 +3,10 @@ import App from './App.vue';
 import router from './router';
 import axios from 'axios';
 
-import '@/assets/main.css';
+import './assets/main.css';
 
-axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+axios.defaults.baseURL = 'http://localhost:5000/api';
 
 createApp(App).use(router).mount('#app');
+
 export default axios;

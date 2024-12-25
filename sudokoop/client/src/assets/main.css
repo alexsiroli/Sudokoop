@@ -1,9 +1,11 @@
-/* main.css */
+/* ===================================
+   main.css
+   (Stili specifici e override)
+   =================================== */
 
 /* Import delle variabili e regole di base */
 @import 'base.css';
 
-/* Stili già presenti in main.css */
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -25,25 +27,16 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-}
-
+/* =========================================
+   Variabili generiche per i tuoi stili extra
+   ========================================= */
 :root {
   --bg-color: var(--color-background);
-  --box-bg-color: #ffffff;
-  --border-color: #000;
+  --box-bg-color: var(--color-background-soft);
+  --border-color: #444;  /* leggermente più scuro per dark mode */
   --primary-color: #007bff;
   --primary-dark: #0056b3;
-  --text-color: #333;
+  --text-color: var(--color-text);
   --error-color: #f8d7da;
   --success-color: #d4edda;
 }
@@ -53,7 +46,8 @@ a,
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  /* Altezza full viewport (al netto di possibili offset) */
+  min-height: 100vh;
   padding: 20px;
 }
 
@@ -83,7 +77,6 @@ a,
   margin-bottom: 30px;
   font-weight: bold;
 }
-
 .subtitle {
   font-size: 1.8em;
   margin-bottom: 30px;
@@ -124,7 +117,7 @@ a,
   padding: 0;
 }
 .back-button:hover {
-  background-color: #eaeaea;
+  background-color: var(--color-background-mute);
 }
 
 /* Input e select */
@@ -172,4 +165,3 @@ a,
   background-color: var(--primary-dark);
   transform: scale(1.05);
 }
-
