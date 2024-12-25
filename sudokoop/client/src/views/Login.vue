@@ -1,89 +1,73 @@
+<template>
+  <div class="centered-container">
+    <div class="rounded-box">
+      <h2>Login</h2>
+      <form @submit.prevent="onSubmit">
+        <div class="mb-3">
+          <input
+            type="text"
+            v-model="username"
+            placeholder="Username"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <input
+            type="password"
+            v-model="password"
+            placeholder="Password"
+            required
+          />
+        </div>
+        <p class="text-bg-danger">{{ loginError }}</p>
+        <button type="submit" class="button">Accedi</button>
+      </form>
+      <p>
+        Non hai un account?
+        <a @click="goRegister" style="cursor: pointer;">Registrati</a>
+      </p>
+    </div>
+  </div>
+</template>
+
 <script>
 import axios from "../main.js";
-import RegisterComponent from "../components/Register.vue";
+import socket from "../plugins/socket.js";
 
 export default {
   data() {
     return {
       username: "",
       password: "",
-      loginError: "",
-      register: false // toggle per mostrare/nascondere il form di registrazione
+      loginError: ""
     };
   },
   methods: {
     async onSubmit() {
       try {
-        // Chiamata REST al backend per il login
+        // Chiamata REST
         await axios.post("/login", {
           userName: this.username,
           password: this.password
         });
-        console.log("loginSuccess");
+        // Se ok
+        console.log("Login riuscito");
+        // Emetti l'username al socket
+        socket.emit("username", this.username);
+        // Passa alla Home (o a Lobby)
         this.$router.push({ name: "Home" });
-      } catch (err) {
-        if (err.response && err.response.data && err.response.data.error) {
-          this.loginError = err.response.data.error;
-        } else {
-          this.loginError = "Errore di login";
-        }
+      } catch (error) {
+        console.log("Login fallito:", error.response?.data?.error);
+        this.loginError = error.response?.data?.error || "Errore imprevisto di login";
       }
     },
-    hidRegister() {
-      this.register = false;
+    goRegister() {
+      this.$router.push({ name: "Register" });
     }
-  },
-  components: {
-    RegisterComponent
   }
 };
 </script>
 
-<template>
-  <div class="centered-container">
-    <div class="rounded-box lobby-container">
-      <h1 class="title">SudoKoop</h1>
-      <!-- Mostra il componente Register se register == true -->
-      <RegisterComponent
-        v-if="register"
-        :turnBack="hidRegister"
-      />
-      <!-- Altrimenti mostra il form di login -->
-      <div v-else>
-        <h3>Login</h3>
-        <form @submit.prevent="onSubmit()">
-          <div class="mb-3">
-            <input
-              type="text"
-              v-model="username"
-              id="usernameInput"
-              class="form-control"
-              placeholder="Username"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <input
-              type="password"
-              v-model="password"
-              id="passwordInput"
-              class="form-control"
-              placeholder="Password"
-              required
-            />
-          </div>
-          <h3 class="text-bg-danger">{{ loginError }}</h3>
-          <div class="row">
-            <!-- Cliccando su "Registrati", mostriamo il form di registrazione -->
-            <a class="col fs-5" @click="register = true">Registrati</a>
-            <button type="submit" class="btn btn-primary col">Accedi</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-/* Stili specifici del componente, se necessari */
+/* Stili locali */
 </style>

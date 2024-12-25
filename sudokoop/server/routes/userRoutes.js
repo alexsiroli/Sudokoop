@@ -48,22 +48,10 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Password errata" });
         }
 
-        // Se tutto OK
         return res.status(200).json({ message: "Login riuscito" });
     } catch (err) {
         console.error("Errore nel login:", err);
         res.status(500).json({ error: "Errore nel login" });
-    }
-});
-
-// (Opzionale) Rotta per ottenere tutti gli utenti
-router.get("/users", async (req, res) => {
-    try {
-        const users = await User.find();
-        res.status(200).json(users);
-    } catch (err) {
-        console.error("Errore nel recupero degli utenti:", err);
-        res.status(500).json({ error: "Errore nel recupero degli utenti" });
     }
 });
 

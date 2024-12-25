@@ -1,132 +1,120 @@
-<script>
-import CreateLobby from "./CreateLobby.vue";
-import socket from "../plugins/socket";
-
-export default {
-  name: 'Lobby',
-  data() {
-    return {
-      inLobby: false,
-      isMaster: false,
-      lobbyCode: '',
-      currentLobbyCode: '',
-      players: [],
-      selectedMode: 'coop',
-      selectedDifficulty: 'easy',
-      showLobbyForm: false,
-      lobbyCodeIncorrect: false,
-    };
-  },
-  components: {
-    CreateLobby
-  },
-  methods: {
-
-    createLobby() {
-      socket.emit("createLobby");
-      socket.on("onLobbyCreated", (lobbyCode) => {
-        this.currentLobbyCode = lobbyCode;
-        this.inLobby = true;
-        this.isMaster = true;
-        socket.on("players", (lobbyPlayers) => {
-          this.players = lobbyPlayers
-        })
-      })
-    },
-
-    joinLobby() {
-      socket.emit("joinLobby", this.lobbyCode);
-      socket.on("joinLobby", (res) =>
-      {
-        switch (res) {
-          case "Ok": {
-            this.inLobby = true;
-            this.currentLobbyCode = this.lobbyCode;
-            socket.on("players", (lobbyPlayers) => {
-              this.players = lobbyPlayers
-            });
-            break
-          }
-          case "Not exists": {
-            this.lobbyCodeIncorrect = true;
-          }
-        }
-      })
-
-
-    },
-
-    startMultiplayerGame() {
-      if (this.selectedMode === 'coop') {
-        this.$router.push({name: 'CoopGame', query: {difficulty: this.selectedDifficulty}});
-      } else {
-        this.$router.push({name: 'VersusGame'});
-      }
-    },
-    goBack() {
-      this.$router.push('/');
-    }
-  },
-};
-</script>
 <template>
   <div class="centered-container">
-    <div class="rounded-box lobby-container">
-      <button class="back-button" @click="goBack" title="Torna Indietro">&#8592;</button>
-      <h1 class="title">Lobby</h1>
-      <!--      <CreateLobby v-show="showLobbyForm" :onLobbyCreated = "this.onLobbyCreated"></CreateLobby>-->
-      <div v-show="!showLobbyForm">
-        <div v-if="!inLobby">
-          <h2 class="subtitle">Crea o Unisciti a una Lobby</h2>
-          <div class="create-lobby">
-            <button @click="createLobby" class="button">Crea Lobby</button>
-          </div>
-          <div class="join-lobby" style="margin-top:20px;">
-            <input v-model="lobbyCode" placeholder="Inserisci codice lobby" class="input"/>
-            <p class="text-bg-danger" v-show="this.lobbyCodeIncorrect">Non esiste una lobby con questo codice!</p>
-            <button @click="joinLobby" class="button" style="margin-top:10px;">Unisciti</button>
-          </div>
+    <div class="rounded-box">
+      <h1>Lobby</h1>
+      <!-- Se non siamo in lobby, due pulsanti: create e join -->
+      <div v-if="!inLobby">
+        <button @click="createLobby" class="button">Crea Lobby</button>
+        <div style="margin-top:20px;">
+          <input v-model="lobbyCode" class="input" placeholder="Inserisci Codice Lobby" />
+          <button @click="joinLobby" class="button">Unisciti</button>
         </div>
-        <div v-else>
-          <p class="lobby-code">Codice Lobby: {{ currentLobbyCode }}</p>
-          <div class="players-list">
-            <h3>Giocatori:</h3>
-            <ul>
-              <li v-for="player in players" class="player-item">
-                {{ player }}
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div v-if="isMaster" class="game-settings">
-          <h3 class="subtitle">Impostazioni Partita</h3>
-          <div class="select-mode" style="margin-bottom:10px;">
-            <label>Modalità:</label>
-            <select v-model="selectedMode" class="select">
-              <option value="coop">Coop</option>
-              <option value="versus">Versus</option>
-            </select>
-          </div>
-          <div v-if="selectedMode === 'coop'" class="select-difficulty" style="margin-bottom:10px;">
+        <p class="text-bg-danger" v-if="lobbyCodeError">{{ lobbyCodeError }}</p>
+      </div>
+      <!-- Se inLobby -->
+      <div v-else>
+        <p>Codice Lobby: {{ currentLobbyCode }}</p>
+        <h3>Giocatori:</h3>
+        <ul>
+          <li v-for="p in players" :key="p.username">
+            {{ p.username }} <span v-if="p.isMaster"> (Master)</span>
+          </li>
+        </ul>
+        <!-- Bottone avvio, se isMaster -->
+        <div v-if="isMaster">
+          <label>Modalità:</label>
+          <select v-model="selectedMode">
+            <option value="coop">Coop</option>
+            <option value="versus">Versus</option>
+          </select>
+          <div v-if="selectedMode==='coop'">
             <label>Difficoltà:</label>
-            <select v-model="selectedDifficulty" class="select">
+            <select v-model="selectedDifficulty">
               <option value="easy">Facile</option>
               <option value="medium">Medio</option>
               <option value="hard">Difficile</option>
             </select>
           </div>
-          <div class="start-game" style="margin-top:20px;">
-            <button @click="startMultiplayerGame" class="button">Avvia Partita</button>
-          </div>
+          <button @click="startMultiGame">Avvia Partita</button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+import socket from "../plugins/socket.js";
+
+export default {
+  data() {
+    return {
+      inLobby: false,
+      currentLobbyCode: "",
+      players: [], // array di oggetti { username, isMaster }
+      isMaster: false,
+      selectedMode: "coop",
+      selectedDifficulty: "easy",
+      lobbyCodeError: "",
+      lobbyCode: ""
+    };
+  },
+  methods: {
+    createLobby() {
+      socket.emit("createLobby");
+    },
+    joinLobby() {
+      socket.emit("joinLobby", this.lobbyCode);
+    },
+    startMultiGame() {
+      socket.emit("startMultiGame", {
+        lobbyCode: this.currentLobbyCode,
+        mode: this.selectedMode,
+        difficulty: this.selectedDifficulty,
+      });
+    }
+  },
+  mounted() {
+    socket.on("onLobbyCreated", (code) => {
+      this.currentLobbyCode = code;
+      this.inLobby = true;
+      // Il creatore è sempre master, come da server
+      this.isMaster = true;
+    });
+    socket.on("joinLobby", (res) => {
+      if (res === "Ok") {
+        this.currentLobbyCode = this.lobbyCode;
+        this.inLobby = true;
+      } else if (res === "Not exists") {
+        this.lobbyCodeError = "Questa lobby non esiste!";
+      } else if (res === "Full") {
+        this.lobbyCodeError = "Lobby piena (max 10)!";
+      }
+    });
+    // Ricevo players come array di { username, isMaster }
+    socket.on("players", (playersArr) => {
+      this.players = playersArr;
+    });
+    socket.on("gameStarted", (data) => {
+      if (data.mode === "coop") {
+        this.$router.push({ name: 'CoopGame', query: { difficulty: data.difficulty } });
+      } else {
+        this.$router.push({ name: 'VersusGame' });
+      }
+    });
+    socket.on("notMaster", () => {
+      alert("Non sei il master, non puoi avviare la partita!");
+    });
+  },
+  beforeUnmount() {
+    socket.off("onLobbyCreated");
+    socket.off("joinLobby");
+    socket.off("players");
+    socket.off("gameStarted");
+    socket.off("notMaster");
+  },
+};
+</script>
+
 <style scoped>
-.player-item {
-  padding: 5px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
+/* Stili locali */
 </style>
