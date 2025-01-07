@@ -10,7 +10,7 @@ COPY ./server /app
 RUN npm install
 
 # Espone la porta (ad esempio 3000 se il tuo server gira su 3000)
-EXPOSE 5000
+EXPOSE 5001
 
 # Comando di start del server
 CMD ["npm", "start"]

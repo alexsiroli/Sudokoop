@@ -13,7 +13,7 @@ services:
       dockerfile: Dockerfile.server
     container_name: sudokoop-server
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       MONGODB_URI: "mongodb://mongo:27017/sudokoopDB"
       JWT_SECRET: "qualcosa_di_segreto"

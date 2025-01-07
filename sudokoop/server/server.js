@@ -31,7 +31,7 @@ app.use("/api", userRoutes); // /api/register e /api/login
 require('./sockets')(io);
 
 // Avvio server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`Server in ascolto sulla porta ${PORT}`);
 });
