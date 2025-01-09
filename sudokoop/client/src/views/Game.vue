@@ -23,39 +23,69 @@
 </template>
 
 <script>
-import SudokuGrid from '../components/SudokuGrid.vue';
-import socket from '../plugins/socket.js';
+import axios from "../main.js";
+import SudokuGrid from "../components/SudokuGrid.vue";
 
 export default {
-  name: 'Game',
-  components: { SudokuGrid },
+  name: "Game",
+  components: {SudokuGrid},
   data() {
     return {
+      gameId: null,
       sudokuGrid: [],
       vite: 3,
-      message: '',
+      message: "",
       gameOver: false,
-      gameOverMessage: '',
-      difficulty: 'easy',
+      gameOverMessage: "",
+      difficulty: "easy",
     };
   },
   computed: {
     hearts() {
-      const fullHeart = '❤️'; // Cuore rosso
-      return fullHeart.repeat(this.vite);
+      return "❤️".repeat(this.vite);
     },
   },
   methods: {
-    startNewGame() {
+    async startNewGame() {
       this.gameOver = false;
-      this.gameOverMessage = '';
-      this.message = '';
+      this.gameOverMessage = "";
+      this.message = "";
       this.vite = 3;
       this.sudokuGrid = [];
-      socket.emit('startGame', this.difficulty);
+      this.gameId = null;
+
+      try {
+        // Richiesta GET per avviare una nuova partita in Single Player
+        const response = await axios.get(`/game/new?difficulty=${this.difficulty}`);
+        const data = response.data;
+        this.gameId = data.gameId;
+        this.vite = data.vite;
+        this.initializeGrid(data.puzzle);
+      } catch (error) {
+        console.error("Errore nella creazione della partita:", error);
+      }
     },
-    handleCellUpdate(cellData) {
-      socket.emit('cellUpdate', cellData);
+    async handleCellUpdate(cellData) {
+      if (!this.gameId) return;
+      try {
+        // Richiesta POST per inserire un numero nella cella
+        const response = await axios.post("/game/insert", {
+          gameId: this.gameId,
+          row: cellData.row,
+          col: cellData.col,
+          value: cellData.value,
+        });
+        const data = response.data;
+        this.message = data.message || "";
+        this.vite = data.vite;
+        this.initializeGrid(data.puzzle);
+        if (data.gameOver) {
+          this.gameOver = true;
+          this.gameOverMessage = data.message || "Partita terminata.";
+        }
+      } catch (error) {
+        console.error("Errore nell'inserimento del numero:", error);
+      }
     },
     initializeGrid(puzzle) {
       this.sudokuGrid = [];
@@ -65,50 +95,23 @@ export default {
           const index = i * 9 + j;
           const char = puzzle[index];
           row.push({
-            value: char === '-' ? '' : char,
-            readOnly: char !== '-',
+            value: char === "-" ? "" : char,
+            readOnly: char !== "-",
           });
         }
         this.sudokuGrid.push(row);
       }
     },
     goToHome() {
-      this.$router.push('/home');
+      this.$router.push("/home");
     },
-},
+  },
   mounted() {
     const diff = this.$route.query.difficulty;
-    if (['easy', 'medium', 'hard'].includes(diff)) {
+    if (["easy", "medium", "hard"].includes(diff)) {
       this.difficulty = diff;
     }
     this.startNewGame();
-
-    socket.on('gameData', (data) => {
-      this.vite = data.vite;
-      this.initializeGrid(data.puzzle);
-    });
-
-    socket.on('cellResult', (data) => {
-      this.message = data.message;
-      this.vite = data.vite;
-      this.initializeGrid(data.puzzle);
-    });
-
-    socket.on('gameWon', (message) => {
-      this.gameOver = true;
-      this.gameOverMessage = message;
-    });
-
-    socket.on('gameOver', (message) => {
-      this.gameOver = true;
-      this.gameOverMessage = message;
-    });
-  },
-  beforeUnmount() {
-    socket.off('gameData');
-    socket.off('cellResult');
-    socket.off('gameWon');
-    socket.off('gameOver');
   },
 };
 </script>

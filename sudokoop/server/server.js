@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 
 // Import delle rotte REST
 const userRoutes = require('./routes/userRoutes');
+const gameRoutes = require('./routes/gameRoutes');
 
 // Connessione DB
 const connectDB = require('./db');
@@ -25,7 +26,8 @@ app.use(cors());
 app.use(express.json());
 
 // Rotte REST
-app.use("/api", userRoutes); // /api/register e /api/login
+app.use("/api", userRoutes);
+app.use("/api/game", gameRoutes);
 
 // Socket
 require('./sockets')(io);
