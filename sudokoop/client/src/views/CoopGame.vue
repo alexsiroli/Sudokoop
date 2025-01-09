@@ -1,15 +1,3 @@
-<template>
-  <div class="centered-container">
-    <div class="rounded-box coop-game-container">
-      <button class="back-button" @click="goBack" title="Torna alla Lobby">&#8592;</button>
-      <h1 class="title">Coop Game ({{ $route.query.difficulty }})</h1>
-      <div class="lives-container">
-        <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
-      </div>
-      <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
-    </div>
-  </div>
-</template>
 
 <script>
 import SudokuGrid from '../components/SudokuGrid.vue';
@@ -63,3 +51,15 @@ export default {
 <style scoped>
 
 </style>
+<template>
+  <div class="centered-container">
+    <div class="rounded-box coop-game-container">
+      <button class="back-button" @click="goBack" title="Torna alla Lobby">&#8592;</button>
+      <h1 class="title">Coop Game ({{ $route.query.difficulty }})</h1>
+      <div class="lives-container">
+        <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+      </div>
+      <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
+    </div>
+  </div>
+</template>

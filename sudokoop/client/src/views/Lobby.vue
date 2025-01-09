@@ -1,3 +1,81 @@
+
+<script>
+import socket from "../plugins/socket.js";
+
+export default {
+  data() {
+    return {
+      inLobby: false,
+      currentLobbyCode: "",
+      players: [], // array di oggetti { username, isMaster }
+      isMaster: false,
+      selectedMode: "coop",
+      selectedDifficulty: "easy",
+      lobbyCodeError: "",
+      lobbyCode: "",
+      errorOnStart: "",
+    };
+  },
+  methods: {
+    createLobby() {
+      socket.emit("createLobby");
+    },
+    joinLobby() {
+      socket.emit("joinLobby", this.lobbyCode);
+    },
+    startMultiGame() {
+      socket.emit("startMultiGame", {
+        lobbyCode: this.currentLobbyCode,
+        mode: this.selectedMode,
+        difficulty: this.selectedDifficulty,
+      });
+    }
+  },
+  mounted() {
+    socket.on("onLobbyCreated", (code) => {
+      this.currentLobbyCode = code;
+      this.inLobby = true;
+      // Il creatore è sempre master, come da server
+      this.isMaster = true;
+    });
+    socket.on("joinLobby", (res) => {
+      if (res === "Ok") {
+        this.currentLobbyCode = this.lobbyCode;
+        this.errorOnStart = "";
+        this.inLobby = true;
+      } else if (res === "Not exists") {
+        this.lobbyCodeError = "Questa lobby non esiste!";
+      } else if (res === "Full") {
+        this.lobbyCodeError = "Lobby piena (max 10)!";
+      }
+    });
+    // Ricevo players come array di { username, isMaster }
+    socket.on("players", (playersArr) => {
+      this.players = playersArr;
+    });
+    socket.on("gameStarted", (data) => {
+      if (data.mode === "coop") {
+        this.$router.push({ name: 'CoopGame', query: { difficulty: data.difficulty } });
+      } else {
+        this.$router.push({ name: 'VersusGame' });
+      }
+    });
+    socket.on("notEnoughPlayers", () => {
+      this.errorOnStart = "Non ci sono abbastanza giocatori per iniziare la partita"
+    })
+    socket.on("notMaster", () => {
+      alert("Non sei il master, non puoi avviare la partita!");
+    });
+  },
+  beforeUnmount() {
+    socket.off("onLobbyCreated");
+    socket.off("joinLobby");
+    socket.off("players");
+    socket.off("gameStarted");
+    socket.off("notMaster");
+  },
+};
+</script>
 <template>
   <div class="centered-container">
     <div class="rounded-box">
@@ -36,84 +114,12 @@
             </select>
           </div>
           <button @click="startMultiGame">Avvia Partita</button>
+          <p class="text-danger" > {{this.errorOnStart}}</p>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script>
-import socket from "../plugins/socket.js";
-
-export default {
-  data() {
-    return {
-      inLobby: false,
-      currentLobbyCode: "",
-      players: [], // array di oggetti { username, isMaster }
-      isMaster: false,
-      selectedMode: "coop",
-      selectedDifficulty: "easy",
-      lobbyCodeError: "",
-      lobbyCode: ""
-    };
-  },
-  methods: {
-    createLobby() {
-      socket.emit("createLobby");
-    },
-    joinLobby() {
-      socket.emit("joinLobby", this.lobbyCode);
-    },
-    startMultiGame() {
-      socket.emit("startMultiGame", {
-        lobbyCode: this.currentLobbyCode,
-        mode: this.selectedMode,
-        difficulty: this.selectedDifficulty,
-      });
-    }
-  },
-  mounted() {
-    socket.on("onLobbyCreated", (code) => {
-      this.currentLobbyCode = code;
-      this.inLobby = true;
-      // Il creatore è sempre master, come da server
-      this.isMaster = true;
-    });
-    socket.on("joinLobby", (res) => {
-      if (res === "Ok") {
-        this.currentLobbyCode = this.lobbyCode;
-        this.inLobby = true;
-      } else if (res === "Not exists") {
-        this.lobbyCodeError = "Questa lobby non esiste!";
-      } else if (res === "Full") {
-        this.lobbyCodeError = "Lobby piena (max 10)!";
-      }
-    });
-    // Ricevo players come array di { username, isMaster }
-    socket.on("players", (playersArr) => {
-      this.players = playersArr;
-    });
-    socket.on("gameStarted", (data) => {
-      if (data.mode === "coop") {
-        this.$router.push({ name: 'CoopGame', query: { difficulty: data.difficulty } });
-      } else {
-        this.$router.push({ name: 'VersusGame' });
-      }
-    });
-    socket.on("notMaster", () => {
-      alert("Non sei il master, non puoi avviare la partita!");
-    });
-  },
-  beforeUnmount() {
-    socket.off("onLobbyCreated");
-    socket.off("joinLobby");
-    socket.off("players");
-    socket.off("gameStarted");
-    socket.off("notMaster");
-  },
-};
-</script>
 
 <style scoped>
 /* Stili locali */

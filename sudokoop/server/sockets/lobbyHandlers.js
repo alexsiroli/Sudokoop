@@ -37,6 +37,11 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       socket.emit("notMaster");
       return;
     }
+    // se ci sono meno di due giocatori nella lobby, il gioco non può iniziare
+    if (lobbyController.getPlayersOfLobby(lobbyCode).length < 2) {
+      io.to(lobbyCode).emit("notEnoughPlayers");
+      return;
+    }
     io.to(lobbyCode).emit("gameStarted", { mode, difficulty });
   });
 };
