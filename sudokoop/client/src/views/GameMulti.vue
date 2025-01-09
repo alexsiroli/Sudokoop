@@ -4,13 +4,12 @@ import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
 
 export default {
-  name: "Game",
+  props: ['vite', 'puzzle'],
+
   components: { SudokuGrid },
   data() {
     return {
       gameId: null,
-      sudokuGrid: [],
-      vite: 3,
       message: "",
       gameOver: false,
       gameOverMessage: "",
@@ -18,7 +17,8 @@ export default {
       coloredCell: null,
       final: false,
       userFilledCells: null,
-      initialPuzzle: ""
+      initialPuzzle: "",
+      sudokuGrid: []
     };
   },
   computed: {
@@ -27,75 +27,9 @@ export default {
     },
   },
   methods: {
-    async startNewGame() {
-      this.gameOver = false;
-      this.gameOverMessage = "";
-      this.message = "";
-      this.vite = 3;
-      this.sudokuGrid = [];
-      this.gameId = null;
-      this.final = false;
-      this.userFilledCells = null;
 
-      try {
-        const response = await axios.get(`/game/new?difficulty=${this.difficulty}`);
-        const data = response.data;
-        this.gameId = data.gameId;
-        this.vite = data.vite;
-        this.initialPuzzle = data.puzzle;
-        this.initializeGrid(data.puzzle);
-      } catch (error) {
-        console.error("Errore nella creazione della partita:", error);
-      }
-    },
-    async handleCellUpdate(cellData) {
-      if (!this.gameId) return;
-      try {
-        // Resetta il colore della cella errata al nuovo inserimento
-        this.coloredCell = null;
 
-        const response = await axios.post("/game/insert", {
-          gameId: this.gameId,
-          row: cellData.row,
-          col: cellData.col,
-          value: cellData.value,
-        });
-        const data = response.data;
-        this.message = data.message || "";
-        this.vite = data.vite;
 
-        if (data.gameOver) {
-          this.userFilledCells = this.sudokuGrid.map(row =>
-            row.map(cell => !cell.readOnly && cell.value !== '')
-          );
-
-          this.gameOver = true;
-          this.gameOverMessage = data.message || "Partita terminata.";
-          this.final = true;
-          if (data.solution) {
-            this.initializeGridWithSolution(data.puzzle, data.solution);
-          } else {
-            this.initializeGrid(data.puzzle);
-          }
-          if (this.gameOverMessage.startsWith("Hai perso")) {
-            // Le celle mancanti verranno colorate di rosso all'interno di initializeGridWithSolution
-          }
-        } else {
-          this.initializeGrid(data.puzzle);
-          if (data.message.startsWith("Giusto")) {
-            const { row, col } = cellData;
-            if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
-              this.sudokuGrid[row][col].isGreen = true;
-              this.sudokuGrid[row][col].readOnly = true;
-            }
-          } else if (data.message.startsWith("Sbagliato")) {
-            this.coloredCell = { row: cellData.row, col: cellData.col, color: "red" };
-          }
-        }
-      } catch (error) {
-        console.error("Errore nell'inserimento del numero:", error);
-      }
-    },
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -146,11 +80,8 @@ export default {
     },
   },
   mounted() {
-    const diff = this.$route.query.difficulty;
-    if (["easy", "medium", "hard"].includes(diff)) {
-      this.difficulty = diff;
-    }
-    this.startNewGame();
+
+    this.initializeGrid(this.puzzle);
   },
 };
 </script>
@@ -170,7 +101,7 @@ export default {
   <div class="centered-container">
     <div class="rounded-box game-container">
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
-      <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
+      <h1 class="title">Gioco Singolo - Difficoltà: </h1>
 
       <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
       <div v-if="gameOver && gameOverMessage.startsWith('Hai perso')" class="game-over-container">
@@ -184,16 +115,14 @@ export default {
 
         <div class="sudoku-container">
           <sudoku-grid
-            :grid="sudokuGrid"
-            @cell-updated="handleCellUpdate"
-            :coloredCell="coloredCell"
-            :final="final"
+            :grid="this.sudokuGrid"
+
           />
         </div>
 
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
-          <button @click="startNewGame" class="button new-game-button">Inizia una Nuova Partita</button>
+          <button class="button new-game-button">Inizia una Nuova Partita</button>
         </div>
       </div>
     </div>

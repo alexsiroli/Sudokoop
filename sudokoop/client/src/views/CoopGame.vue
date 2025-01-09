@@ -2,10 +2,10 @@
 <script>
 import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
-
+import GameMulti from './GameMulti.vue';
 export default {
   name: 'CoopGame',
-  components: { SudokuGrid },
+  components: { SudokuGrid, GameMulti },
   data() {
     return {
       sudokuGrid: [],
@@ -60,14 +60,5 @@ export default {
 
 </style>
 <template>
-  <div class="centered-container">
-    <div class="rounded-box coop-game-container">
-      <button class="back-button" @click="goBack" title="Torna alla Lobby">&#8592;</button>
-      <h1 class="title">Coop Game</h1>
-      <div class="lives-container">
-        <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
-      </div>
-      <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
-    </div>
-  </div>
+  <GameMulti :vite = this.vite :puzzle = this.sudokuGrid></GameMulti>
 </template>
