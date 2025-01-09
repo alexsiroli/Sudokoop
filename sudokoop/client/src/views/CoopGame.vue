@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       sudokuGrid: [],
-      vite: 3,
+      vite: 0,
     };
   },
   computed: {
@@ -41,9 +41,17 @@ export default {
       this.$router.push({ name: 'Lobby' });
     },
   },
-  mounted() {
-    // Logica per ricevere puzzle e vite (simile a Game.vue)
-    // socket.on('gameData', ...)
+  created() {
+
+    socket.emit('getGame');
+    socket.on("game", (data) => {
+      this.sudokuGrid = data.sudoku;
+      console.log("sudoku  " + this.sudoku)
+      this.vite = data.vite;
+      console.log("vite " + this.vite);
+    })
+
+
   },
 };
 </script>
@@ -55,7 +63,7 @@ export default {
   <div class="centered-container">
     <div class="rounded-box coop-game-container">
       <button class="back-button" @click="goBack" title="Torna alla Lobby">&#8592;</button>
-      <h1 class="title">Coop Game ({{ $route.query.difficulty }})</h1>
+      <h1 class="title">Coop Game</h1>
       <div class="lives-container">
         <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
       </div>

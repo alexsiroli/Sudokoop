@@ -1,3 +1,5 @@
+const gameController = require("./gameController");
+
 class LobbyController {
     constructor() {
         this.lobbies = [];
@@ -13,6 +15,7 @@ class LobbyController {
         this.lobbies.push(newLobby);
         return newLobby;
     }
+
 
     findLobby(code) {
         return this.lobbies.find((l) => l.code === code);

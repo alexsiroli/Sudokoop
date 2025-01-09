@@ -53,12 +53,15 @@ export default {
     socket.on("players", (playersArr) => {
       this.players = playersArr;
     });
-    socket.on("gameStarted", (data) => {
-      if (data.mode === "coop") {
-        this.$router.push({ name: 'CoopGame', query: { difficulty: data.difficulty } });
+    socket.on("gameStarted", mode => {
+
+      if (mode === "coop") {
+        this.$router.push({ name: 'CoopGame'});
       } else {
         this.$router.push({ name: 'VersusGame' });
       }
+
+
     });
     socket.on("notEnoughPlayers", () => {
       this.errorOnStart = "Non ci sono abbastanza giocatori per iniziare la partita"
