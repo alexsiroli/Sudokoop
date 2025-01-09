@@ -46,7 +46,6 @@ a,
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Altezza full viewport (al netto di possibili offset) */
   min-height: 100vh;
   padding: 20px;
 }
@@ -69,6 +68,10 @@ a,
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.rounded-box input {
+  border-radius: 0;
 }
 
 /* Titoli e testo */
@@ -133,20 +136,6 @@ a,
   margin-bottom: 20px;
 }
 
-/* Messaggi di stato */
-.last-correct {
-  background-color: var(--success-color);
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-.last-incorrect {
-  background-color: var(--error-color);
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-
 /* Link stile pulsante */
 .router-link-button {
   display: inline-block;
@@ -164,4 +153,20 @@ a,
 .router-link-button:hover {
   background-color: var(--primary-dark);
   transform: scale(1.05);
+}
+
+/* Stili per celle corrette e sbagliate */
+.cell-readonly.cell-correct input {
+  background-color: lightgreen;
+  transition: background-color 0.3s ease;
+}
+
+.cell-incorrect input {
+  background-color: lightcoral;
+  transition: background-color 0.3s ease;
+}
+
+/* Stile comune per .hearts */
+.hearts {
+  font-size: 1.5em;
 }

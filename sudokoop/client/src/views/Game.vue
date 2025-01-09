@@ -12,7 +12,11 @@
           <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
         </div>
         <div class="sudoku-container">
-          <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
+          <sudoku-grid
+            :grid="sudokuGrid"
+            @cell-updated="handleCellUpdate"
+            :coloredCell="coloredCell"
+          />
         </div>
         <div class="message-container">
           <p>{{ message }}</p>
@@ -38,6 +42,7 @@ export default {
       gameOver: false,
       gameOverMessage: "",
       difficulty: "easy",
+      coloredCell: null,  // nuova proprietà per tracciare la cella colorata
     };
   },
   computed: {
@@ -53,9 +58,9 @@ export default {
       this.vite = 3;
       this.sudokuGrid = [];
       this.gameId = null;
+      this.coloredCell = null;  // resetta la cella colorata
 
       try {
-        // Richiesta GET per avviare una nuova partita in Single Player
         const response = await axios.get(`/game/new?difficulty=${this.difficulty}`);
         const data = response.data;
         this.gameId = data.gameId;
@@ -68,7 +73,6 @@ export default {
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
       try {
-        // Richiesta POST per inserire un numero nella cella
         const response = await axios.post("/game/insert", {
           gameId: this.gameId,
           row: cellData.row,
@@ -78,7 +82,18 @@ export default {
         const data = response.data;
         this.message = data.message || "";
         this.vite = data.vite;
+
+        // Imposta coloredCell in base al messaggio ricevuto
+        if (data.message.startsWith("Giusto")) {
+          this.coloredCell = {row: cellData.row, col: cellData.col, color: "green"};
+        } else if (data.message.startsWith("Sbagliato")) {
+          this.coloredCell = {row: cellData.row, col: cellData.col, color: "red"};
+        } else {
+          this.coloredCell = null;
+        }
+
         this.initializeGrid(data.puzzle);
+
         if (data.gameOver) {
           this.gameOver = true;
           this.gameOverMessage = data.message || "Partita terminata.";
@@ -121,10 +136,6 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
-}
-
-.hearts {
-  font-size: 1.5em;
 }
 
 .message-container {

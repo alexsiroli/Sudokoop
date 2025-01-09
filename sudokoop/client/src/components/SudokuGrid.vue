@@ -6,7 +6,12 @@
         <td
           v-for="(cell, colIndex) in row"
           :key="colIndex"
-          :class="[getCellClass(rowIndex, colIndex)]"
+          :class="[
+              getCellClass(rowIndex, colIndex),
+              coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex
+                ? (coloredCell.color === 'green' ? 'cell-correct' : 'cell-incorrect')
+                : ''
+            ]"
         >
           <input
             type="text"
@@ -28,6 +33,7 @@ export default {
   name: 'SudokuGrid',
   props: {
     grid: { type: Array, required: true },
+    coloredCell: { type: Object, default: null }  // nuova prop per cella colorata
   },
   data() {
     return {
@@ -46,7 +52,6 @@ export default {
         this.grid[rowIndex][colIndex].value = '';
         return;
       }
-
       const cellData = { row: rowIndex, col: colIndex, value: parseInt(value, 10) };
       this.$emit('cell-updated', cellData);
     },
@@ -90,6 +95,8 @@ td {
   height: 50px;
   text-align: center;
   position: relative;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
 input {
@@ -97,8 +104,13 @@ input {
   height: 100%;
   text-align: center;
   font-size: 1.4em;
-  border: none;
+  border: 1px solid #ccc;
   outline: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+  background-color: white;
 }
 
 .cell-border-right {
@@ -113,4 +125,6 @@ input {
   background-color: #eaeaea;
   font-weight: bold;
 }
+
+
 </style>

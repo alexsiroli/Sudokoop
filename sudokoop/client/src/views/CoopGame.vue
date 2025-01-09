@@ -61,13 +61,5 @@ export default {
 </script>
 
 <style scoped>
-.lives-container {
-  margin-bottom: 20px;
-  font-size: 1.2em;
-  font-weight: bold;
-}
 
-.hearts {
-  font-size: 1.5em;
-}
 </style>
