@@ -38,6 +38,7 @@ const gameController = {
             delete activeGames[gameId];
             return res.status(200).json({
                 puzzle: currentGame.sudoku.puzzle,
+                solution: currentGame.sudoku.solution,
                 vite: currentGame.vite,
                 message: 'Hai vinto!',
                 gameOver: true,
@@ -48,6 +49,7 @@ const gameController = {
             delete activeGames[gameId];
             return res.status(200).json({
                 puzzle: currentGame.sudoku.puzzle,
+                solution: currentGame.sudoku.solution,
                 vite: currentGame.vite,
                 message: result,
                 gameOver: true,

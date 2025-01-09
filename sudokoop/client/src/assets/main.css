@@ -156,12 +156,14 @@ a,
 }
 
 /* Stili per celle corrette e sbagliate */
+.cell-correct input,
 .cell-readonly.cell-correct input {
   background-color: lightgreen;
   transition: background-color 0.3s ease;
 }
 
-.cell-incorrect input {
+.cell-incorrect input,
+.cell-readonly.cell-incorrect input {
   background-color: lightcoral;
   transition: background-color 0.3s ease;
 }

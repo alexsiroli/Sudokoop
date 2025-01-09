@@ -8,9 +8,10 @@
           :key="colIndex"
           :class="[
               getCellClass(rowIndex, colIndex),
-              coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex
-                ? (coloredCell.color === 'green' ? 'cell-correct' : 'cell-incorrect')
-                : ''
+              cell.isGreen ? 'sp-green' :
+                (final && cell.isRed ? 'sp-red' :
+                  (!final && coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex && coloredCell.color === 'red' ? 'sp-red' : '')
+                )
             ]"
         >
           <input
@@ -18,7 +19,6 @@
             maxlength="1"
             v-model="cell.value"
             :disabled="cell.readOnly"
-            :class="getLastCellClass(rowIndex, colIndex)"
             @input="onCellInput(rowIndex, colIndex, cell.value)"
           />
         </td>
@@ -33,7 +33,8 @@ export default {
   name: 'SudokuGrid',
   props: {
     grid: { type: Array, required: true },
-    coloredCell: { type: Object, default: null }  // nuova prop per cella colorata
+    coloredCell: { type: Object, default: null },
+    final: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -69,7 +70,7 @@ export default {
       }
       return '';
     },
-  },
+  }
 };
 </script>
 
@@ -126,5 +127,12 @@ input {
   font-weight: bold;
 }
 
+/* Stili specifici per Single Player */
+.sp-green input {
+  background-color: lightgreen;
+}
 
+.sp-red input {
+  background-color: lightcoral;
+}
 </style>
