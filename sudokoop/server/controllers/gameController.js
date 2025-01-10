@@ -1,31 +1,44 @@
+// server/src/controllers/gameController.js
 const Game = require('../models/Game');
+const Leaderboard = require('../models/Leaderboard');
 
 // Mappa in memoria per associare gameId alle istanze di Game
 const activeGames = {};
-// array in memoria: [{ username, milliseconds, difficulty }, ...]
-let leaderboard = [];
 
 const gameController = {
-    // Funzione per generare un gameId basato sul timestamp
-    generateGameId: () => {
-        return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-    },
 
-    saveTime: (req, res) => {
+    // Salva il tempo su DB
+    saveTime: async (req, res) => {
         const { username, milliseconds, difficulty } = req.body;
         if (!username || !milliseconds) {
             return res.status(400).json({ error: "Dati insufficienti" });
         }
-        leaderboard.push({ username, milliseconds, difficulty });
-        // Ordina per tempo crescente
-        leaderboard.sort((a, b) => a.milliseconds - b.milliseconds);
+        try {
+            // Crea un nuovo record Leaderboard e salva
+            const record = new Leaderboard({
+                username,
+                milliseconds,
+                difficulty
+            });
+            await record.save();
 
-        return res.status(200).json({ message: "Tempo salvato" });
+            return res.status(200).json({ message: "Tempo salvato su DB" });
+        } catch (err) {
+            console.error("Errore salvataggio tempo:", err);
+            return res.status(500).json({ error: "Errore interno nel salvataggio" });
+        }
     },
 
-    getLeaderboard: (req, res) => {
-        // Restituisce l'intero array ordinato
-        res.status(200).json(leaderboard);
+    // Recupera la leaderboard dal DB
+    getLeaderboard: async (req, res) => {
+        try {
+            // Trova tutti i record, ordina per tempo crescente
+            const records = await Leaderboard.find().sort({ milliseconds: 1 });
+            res.status(200).json(records);
+        } catch (err) {
+            console.error("Errore recupero leaderboard:", err);
+            res.status(500).json({ error: "Errore nel recupero della leaderboard" });
+        }
     },
 
     // Endpoint per avviare una nuova partita
@@ -81,6 +94,10 @@ const gameController = {
             message: result,
             gameOver: false,
         });
+    },
+
+    generateGameId: () => {
+        return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     },
 };
 
