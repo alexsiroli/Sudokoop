@@ -30,5 +30,5 @@ export default {
 
 </style>
 <template>
-  <GameMulti v-if="this.isInitialized" :vite ="vite" :puzzle="sudokuGrid"></GameMulti>
+  <GameMulti v-if="this.isInitialized" :initialVite ="vite" :puzzle="sudokuGrid"></GameMulti>
 </template>

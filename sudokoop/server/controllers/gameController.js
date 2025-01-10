@@ -43,6 +43,42 @@ const gameController = {
         return new Game(difficulty);
     },
 
+    insertNumberMulti: (cellData, lobbyCode) => {
+        // recupero il gioco e chiamo l insert
+        const game = gameController.getGameOfLobby(lobbyCode);
+        const result = game.insertNumber(cellData.row, cellData.col, cellData.value);
+
+        if (result === undefined) {
+
+            return ({
+                puzzle: game.sudoku.puzzle,
+                solution: game.sudoku.solution,
+                vite: game.vite,
+                message: 'Hai vinto!',
+                gameOver: true,
+            });
+        }
+
+        if (result === 'Hai perso! Vite terminate.') {
+            return ({
+                puzzle: game.sudoku.puzzle,
+                solution: game.sudoku.solution,
+                vite: game.vite,
+                message: result,
+                gameOver: true,
+            });
+        }
+
+        return ({
+            puzzle: game.sudoku.puzzle,
+            cellData: cellData,
+            vite: game.vite,
+            message: result,
+            gameOver: false,
+        });
+    },
+
+
     // Endpoint per inserire un numero in una cella
     insertNumber: (req, res) => {
         const { gameId, row, col, value } = req.body;

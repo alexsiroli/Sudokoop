@@ -6,7 +6,7 @@ module.exports = function registerGameHandlers(socket, io) {
 
   socket.on("getGame", () => {
     console.log("Code " + socket.lobbyCode)
-    socket.to( socket.lobbyCode).emit("game",
+    io.to( socket.lobbyCode).emit("game",
         {
           vite: gameController.getGameOfLobby( socket.lobbyCode).vite,
           sudoku: gameController.getGameOfLobby( socket.lobbyCode).sudoku.puzzle,
@@ -25,6 +25,12 @@ module.exports = function registerGameHandlers(socket, io) {
       vite: game.vite,
       emptyPlace: game.emptyPlace,
     });
+  });
+
+  socket.on('cellUpdateMulti', (cellData) => {
+    const result = gameController.insertNumberMulti(cellData, socket.lobbyCode);
+    console.log("result after update " + result);
+    io.to(socket.lobbyCode).emit("afterUpdating", result);
   });
 
   // Aggiornamento cella

@@ -2,9 +2,10 @@
 <script>
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
+import socket from "../plugins/socket";
 
 export default {
-  props: ['vite', 'puzzle'],
+  props: ['initialVite', 'puzzle'],
 
   components: { SudokuGrid },
   data() {
@@ -17,8 +18,9 @@ export default {
       coloredCell: null,
       final: false,
       userFilledCells: null,
-      initialPuzzle: "",
-      sudokuGrid: []
+      sudokuGrid: [],
+      vite: 0,
+
     };
   },
   computed: {
@@ -28,8 +30,6 @@ export default {
   },
   methods: {
     initializeGrid(puzzle) {
-      console.log("puzzle sopra " ,this.puzzle);
-      console.log("puzzle passato " , puzzle);
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
         const row = [];
@@ -47,9 +47,18 @@ export default {
         newGrid.push(row);
       }
       this.sudokuGrid = newGrid;
-
-      console.log("sudokuGrid " , this.sudokuGrid);
     },
+
+    // inserimento di un valore
+    handleCellUpdate(cellData) {
+      // Resetta il colore della cella errata al nuovo inserimento
+      this.coloredCell = null;
+      console.log("handleCellUpdate", cellData);
+        // dico al server che ho inserito
+      socket.emit("cellUpdateMulti", cellData);
+
+    },
+
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
       this.sudokuGrid = [];
@@ -81,9 +90,37 @@ export default {
       this.$router.push("/home");
     },
   },
+
   mounted() {
     console.log("puzzle : " + this.puzzle);
+    this.vite = this.initialVite;
     this.initializeGrid(this.puzzle);
+
+    socket.on("afterUpdating", (data) => {
+      console.log("afterUpdating ", data);
+      // aggiorna vite
+      this.vite = data.vite;
+      if (data.gameOver) {
+        // avviso sudokugrid
+        this.final = true;
+        this.gameOver = true;
+        this.gameOverMessage = data.message;
+      } else {
+        this.initializeGrid(data.puzzle)
+        if (data.message.startsWith("Giusto")) {
+           const { row, col } = data.cellData;
+          if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
+            this.sudokuGrid[row][col].isGreen = true;
+            this.sudokuGrid[row][col].readOnly = true;
+          }
+        } else if (data.message.startsWith("Sbagliato")) {
+          this.coloredCell = { row: data.cellData.row, col: data.cellData.col, color: "red" };
+
+
+        }
+      }
+
+    });
   },
 };
 </script>
@@ -103,11 +140,11 @@ export default {
   <div class="centered-container">
     <div class="rounded-box game-container">
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
-      <h1 class="title">Gioco Singolo - Difficoltà: </h1>
+      <h1 class="title">Gioco Multiplayer </h1>
 
       <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
-      <div v-if="gameOver && gameOverMessage.startsWith('Hai perso')" class="game-over-container">
-        <p class="game-over-message">{{ gameOverMessage }}</p>
+      <div v-if="gameOver" class="game-over-container">
+        <p class="game-over-message"> {{this.gameOverMessage}}</p>
       </div>
 
       <div class="game-content">
@@ -116,7 +153,10 @@ export default {
         </div>
 
         <div class="sudoku-container">
-          <sudoku-grid :grid="sudokuGrid" />
+          <sudoku-grid :grid="sudokuGrid"
+                       @cell-updated="handleCellUpdate"
+                       :coloredCell="coloredCell"
+          />
 
         </div>
 
