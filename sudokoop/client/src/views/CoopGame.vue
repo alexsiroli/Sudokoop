@@ -8,50 +8,20 @@ export default {
   components: { SudokuGrid, GameMulti },
   data() {
     return {
-      sudokuGrid: [],
+      sudokuGrid: "",
       vite: 0,
+      isInitialized: false,
     };
   },
-  computed: {
-    hearts() {
-      const fullHeart = '❤️';
-      return fullHeart.repeat(this.vite);
-    },
-  },
-  methods: {
-    handleCellUpdate(cellData) {
-      socket.emit('cellUpdate', cellData);
-    },
-    initializeGrid(puzzle) {
-      this.sudokuGrid = [];
-      for (let i = 0; i < 9; i++) {
-        const row = [];
-        for (let j = 0; j < 9; j++) {
-          const index = i * 9 + j;
-          const char = puzzle[index];
-          row.push({
-            value: char === '-' ? '' : char,
-            readOnly: char !== '-',
-          });
-        }
-        this.sudokuGrid.push(row);
-      }
-    },
-    goBack() {
-      this.$router.push({ name: 'Lobby' });
-    },
-  },
-  created() {
 
+  mounted() {
     socket.emit('getGame');
     socket.on("game", (data) => {
-      this.sudokuGrid = data.sudoku;
-      console.log("sudoku  " + this.sudoku)
-      this.vite = data.vite;
-      console.log("vite " + this.vite);
+      const { sudoku, vite } = data;
+      this.sudokuGrid = sudoku;
+      this.vite = vite;
+      this.isInitialized = true;
     })
-
-
   },
 };
 </script>
@@ -60,5 +30,5 @@ export default {
 
 </style>
 <template>
-  <GameMulti :vite = this.vite :puzzle = this.sudokuGrid></GameMulti>
+  <GameMulti v-if="this.isInitialized" :vite ="vite" :puzzle="sudokuGrid"></GameMulti>
 </template>

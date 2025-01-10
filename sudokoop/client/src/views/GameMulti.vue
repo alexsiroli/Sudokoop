@@ -27,10 +27,9 @@ export default {
     },
   },
   methods: {
-
-
-
     initializeGrid(puzzle) {
+      console.log("puzzle sopra " ,this.puzzle);
+      console.log("puzzle passato " , puzzle);
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
         const row = [];
@@ -48,6 +47,8 @@ export default {
         newGrid.push(row);
       }
       this.sudokuGrid = newGrid;
+
+      console.log("sudokuGrid " , this.sudokuGrid);
     },
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
@@ -74,13 +75,14 @@ export default {
         }
         this.sudokuGrid.push(row);
       }
+
     },
     goToHome() {
       this.$router.push("/home");
     },
   },
   mounted() {
-
+    console.log("puzzle : " + this.puzzle);
     this.initializeGrid(this.puzzle);
   },
 };
@@ -114,10 +116,8 @@ export default {
         </div>
 
         <div class="sudoku-container">
-          <sudoku-grid
-            :grid="this.sudokuGrid"
+          <sudoku-grid :grid="sudokuGrid" />
 
-          />
         </div>
 
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
