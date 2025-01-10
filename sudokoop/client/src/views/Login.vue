@@ -45,7 +45,7 @@ export default {
   methods: {
     async onSubmit() {
       try {
-        // Chiamata REST
+        // Chiamata REST per login
         await axios.post("/login", {
           userName: this.username,
           password: this.password
@@ -54,15 +54,18 @@ export default {
         console.log("Login riuscito");
         // Emetti l'username al socket
         socket.emit("username", this.username);
-        // Passa alla Home (o a Lobby)
-        this.$router.push({ name: "Home" });
+        // Salva l'username in localStorage
+        localStorage.setItem("username", this.username);
+
+        // Passa alla Home
+        this.$router.push({name: "Home"});
       } catch (error) {
         console.log("Login fallito:", error.response?.data?.error);
         this.loginError = error.response?.data?.error || "Errore imprevisto di login";
       }
     },
     goRegister() {
-      this.$router.push({ name: "Register" });
+      this.$router.push({name: "Register"});
     }
   }
 };

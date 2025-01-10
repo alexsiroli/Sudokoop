@@ -31,6 +31,7 @@ import axios from "../main.js";
 import socket from "../plugins/socket.js";
 
 export default {
+  name: "Register",
   data() {
     return {
       username: "",
@@ -47,15 +48,19 @@ export default {
           password: this.password
         });
         console.log("Registrazione riuscita");
-        // Emetti l'username al socket (opzionale, se vuoi loggarlo subito)
+
+        // Salva l'username appena registrato
+        localStorage.setItem("username", this.username);
+
         socket.emit("username", this.username);
-        this.$router.push({ name: "Home" });
+
+        this.$router.push({name: "Home"});
       } catch (error) {
         this.registerError = error.response?.data?.error || "Errore imprevisto di registrazione";
       }
     },
     goLogin() {
-      this.$router.push({ name: "Login" });
+      this.$router.push({name: "Login"});
     }
   }
 };

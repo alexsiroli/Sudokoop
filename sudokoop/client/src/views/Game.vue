@@ -68,13 +68,11 @@ export default {
       gameId: null,
       sudokuGrid: [],
       vite: 3,
-      message: "",
       gameOver: false,
       gameOverMessage: "",
       difficulty: "easy",
       coloredCell: null,
       final: false,
-      userFilledCells: null,
       initialPuzzle: "",
       // Cronometro
       startTime: 0,
@@ -82,6 +80,9 @@ export default {
       timerInterval: null,
       // Leaderboard
       showLeaderboard: false,
+
+      // username
+      currentUsername: ""
     };
   },
   computed: {
@@ -100,15 +101,15 @@ export default {
   },
   methods: {
     async startNewGame() {
+      // Stop eventuale timer in corso
+      this.stopTimer();
       // Resetta stati
       this.gameOver = false;
       this.gameOverMessage = "";
-      this.message = "";
       this.vite = 3;
       this.sudokuGrid = [];
       this.gameId = null;
       this.final = false;
-      this.userFilledCells = null;
       this.showLeaderboard = false;
 
       // Avvio cronometro
@@ -128,7 +129,8 @@ export default {
 
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
-      // Resetta cella colorata di errore all'inizio di un nuovo inserimento
+
+      // Resetta la colorazione di errore
       this.coloredCell = null;
 
       try {
@@ -139,7 +141,6 @@ export default {
           value: cellData.value,
         });
         const data = response.data;
-        this.message = data.message || "";
         this.vite = data.vite;
 
         if (data.gameOver) {
@@ -150,10 +151,6 @@ export default {
           if (data.message.startsWith("Hai vinto")) {
             await this.saveTimeToLeaderboard(this.timeSpent);
           }
-
-          this.userFilledCells = this.sudokuGrid.map(row =>
-            row.map(cell => !cell.readOnly && cell.value !== '')
-          );
 
           this.gameOver = true;
           this.gameOverMessage = data.message || "Partita terminata.";
@@ -205,8 +202,8 @@ export default {
     // Salva il tempo nella leaderboard
     async saveTimeToLeaderboard(timeMs) {
       try {
-        // TODO: Sostituisci "DemoUser" con un vero username
-        const username = "DemoUser";
+        // Recuperiamo l'username salvato in localStorage in fase di login
+        const username = localStorage.getItem("username") || "AnonUser";
         await axios.post("/game/time", {
           username,
           milliseconds: timeMs,
@@ -277,13 +274,16 @@ export default {
     },
   },
   mounted() {
+    // Recupera la difficoltà dalla query
     const diff = this.$route.query.difficulty;
     if (["easy", "medium", "hard"].includes(diff)) {
       this.difficulty = diff;
     }
+    // Avvia la partita
     this.startNewGame();
   },
   beforeUnmount() {
+    // Stop timer se si esce dalla pagina
     this.stopTimer();
   }
 };
@@ -296,10 +296,9 @@ export default {
   margin-bottom: 20px;
 }
 
-/* Righe di pulsanti affiancate */
 .buttons-row {
   display: flex;
-  gap: 20px; /* spazio fra i pulsanti */
+  gap: 20px;
   justify-content: center;
   margin-top: 10px;
 }
