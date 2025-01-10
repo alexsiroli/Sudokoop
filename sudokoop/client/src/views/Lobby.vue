@@ -18,10 +18,13 @@ export default {
   },
   methods: {
     createLobby() {
-      socket.emit("createLobby");
+      socket.emit("createLobby", sessionStorage.getItem('username'));
     },
     joinLobby() {
-      socket.emit("joinLobby", this.lobbyCode);
+      socket.emit("joinLobby", {
+        username: sessionStorage.getItem('username'),
+        code: this.lobbyCode
+      });
     },
     startMultiGame() {
       socket.emit("startMultiGame", {
@@ -33,6 +36,7 @@ export default {
   },
   mounted() {
     socket.on("onLobbyCreated", (code) => {
+      sessionStorage.setItem("lobbyCode", code);
       this.currentLobbyCode = code;
       this.inLobby = true;
       // Il creatore è sempre master, come da server
@@ -40,6 +44,7 @@ export default {
     });
     socket.on("joinLobby", (res) => {
       if (res === "Ok") {
+        sessionStorage.setItem("lobbyCode", this.lobbyCode);
         this.currentLobbyCode = this.lobbyCode;
         this.errorOnStart = "";
         this.inLobby = true;

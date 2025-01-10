@@ -4,12 +4,11 @@ module.exports = function registerGameHandlers(socket, io) {
   // Oggetto per tenere traccia delle partite single player
   const games = {};
 
-  socket.on("getGame", () => {
-    console.log("Code " + socket.lobbyCode)
-    io.to( socket.lobbyCode).emit("game",
+  socket.on("getGame", (lobbyCode) => {
+    io.to( lobbyCode).emit("game",
         {
-          vite: gameController.getGameOfLobby( socket.lobbyCode).vite,
-          sudoku: gameController.getGameOfLobby( socket.lobbyCode).sudoku.puzzle,
+          vite: gameController.getGameOfLobby(lobbyCode).vite,
+          sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
 
         });
   });
@@ -27,10 +26,12 @@ module.exports = function registerGameHandlers(socket, io) {
     });
   });
 
-  socket.on('cellUpdateMulti', (cellData) => {
-    const result = gameController.insertNumberMulti(cellData, socket.lobbyCode);
+
+  socket.on('cellUpdateMulti', (data) => {
+    const {cellData, lobbyCode} = data;
+    const result = gameController.insertNumberMulti(cellData, lobbyCode);
     console.log("result after update " + result);
-    io.to(socket.lobbyCode).emit("afterUpdating", result);
+    io.to(lobbyCode).emit("afterUpdating", result);
   });
 
   // Aggiornamento cella

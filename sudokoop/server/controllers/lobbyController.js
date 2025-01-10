@@ -40,6 +40,7 @@ class LobbyController {
         const lobby = this.findLobby(code);
         if (!lobby) return [];
         // Invece di .map(...) restituisco l'intero array di obj
+        console.log("Lista di gioca" + lobby.players);
         return lobby.players;
     }
 
