@@ -1,10 +1,12 @@
 // server/src/controllers/gameController.js
 const Game = require('../models/Game');
 const Leaderboard = require('../models/Leaderboard');
+const User = require('../models/User'); // Import del modello User
 
 // Mappa in memoria per associare gameId alle istanze di Game
 const activeGames = {};
 const lobbyGame = {};
+
 const gameController = {
 
     // Salva il tempo su DB
@@ -110,6 +112,25 @@ const gameController = {
         });
     },
 
+    // Endpoint per aggiornare vittorie o sconfitte
+    updateStats: async (req, res) => {
+        const { username, result } = req.body;
+        if (!username || !result) {
+            return res.status(400).json({ error: "Dati insufficienti" });
+        }
+        try {
+            // Se result è "win", incrementiamo wins, altrimenti losses
+            const update = result === "win" ? { $inc: { wins: 1 } } : { $inc: { losses: 1 } };
+            const user = await User.findOneAndUpdate({ userName: username }, update, { new: true });
+            if (!user) {
+                return res.status(404).json({ error: "Utente non trovato" });
+            }
+            return res.status(200).json({ message: "Statistiche aggiornate" });
+        } catch (err) {
+            console.error("Errore aggiornamento statistiche:", err);
+            return res.status(500).json({ error: "Errore interno" });
+        }
+    },
 
     // Endpoint per inserire un numero in una cella
     insertNumber: (req, res) => {

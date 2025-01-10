@@ -3,10 +3,10 @@
     <div class="account-container">
       <h2>Il Tuo Account</h2>
       <p><strong>Username:</strong> {{ username }}</p>
-      <!-- Vittorie e Sconfitte -->
+      <!-- Vittorie e Sconfitte su una singola riga -->
       <div class="stats-row">
-        <p><strong>Vittorie:</strong> 0</p>
-        <p><strong>Sconfitte:</strong> 0</p>
+        <p><strong>Vittorie:</strong> {{ wins }}</p>
+        <p><strong>Sconfitte:</strong> {{ losses }}</p>
       </div>
 
       <div class="buttons-row">
@@ -18,22 +18,35 @@
 </template>
 
 <script>
+import axios from "../main.js";
+
 export default {
   name: "AccountOverlay",
   emits: ["close"],
   data() {
     return {
-      username: ""
+      username: "",
+      wins: 0,
+      losses: 0
     };
   },
   mounted() {
-    // Recupera l'username da sessionStorage
     this.username = sessionStorage.getItem('username') || "AnonUser";
+    this.fetchStats(); // Recupera le statistiche dal server
   },
   methods: {
+    async fetchStats() {
+      try {
+        const response = await axios.get(`/stats?username=${this.username}`);
+        this.wins = response.data.wins || 0;
+        this.losses = response.data.losses || 0;
+      } catch (err) {
+        console.error("Errore nel recupero delle statistiche utente:", err);
+      }
+    },
     logout() {
       sessionStorage.removeItem('username');
-      this.$router.push({ name: "Login" });
+      this.$router.push({name: "Login"});
     },
     closeOverlay() {
       this.$emit("close");
@@ -49,7 +62,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;

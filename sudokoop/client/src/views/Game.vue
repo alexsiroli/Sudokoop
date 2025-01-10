@@ -147,10 +147,17 @@ export default {
           // Ferma il timer
           this.stopTimer();
 
-          // Se vinto => invia punteggio al server
+          // Determina se win o lose
+          let result = "lose";
           if (data.message.startsWith("Hai vinto")) {
+            result = "win";
+            // Se vinto => salva il tempo in leaderboard
             await this.saveTimeToLeaderboard(this.timeSpent);
           }
+
+          // Aggiorna statistiche (win o lose)
+          const username = sessionStorage.getItem("username") || "AnonUser";
+          await axios.post("/game/updateStats", {username, result});
 
           this.gameOver = true;
           this.gameOverMessage = data.message || "Partita terminata.";
