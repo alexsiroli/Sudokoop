@@ -1,32 +1,3 @@
-<template>
-  <div class="sudoku-grid">
-    <table>
-      <tbody>
-      <tr v-for="(row, rowIndex) in grid" :key="rowIndex">
-        <td
-          v-for="(cell, colIndex) in row"
-          :key="colIndex"
-          :class="[
-              getCellClass(rowIndex, colIndex),
-              cell.isGreen ? 'sp-green' :
-                (final && cell.isRed ? 'sp-red' :
-                  (!final && coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex && coloredCell.color === 'red' ? 'sp-red' : '')
-                )
-            ]"
-        >
-          <input
-            type="text"
-            maxlength="1"
-            v-model="cell.value"
-            :disabled="cell.readOnly"
-            @input="onCellInput(rowIndex, colIndex, cell.value)"
-          />
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</template>
 
 <script>
 export default {
@@ -73,6 +44,35 @@ export default {
   }
 };
 </script>
+<template>
+  <div class="sudoku-grid">
+    <table>
+      <tbody>
+      <tr v-for="(row, rowIndex) in this.grid" :key="rowIndex">
+        <td
+          v-for="(cell, colIndex) in row"
+          :key="colIndex"
+          :class="[
+              getCellClass(rowIndex, colIndex),
+              cell.isGreen ? 'sp-green' :
+                (final && cell.isRed ? 'sp-red' :
+                  (!final && coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex && coloredCell.color === 'red' ? 'sp-red' : '')
+                )
+            ]"
+        >
+          <input
+            type="text"
+            maxlength="1"
+            v-model="cell.value"
+            :disabled="cell.readOnly"
+            @input="onCellInput(rowIndex, colIndex, cell.value)"
+          />
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
 
 <style scoped>
 .sudoku-grid {

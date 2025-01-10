@@ -1,9 +1,18 @@
 const Game = require('../models/Game');
-
+const gameController = require('../controllers/gameController');
 module.exports = function registerGameHandlers(socket, io) {
   // Oggetto per tenere traccia delle partite single player
   const games = {};
 
+  socket.on("getGame", () => {
+    console.log("Code " + socket.lobbyCode)
+    socket.to( socket.lobbyCode).emit("game",
+        {
+          vite: gameController.getGameOfLobby( socket.lobbyCode).vite,
+          sudoku: gameController.getGameOfLobby( socket.lobbyCode).sudoku.puzzle,
+
+        });
+  });
   // Avvio partita single player
   socket.on('startGame', (difficulty) => {
     // Crea la nuova partita e assegna a games[socket.id]

@@ -4,7 +4,7 @@ const Leaderboard = require('../models/Leaderboard');
 
 // Mappa in memoria per associare gameId alle istanze di Game
 const activeGames = {};
-
+const lobbyGame = {};
 const gameController = {
 
     // Salva il tempo su DB
@@ -54,6 +54,25 @@ const gameController = {
             puzzle: newGame.sudoku.puzzle,
             vite: newGame.vite,
         });
+    },
+
+    setGameOfLobby: (lobbyCode, difficulty) => {
+        lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
+    },
+
+    getGameOfLobby: (lobbyCode) => {
+        if (!lobbyGame[lobbyCode]) {
+            console.log("Lobby not found for code: " + lobbyCode);
+            return null;
+        }
+        console.log("Game " + JSON.stringify(lobbyGame[lobbyCode]));
+        console.log("sudoku " + JSON.stringify(lobbyGame[lobbyCode].sudoku));
+        console.log("vite " + lobbyGame[lobbyCode].vite);
+        return lobbyGame[lobbyCode];
+    },
+
+    newMultiPlayerGame: (difficulty)  => {
+        return new Game(difficulty);
     },
 
     // Endpoint per inserire un numero in una cella

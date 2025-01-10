@@ -1,61 +1,27 @@
-<template>
-  <div class="centered-container">
-    <div class="rounded-box coop-game-container">
-      <button class="back-button" @click="goBack" title="Torna alla Lobby">&#8592;</button>
-      <h1 class="title">Coop Game ({{ $route.query.difficulty }})</h1>
-      <div class="lives-container">
-        <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
-      </div>
-      <sudoku-grid :grid="sudokuGrid" @cell-updated="handleCellUpdate" />
-    </div>
-  </div>
-</template>
 
 <script>
 import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
-
+import GameMulti from './GameMulti.vue';
 export default {
   name: 'CoopGame',
-  components: { SudokuGrid },
+  components: { SudokuGrid, GameMulti },
   data() {
     return {
-      sudokuGrid: [],
-      vite: 3,
+      sudokuGrid: "",
+      vite: 0,
+      isInitialized: false,
     };
   },
-  computed: {
-    hearts() {
-      const fullHeart = '❤️';
-      return fullHeart.repeat(this.vite);
-    },
-  },
-  methods: {
-    handleCellUpdate(cellData) {
-      socket.emit('cellUpdate', cellData);
-    },
-    initializeGrid(puzzle) {
-      this.sudokuGrid = [];
-      for (let i = 0; i < 9; i++) {
-        const row = [];
-        for (let j = 0; j < 9; j++) {
-          const index = i * 9 + j;
-          const char = puzzle[index];
-          row.push({
-            value: char === '-' ? '' : char,
-            readOnly: char !== '-',
-          });
-        }
-        this.sudokuGrid.push(row);
-      }
-    },
-    goBack() {
-      this.$router.push({ name: 'Lobby' });
-    },
-  },
+
   mounted() {
-    // Logica per ricevere puzzle e vite (simile a Game.vue)
-    // socket.on('gameData', ...)
+    socket.emit('getGame');
+    socket.on("game", (data) => {
+      const { sudoku, vite } = data;
+      this.sudokuGrid = sudoku;
+      this.vite = vite;
+      this.isInitialized = true;
+    })
   },
 };
 </script>
@@ -63,3 +29,6 @@ export default {
 <style scoped>
 
 </style>
+<template>
+  <GameMulti v-if="this.isInitialized" :vite ="vite" :puzzle="sudokuGrid"></GameMulti>
+</template>
