@@ -3,11 +3,11 @@
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
 import socket from "../plugins/socket";
-
+import LobbyUser from "../components/LobbyUsers.vue";
 export default {
   props: ['initialVite', 'puzzle'],
 
-  components: { SudokuGrid },
+  components: { SudokuGrid, LobbyUser },
   data() {
     return {
       gameId: null,
@@ -55,7 +55,10 @@ export default {
       this.coloredCell = null;
       console.log("handleCellUpdate", cellData);
         // dico al server che ho inserito
-      socket.emit("cellUpdateMulti", cellData);
+      socket.emit("cellUpdateMulti", {
+        cellData: cellData,
+        lobbyCode: sessionStorage.getItem("lobbyCode")
+      });
 
     },
 
@@ -160,6 +163,7 @@ export default {
 
         </div>
 
+        <LobbyUser></LobbyUser>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
           <button class="button new-game-button">Inizia una Nuova Partita</button>

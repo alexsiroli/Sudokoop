@@ -15,7 +15,7 @@ export default {
   },
 
   mounted() {
-    socket.emit('getGame');
+    socket.emit('getGame', sessionStorage.getItem('lobbyCode'));
     socket.on("game", (data) => {
       const { sudoku, vite } = data;
       this.sudokuGrid = sudoku;
