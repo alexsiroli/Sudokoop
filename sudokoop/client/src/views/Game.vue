@@ -4,16 +4,19 @@
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
       <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
 
-      <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
+      <!-- Se l'utente ha perso, messaggio sopra la griglia -->
       <div v-if="gameOver && gameOverMessage.startsWith('Hai perso')" class="game-over-container">
         <p class="game-over-message">{{ gameOverMessage }}</p>
       </div>
 
       <div class="game-content">
+        <!-- Mostra vite + cronometro se la partita è attiva -->
         <div class="lives-container" v-if="!gameOver">
           <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+          <p>Tempo trascorso: {{ formattedTime }}</p>
         </div>
 
+        <!-- Griglia Sudoku -->
         <div class="sudoku-container">
           <sudoku-grid
             :grid="sudokuGrid"
@@ -23,10 +26,26 @@
           />
         </div>
 
-        <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
+        <!-- Se il gioco è finito (vittoria o sconfitta), pulsante rigioca -->
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
+          <!-- Se l'utente ha vinto, mostra anche il tempo impiegato -->
+          <p v-if="gameOverMessage.startsWith('Hai vinto')">
+            {{ gameOverMessage }}<br />
+            Tempo impiegato: {{ formattedTime }} secondi
+          </p>
           <button @click="startNewGame" class="button new-game-button">Inizia una Nuova Partita</button>
+
+          <!-- Bottone per mostrare la leaderboard -->
+          <button @click="toggleLeaderboard" class="button new-game-button" style="margin-top: 15px;">
+            Mostra Classifica
+          </button>
         </div>
+
+        <!-- Visualizzazione Leaderboard in overlay o blocco a parte -->
+        <Leaderboard
+          v-if="showLeaderboard"
+          @close="showLeaderboard = false"
+        />
       </div>
     </div>
   </div>
@@ -35,10 +54,11 @@
 <script>
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
+import Leaderboard from "../components/Leaderboard.vue";
 
 export default {
   name: "Game",
-  components: { SudokuGrid },
+  components: { SudokuGrid, Leaderboard },
   data() {
     return {
       gameId: null,
@@ -51,16 +71,26 @@ export default {
       coloredCell: null,
       final: false,
       userFilledCells: null,
-      initialPuzzle: ""
+      initialPuzzle: "",
+      // Cronometro
+      startTime: 0,
+      timeSpent: 0,
+      timerInterval: null,
+      // Leaderboard
+      showLeaderboard: false
     };
   },
   computed: {
     hearts() {
       return "❤️".repeat(this.vite);
     },
+    formattedTime() {
+      return (this.timeSpent / 1000).toFixed(1); // tempo in secondi con un decimale
+    }
   },
   methods: {
     async startNewGame() {
+      // Resetta stati
       this.gameOver = false;
       this.gameOverMessage = "";
       this.message = "";
@@ -69,6 +99,10 @@ export default {
       this.gameId = null;
       this.final = false;
       this.userFilledCells = null;
+      this.showLeaderboard = false;
+
+      // Avvio cronometro
+      this.startTimer();
 
       try {
         const response = await axios.get(`/game/new?difficulty=${this.difficulty}`);
@@ -81,12 +115,14 @@ export default {
         console.error("Errore nella creazione della partita:", error);
       }
     },
+
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
-      try {
-        // Resetta il colore della cella errata al nuovo inserimento
-        this.coloredCell = null;
 
+      // Resetta cella colorata di errore
+      this.coloredCell = null;
+
+      try {
         const response = await axios.post("/game/insert", {
           gameId: this.gameId,
           row: cellData.row,
@@ -98,6 +134,15 @@ export default {
         this.vite = data.vite;
 
         if (data.gameOver) {
+          // Ferma il timer
+          this.stopTimer();
+
+          // Se vinto => invia punteggio al server
+          if (data.message.startsWith("Hai vinto")) {
+            await this.saveTimeToLeaderboard(this.timeSpent);
+          }
+
+          // userFilledCells ci serve se vogliamo colorare celle
           this.userFilledCells = this.sudokuGrid.map(row =>
             row.map(cell => !cell.readOnly && cell.value !== '')
           );
@@ -105,13 +150,11 @@ export default {
           this.gameOver = true;
           this.gameOverMessage = data.message || "Partita terminata.";
           this.final = true;
+
           if (data.solution) {
             this.initializeGridWithSolution(data.puzzle, data.solution);
           } else {
             this.initializeGrid(data.puzzle);
-          }
-          if (this.gameOverMessage.startsWith("Hai perso")) {
-            // Le celle mancanti verranno colorate di rosso all'interno di initializeGridWithSolution
           }
         } else {
           this.initializeGrid(data.puzzle);
@@ -122,6 +165,7 @@ export default {
               this.sudokuGrid[row][col].readOnly = true;
             }
           } else if (data.message.startsWith("Sbagliato")) {
+            // Colora la cella di rosso temporaneamente
             this.coloredCell = { row: cellData.row, col: cellData.col, color: "red" };
           }
         }
@@ -129,6 +173,43 @@ export default {
         console.error("Errore nell'inserimento del numero:", error);
       }
     },
+
+    // Cronometro: avvio
+    startTimer() {
+      this.timeSpent = 0;
+      this.startTime = Date.now();
+      if (this.timerInterval) clearInterval(this.timerInterval);
+
+      this.timerInterval = setInterval(() => {
+        // Aggiorna timeSpent con la differenza
+        this.timeSpent = Date.now() - this.startTime;
+      }, 100);
+    },
+
+    // Cronometro: stop
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+    },
+
+    // Salva il tempo nella leaderboard
+    async saveTimeToLeaderboard(timeMs) {
+      try {
+        // TODO: Sostituisci "DemoUser" con un vero username
+        const username = "DemoUser";
+        await axios.post("/game/time", {
+          username,
+          milliseconds: timeMs,
+          difficulty: this.difficulty
+        });
+      } catch (err) {
+        console.error("Errore nel salvataggio del tempo:", err);
+      }
+    },
+
+    // Inizializza la griglia
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -148,6 +229,8 @@ export default {
       }
       this.sudokuGrid = newGrid;
     },
+
+    // Griglia soluzione a fine partita
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
       this.sudokuGrid = [];
@@ -158,12 +241,14 @@ export default {
           const char = puzzle[index];
           const initiallyFilled = this.initialPuzzle[index] !== "-";
           const previouslyGreen = previousGrid[i] && previousGrid[i][j] && previousGrid[i][j].isGreen;
+
           let cellValue;
           if (char === "-" && solution) {
             cellValue = solution[index];
           } else {
             cellValue = char === "-" ? "" : char;
           }
+
           row.push({
             value: cellValue,
             readOnly: true,
@@ -174,6 +259,11 @@ export default {
         this.sudokuGrid.push(row);
       }
     },
+
+    toggleLeaderboard() {
+      this.showLeaderboard = !this.showLeaderboard;
+    },
+
     goToHome() {
       this.$router.push("/home");
     },
@@ -185,6 +275,10 @@ export default {
     }
     this.startNewGame();
   },
+  beforeUnmount() {
+    // In caso l'utente cambi pagina, stoppa il timer
+    this.stopTimer();
+  }
 };
 </script>
 
@@ -193,9 +287,5 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
-}
-.message-container {
-  font-size: 1.1em;
-  margin-top: 10px;
 }
 </style>
