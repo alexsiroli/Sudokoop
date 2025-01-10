@@ -5,7 +5,7 @@
         <h1 class="title">Sudokoop</h1>
       </div>
 
-      <!-- Colonna: Singleplayer e Multiplayer impilati verticalmente e centrati -->
+      <!-- Singleplayer e Multiplayer impilati verticalmente -->
       <div class="menu-column">
         <div class="menu-item">
           <h2>Singleplayer</h2>
@@ -22,21 +22,21 @@
         </div>
       </div>
 
-      <!-- Riga 2: Leaderboard centrata -->
+      <!-- Leaderboard centrata -->
       <div class="menu-row centered">
         <div class="menu-item">
           <h2>Leaderboard</h2>
-          <button @click="showLeaderboard()" class="button">Mostra Classifica</button>
+          <button @click="showLeaderboard" class="button">Mostra Classifica</button>
         </div>
       </div>
 
-      <!-- Footer: impostazioni e crediti fianco a fianco -->
+      <!-- Footer: Account e Crediti fianco a fianco -->
       <div class="footer">
         <div class="footer-item">
-          <button class="button">Impostazioni</button>
+          <button class="button" @click="showAccount">Account</button>
         </div>
         <div class="footer-item">
-          <button class="button">Crediti</button>
+          <button class="button white-button">Crediti</button>
         </div>
       </div>
 
@@ -45,32 +45,45 @@
         v-if="leaderboardVisible"
         @close="leaderboardVisible = false"
       />
+
+      <!-- Account in overlay, se richiesto -->
+      <Account
+        v-if="accountVisible"
+        @close="accountVisible = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import Leaderboard from "../components/Leaderboard.vue";
+import Account from "../components/Account.vue";
 
 export default {
   name: 'Home',
-  components: { Leaderboard },
+  components: { Leaderboard, Account },
   data() {
     return {
       selectedDifficulty: 'easy',
       leaderboardVisible: false,
+      accountVisible: false,
     };
   },
   methods: {
     playSinglePlayer() {
-      this.$router.push({name: 'Game', query: {difficulty: this.selectedDifficulty}});
+      this.$router.push({ name: 'Game', query: { difficulty: this.selectedDifficulty } });
     },
     goToLobby() {
-      this.$router.push({name: 'Lobby'});
+      this.$router.push({ name: 'Lobby' });
     },
+    // Mostra l'overlay Leaderboard
     showLeaderboard() {
       this.leaderboardVisible = true;
-    }
+    },
+    // Mostra l'overlay Account
+    showAccount() {
+      this.accountVisible = true;
+    },
   },
 };
 </script>
@@ -81,28 +94,43 @@ export default {
   text-align: center;
 }
 
-/* Centratura degli elementi nel menu */
-.menu {
+/* Colonna per Singleplayer e Multiplayer */
+.menu-column {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
   margin-bottom: 40px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  width: 250px;
 }
 
-.difficulty-select {
-  margin-bottom: 10px;
+.menu-row.centered {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
 }
 
-/* Footer con le due voci affiancate e centrate */
+/* Footer */
 .footer {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
 }
-
 .footer-item {
   display: flex;
+}
+
+/* Bottone bianco */
+.white-button {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 2px solid #444 !important;
 }
 </style>
