@@ -26,22 +26,26 @@
           />
         </div>
 
-        <!-- Se il gioco è finito (vittoria o sconfitta), pulsante rigioca -->
+        <!-- Se il gioco è finito -->
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
           <!-- Se l'utente ha vinto, mostra anche il tempo impiegato -->
           <p v-if="gameOverMessage.startsWith('Hai vinto')">
             {{ gameOverMessage }}<br />
-            Tempo impiegato: {{ formattedTime }} secondi
+            Tempo impiegato: {{ formattedTime }}
           </p>
-          <button @click="startNewGame" class="button new-game-button">Inizia una Nuova Partita</button>
 
-          <!-- Bottone per mostrare la leaderboard -->
-          <button @click="toggleLeaderboard" class="button new-game-button" style="margin-top: 15px;">
-            Mostra Classifica
-          </button>
+          <!-- Bottoni con un po' di spazio fra loro -->
+          <div class="buttons-row">
+            <button @click="startNewGame" class="button new-game-button">
+              Inizia una Nuova Partita
+            </button>
+            <button @click="toggleLeaderboard" class="button new-game-button">
+              Mostra Classifica
+            </button>
+          </div>
         </div>
 
-        <!-- Visualizzazione Leaderboard in overlay o blocco a parte -->
+        <!-- Leaderboard come overlay -->
         <Leaderboard
           v-if="showLeaderboard"
           @close="showLeaderboard = false"
@@ -77,15 +81,21 @@ export default {
       timeSpent: 0,
       timerInterval: null,
       // Leaderboard
-      showLeaderboard: false
+      showLeaderboard: false,
     };
   },
   computed: {
     hearts() {
       return "❤️".repeat(this.vite);
     },
+    // Formatta il tempo in mm:ss
     formattedTime() {
-      return (this.timeSpent / 1000).toFixed(1); // tempo in secondi con un decimale
+      const totalSeconds = Math.floor(this.timeSpent / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      const mm = String(minutes).padStart(2, "0");
+      const ss = String(seconds).padStart(2, "0");
+      return `${mm}:${ss}`;
     }
   },
   methods: {
@@ -118,8 +128,7 @@ export default {
 
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
-
-      // Resetta cella colorata di errore
+      // Resetta cella colorata di errore all'inizio di un nuovo inserimento
       this.coloredCell = null;
 
       try {
@@ -142,7 +151,6 @@ export default {
             await this.saveTimeToLeaderboard(this.timeSpent);
           }
 
-          // userFilledCells ci serve se vogliamo colorare celle
           this.userFilledCells = this.sudokuGrid.map(row =>
             row.map(cell => !cell.readOnly && cell.value !== '')
           );
@@ -156,17 +164,18 @@ export default {
           } else {
             this.initializeGrid(data.puzzle);
           }
+
         } else {
           this.initializeGrid(data.puzzle);
           if (data.message.startsWith("Giusto")) {
-            const { row, col } = cellData;
+            const {row, col} = cellData;
             if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
               this.sudokuGrid[row][col].isGreen = true;
               this.sudokuGrid[row][col].readOnly = true;
             }
           } else if (data.message.startsWith("Sbagliato")) {
             // Colora la cella di rosso temporaneamente
-            this.coloredCell = { row: cellData.row, col: cellData.col, color: "red" };
+            this.coloredCell = {row: cellData.row, col: cellData.col, color: "red"};
           }
         }
       } catch (error) {
@@ -181,7 +190,6 @@ export default {
       if (this.timerInterval) clearInterval(this.timerInterval);
 
       this.timerInterval = setInterval(() => {
-        // Aggiorna timeSpent con la differenza
         this.timeSpent = Date.now() - this.startTime;
       }, 100);
     },
@@ -276,7 +284,6 @@ export default {
     this.startNewGame();
   },
   beforeUnmount() {
-    // In caso l'utente cambi pagina, stoppa il timer
     this.stopTimer();
   }
 };
@@ -287,5 +294,13 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
+}
+
+/* Righe di pulsanti affiancate */
+.buttons-row {
+  display: flex;
+  gap: 20px; /* spazio fra i pulsanti */
+  justify-content: center;
+  margin-top: 10px;
 }
 </style>

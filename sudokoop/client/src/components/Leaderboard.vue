@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import {ref, onMounted} from "vue";
 import axios from "../main.js";
 
 const leaderboardData = ref([]);
@@ -25,6 +25,16 @@ async function fetchLeaderboard() {
 function closeLeaderboard() {
   emit("close");
 }
+
+// Helper per formattare ms in mm:ss
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(seconds).padStart(2, "0");
+  return `${mm}:${ss}`;
+}
 </script>
 
 <template>
@@ -34,20 +44,17 @@ function closeLeaderboard() {
       <div class="leaderboard-scrollable">
         <p v-if="loading">Caricamento classifica...</p>
         <table v-else>
-          <thead>
-          <tr>
-            <th>Pos</th>
-            <th>Username</th>
-            <th>Tempo (s)</th>
-            <th>Difficoltà</th>
-          </tr>
-          </thead>
           <tbody>
-          <tr v-for="(record, index) in leaderboardData" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ record.username }}</td>
-            <td>{{ (record.milliseconds / 1000).toFixed(1) }}</td>
-            <td>{{ record.difficulty }}</td>
+          <tr
+            v-for="(record, index) in leaderboardData"
+            :key="index"
+            class="leaderboard-row"
+          >
+            <!-- Niente thead, mostriamo i dati direttamente -->
+            <td style="width: 10%;">{{ index + 1 }}</td>
+            <td style="width: 30%;">{{ record.username }}</td>
+            <td style="width: 30%;">{{ formatTime(record.milliseconds) }}</td>
+            <td style="width: 30%;">{{ record.difficulty }}</td>
           </tr>
           </tbody>
         </table>
@@ -64,7 +71,7 @@ function closeLeaderboard() {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5); /* Semi-trasparenza per "overlay" */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-trasparenza per "overlay" */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,7 +97,24 @@ function closeLeaderboard() {
   margin: 10px 0;
 }
 
-/* Stili base */
+/* Righe a larghezza piena */
+.leaderboard-row {
+  width: 100%;
+}
+
+/* Tabella a larghezza piena */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table td {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+}
+
+/* Bottone chiudi */
 .close-button {
   margin-top: 10px;
 }
