@@ -28,7 +28,7 @@ const router = createRouter({
 
 // Navigation Guard globale
 router.beforeEach((to, from, next) => {
-  const username = localStorage.getItem('username');
+  const username = sessionStorage.getItem('username');
 
   // Se non sono loggato e sto cercando di andare su una rotta diversa da Login o Register
   if (!username && to.name !== 'Login' && to.name !== 'Register') {

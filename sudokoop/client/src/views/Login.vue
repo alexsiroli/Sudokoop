@@ -58,7 +58,7 @@ export default {
     };
   },
   mounted() {
-    const user = localStorage.getItem('username');
+    const user = sessionStorage.getItem('username');
     if (user) {
       this.alreadyLogged = true;
       this.storedUsername = user;
@@ -74,7 +74,7 @@ export default {
         });
         console.log("Login riuscito");
         socket.emit("username", this.username);
-        localStorage.setItem("username", this.username);
+        sessionStorage.setItem("username", this.username);
         this.$router.push({ name: "Home" });
       } catch (error) {
         console.log("Login fallito:", error.response?.data?.error);

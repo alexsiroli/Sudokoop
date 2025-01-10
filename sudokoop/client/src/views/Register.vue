@@ -54,7 +54,7 @@ export default {
     };
   },
   mounted() {
-    const user = localStorage.getItem('username');
+    const user = sessionStorage.getItem('username');
     if (user) {
       this.alreadyLogged = true;
       this.storedUsername = user;
@@ -69,7 +69,7 @@ export default {
           password: this.password
         });
         console.log("Registrazione riuscita");
-        localStorage.setItem("username", this.username);
+        sessionStorage.setItem("username", this.username);
         socket.emit("username", this.username);
         this.$router.push({ name: "Home" });
       } catch (error) {

@@ -27,12 +27,12 @@ export default {
     };
   },
   mounted() {
-    // Recupera l'username da localStorage
-    this.username = localStorage.getItem('username') || "AnonUser";
+    // Recupera l'username da sessionStorage
+    this.username = sessionStorage.getItem('username') || "AnonUser";
   },
   methods: {
     logout() {
-      localStorage.removeItem('username');
+      sessionStorage.removeItem('username');
       this.$router.push({ name: "Login" });
     },
     closeOverlay() {

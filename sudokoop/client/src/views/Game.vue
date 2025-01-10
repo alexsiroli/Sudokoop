@@ -202,8 +202,8 @@ export default {
     // Salva il tempo nella leaderboard
     async saveTimeToLeaderboard(timeMs) {
       try {
-        // Recuperiamo l'username salvato in localStorage in fase di login
-        const username = localStorage.getItem("username") || "AnonUser";
+        // Recuperiamo l'username salvato in sessionStorage in fase di login
+        const username = sessionStorage.getItem("username") || "AnonUser";
         await axios.post("/game/time", {
           username,
           milliseconds: timeMs,
