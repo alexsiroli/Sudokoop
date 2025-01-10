@@ -44,12 +44,12 @@ export default {
 
 <style scoped>
 .account-overlay {
-  position: absolute; /* NON fixed, così come la leaderboard */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5); /* Semi-trasparenza */
+  background-color: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -57,7 +57,8 @@ export default {
 }
 
 .account-container {
-  background-color: white;
+  background-color: var(--box-bg-color);
+  color: var(--text-color);
   padding: 20px;
   border-radius: 10px;
   width: 400px;
@@ -77,7 +78,6 @@ export default {
   margin-top: 20px;
 }
 
-/* Bottone bianco */
 .white-button {
   background-color: #fff;
   color: #000;

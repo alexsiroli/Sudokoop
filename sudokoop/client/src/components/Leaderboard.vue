@@ -71,14 +71,15 @@ function formatTime(ms) {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-trasparenza per "overlay" */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .leaderboard-container {
-  background-color: white;
+  background-color: var(--box-bg-color);
+  color: var(--text-color);
   padding: 20px;
   border-radius: 15px;
   width: 500px;
@@ -93,16 +94,14 @@ function formatTime(ms) {
 .leaderboard-scrollable {
   width: 100%;
   max-height: 250px;
-  overflow-y: auto; /* scroll se troppi record */
+  overflow-y: auto;
   margin: 10px 0;
 }
 
-/* Righe a larghezza piena */
 .leaderboard-row {
   width: 100%;
 }
 
-/* Tabella a larghezza piena */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -114,7 +113,6 @@ table td {
   padding: 8px;
 }
 
-/* Bottone chiudi */
 .close-button {
   margin-top: 10px;
 }
