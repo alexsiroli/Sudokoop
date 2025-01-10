@@ -1,41 +1,119 @@
+<template>
+  <div class="centered-container">
+    <div class="rounded-box game-container">
+      <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
+      <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
+
+      <!-- Se l'utente ha perso, messaggio sopra la griglia -->
+      <div v-if="gameOver && gameOverMessage.startsWith('Hai perso')" class="game-over-container">
+        <p class="game-over-message">{{ gameOverMessage }}</p>
+      </div>
+
+      <div class="game-content">
+        <!-- Mostra vite + cronometro se la partita è attiva -->
+        <div class="lives-container" v-if="!gameOver">
+          <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+          <p>Tempo trascorso: {{ formattedTime }}</p>
+        </div>
+
+        <!-- Griglia Sudoku -->
+        <div class="sudoku-container">
+          <sudoku-grid
+            :grid="sudokuGrid"
+            @cell-updated="handleCellUpdate"
+            :coloredCell="coloredCell"
+            :final="final"
+          />
+        </div>
+
+        <!-- Se il gioco è finito -->
+        <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
+          <!-- Se l'utente ha vinto, mostra anche il tempo impiegato -->
+          <p v-if="gameOverMessage.startsWith('Hai vinto')">
+            {{ gameOverMessage }}<br />
+            Tempo impiegato: {{ formattedTime }}
+          </p>
+
+          <!-- Bottoni con un po' di spazio fra loro -->
+          <div class="buttons-row">
+            <button @click="startNewGame" class="button new-game-button">
+              Inizia una Nuova Partita
+            </button>
+            <button @click="toggleLeaderboard" class="button new-game-button">
+              Mostra Classifica
+            </button>
+          </div>
+        </div>
+
+        <!-- Leaderboard come overlay -->
+        <Leaderboard
+          v-if="showLeaderboard"
+          @close="showLeaderboard = false"
+        />
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
+import Leaderboard from "../components/Leaderboard.vue";
 
 export default {
   name: "Game",
-  components: { SudokuGrid },
+  components: { SudokuGrid, Leaderboard },
   data() {
     return {
       gameId: null,
       sudokuGrid: [],
       vite: 3,
-      message: "",
       gameOver: false,
       gameOverMessage: "",
       difficulty: "easy",
       coloredCell: null,
       final: false,
-      userFilledCells: null,
-      initialPuzzle: ""
+      initialPuzzle: "",
+      // Cronometro
+      startTime: 0,
+      timeSpent: 0,
+      timerInterval: null,
+      // Leaderboard
+      showLeaderboard: false,
+
+      // username
+      currentUsername: ""
     };
   },
   computed: {
     hearts() {
       return "❤️".repeat(this.vite);
     },
+    // Formatta il tempo in mm:ss
+    formattedTime() {
+      const totalSeconds = Math.floor(this.timeSpent / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      const mm = String(minutes).padStart(2, "0");
+      const ss = String(seconds).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
   },
   methods: {
     async startNewGame() {
+      // Stop eventuale timer in corso
+      this.stopTimer();
+      // Resetta stati
       this.gameOver = false;
       this.gameOverMessage = "";
-      this.message = "";
       this.vite = 3;
       this.sudokuGrid = [];
       this.gameId = null;
       this.final = false;
-      this.userFilledCells = null;
+      this.showLeaderboard = false;
+
+      // Avvio cronometro
+      this.startTimer();
 
       try {
         const response = await axios.get(`/game/new?difficulty=${this.difficulty}`);
@@ -48,12 +126,14 @@ export default {
         console.error("Errore nella creazione della partita:", error);
       }
     },
+
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
-      try {
-        // Resetta il colore della cella errata al nuovo inserimento
-        this.coloredCell = null;
 
+      // Resetta la colorazione di errore
+      this.coloredCell = null;
+
+      try {
         const response = await axios.post("/game/insert", {
           gameId: this.gameId,
           row: cellData.row,
@@ -61,41 +141,80 @@ export default {
           value: cellData.value,
         });
         const data = response.data;
-        this.message = data.message || "";
         this.vite = data.vite;
 
         if (data.gameOver) {
-          this.userFilledCells = this.sudokuGrid.map(row =>
-            row.map(cell => !cell.readOnly && cell.value !== '')
-          );
+          // Ferma il timer
+          this.stopTimer();
+
+          // Se vinto => invia punteggio al server
+          if (data.message.startsWith("Hai vinto")) {
+            await this.saveTimeToLeaderboard(this.timeSpent);
+          }
 
           this.gameOver = true;
           this.gameOverMessage = data.message || "Partita terminata.";
           this.final = true;
+
           if (data.solution) {
             this.initializeGridWithSolution(data.puzzle, data.solution);
           } else {
             this.initializeGrid(data.puzzle);
           }
-          if (this.gameOverMessage.startsWith("Hai perso")) {
-            // Le celle mancanti verranno colorate di rosso all'interno di initializeGridWithSolution
-          }
+
         } else {
           this.initializeGrid(data.puzzle);
           if (data.message.startsWith("Giusto")) {
-            const { row, col } = cellData;
+            const {row, col} = cellData;
             if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
               this.sudokuGrid[row][col].isGreen = true;
               this.sudokuGrid[row][col].readOnly = true;
             }
           } else if (data.message.startsWith("Sbagliato")) {
-            this.coloredCell = { row: cellData.row, col: cellData.col, color: "red" };
+            // Colora la cella di rosso temporaneamente
+            this.coloredCell = {row: cellData.row, col: cellData.col, color: "red"};
           }
         }
       } catch (error) {
         console.error("Errore nell'inserimento del numero:", error);
       }
     },
+
+    // Cronometro: avvio
+    startTimer() {
+      this.timeSpent = 0;
+      this.startTime = Date.now();
+      if (this.timerInterval) clearInterval(this.timerInterval);
+
+      this.timerInterval = setInterval(() => {
+        this.timeSpent = Date.now() - this.startTime;
+      }, 100);
+    },
+
+    // Cronometro: stop
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+    },
+
+    // Salva il tempo nella leaderboard
+    async saveTimeToLeaderboard(timeMs) {
+      try {
+        // Recuperiamo l'username salvato in localStorage in fase di login
+        const username = localStorage.getItem("username") || "AnonUser";
+        await axios.post("/game/time", {
+          username,
+          milliseconds: timeMs,
+          difficulty: this.difficulty
+        });
+      } catch (err) {
+        console.error("Errore nel salvataggio del tempo:", err);
+      }
+    },
+
+    // Inizializza la griglia
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -115,6 +234,8 @@ export default {
       }
       this.sudokuGrid = newGrid;
     },
+
+    // Griglia soluzione a fine partita
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
       this.sudokuGrid = [];
@@ -125,12 +246,14 @@ export default {
           const char = puzzle[index];
           const initiallyFilled = this.initialPuzzle[index] !== "-";
           const previouslyGreen = previousGrid[i] && previousGrid[i][j] && previousGrid[i][j].isGreen;
+
           let cellValue;
           if (char === "-" && solution) {
             cellValue = solution[index];
           } else {
             cellValue = char === "-" ? "" : char;
           }
+
           row.push({
             value: cellValue,
             readOnly: true,
@@ -141,17 +264,28 @@ export default {
         this.sudokuGrid.push(row);
       }
     },
+
+    toggleLeaderboard() {
+      this.showLeaderboard = !this.showLeaderboard;
+    },
+
     goToHome() {
       this.$router.push("/home");
     },
   },
   mounted() {
+    // Recupera la difficoltà dalla query
     const diff = this.$route.query.difficulty;
     if (["easy", "medium", "hard"].includes(diff)) {
       this.difficulty = diff;
     }
+    // Avvia la partita
     this.startNewGame();
   },
+  beforeUnmount() {
+    // Stop timer se si esce dalla pagina
+    this.stopTimer();
+  }
 };
 </script>
 
@@ -161,41 +295,11 @@ export default {
   font-weight: bold;
   margin-bottom: 20px;
 }
-.message-container {
-  font-size: 1.1em;
+
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
   margin-top: 10px;
 }
 </style>
-<template>
-  <div class="centered-container">
-    <div class="rounded-box game-container">
-      <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
-      <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
-
-      <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
-      <div v-if="gameOver && gameOverMessage.startsWith('Hai perso')" class="game-over-container">
-        <p class="game-over-message">{{ gameOverMessage }}</p>
-      </div>
-
-      <div class="game-content">
-        <div class="lives-container" v-if="!gameOver">
-          <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
-        </div>
-
-        <div class="sudoku-container">
-          <sudoku-grid
-            :grid="sudokuGrid"
-            @cell-updated="handleCellUpdate"
-            :coloredCell="coloredCell"
-            :final="final"
-          />
-        </div>
-
-        <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
-        <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
-          <button @click="startNewGame" class="button new-game-button">Inizia una Nuova Partita</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
