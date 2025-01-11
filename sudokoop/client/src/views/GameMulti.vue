@@ -99,6 +99,9 @@ export default {
     this.vite = this.initialVite;
     this.initializeGrid(this.puzzle);
 
+    socket.on("insertedNumber", (puzzle) => {
+      this.initializeGrid(puzzle)
+    })
     socket.on("afterUpdating", (data) => {
       console.log("afterUpdating ", data);
       // aggiorna vite

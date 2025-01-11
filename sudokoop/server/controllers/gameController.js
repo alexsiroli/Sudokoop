@@ -76,6 +76,10 @@ const gameController = {
     newMultiPlayerGame: (difficulty)  => {
         return new Game(difficulty);
     },
+    insertNumberWithoutCheck: (cellData, lobbyCode) => {
+        const game = gameController.getGameOfLobby(lobbyCode);
+        return game.insertNumberWithoutCheck(cellData.row, cellData.col, cellData.value);
+    },
 
     insertNumberMulti: (cellData, lobbyCode) => {
         // recupero il gioco e chiamo l insert

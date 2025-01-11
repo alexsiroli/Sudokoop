@@ -7,6 +7,11 @@ class Game {
     this.vite = 3;  // Imposta le vite iniziali a 3
   }
 
+  insertNumberWithoutCheck(row, col, num) {
+    const index = row * 9 + col;
+    return this.sudoku.puzzle.substring(0, index) + num + this.sudoku.puzzle.substring(index + 1);
+  }
+
   // Metodo per inserire un numero in una cella
   insertNumber(row, col, num) {
     const index = row * 9 + col; // Calcola l'indice corrispondente nella stringa puzzle
