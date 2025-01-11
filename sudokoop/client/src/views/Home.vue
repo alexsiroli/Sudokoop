@@ -36,7 +36,7 @@
           <button class="button" @click="showAccount">Account</button>
         </div>
         <div class="footer-item">
-          <button class="button white-button">Crediti</button>
+          <button class="button white-button" @click="showCredits">Crediti</button>
         </div>
       </div>
 
@@ -51,6 +51,12 @@
         v-if="accountVisible"
         @close="accountVisible = false"
       />
+
+      <!-- Credits in overlay, se richiesto -->
+      <Credits
+        v-if="creditsVisible"
+        @close="creditsVisible = false"
+      />
     </div>
   </div>
 </template>
@@ -58,15 +64,17 @@
 <script>
 import Leaderboard from "../components/Leaderboard.vue";
 import Account from "../components/Account.vue";
+import Credits from "../components/Credits.vue";
 
 export default {
   name: 'Home',
-  components: { Leaderboard, Account },
+  components: {Credits, Leaderboard, Account },
   data() {
     return {
       selectedDifficulty: 'easy',
       leaderboardVisible: false,
       accountVisible: false,
+      creditsVisible: false
     };
   },
   methods: {
@@ -76,14 +84,15 @@ export default {
     goToLobby() {
       this.$router.push({ name: 'Lobby' });
     },
-    // Mostra l'overlay Leaderboard
     showLeaderboard() {
       this.leaderboardVisible = true;
     },
-    // Mostra l'overlay Account
     showAccount() {
       this.accountVisible = true;
     },
+    showCredits() {
+      this.creditsVisible = true;
+    }
   },
 };
 </script>
