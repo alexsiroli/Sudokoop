@@ -1,7 +1,7 @@
 
 <script>
 import axios from "../main.js";
-import SudokuGrid from "../components/SudokuGrid.vue";
+import SudokuGrid from "../components/SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
 export default {
@@ -36,12 +36,11 @@ export default {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
           const char = puzzle[index];
-          const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
+          const isReadOnly = char !== "-";
           row.push({
-            value: char === "-" ? "" : char,
-            readOnly: char !== "-",
-            isGreen: previous ? previous.isGreen : false,
-            isRed: false
+            value: isReadOnly ? char : "",
+            readOnly: isReadOnly,
+            color: isReadOnly ? 'filled' : '', // Colore iniziale per celle fisse
           });
         }
         newGrid.push(row);
@@ -62,6 +61,17 @@ export default {
 
     },
 
+    // colora la cella come selezionata e comunicalo agli altri
+    handelCellFocus(rowIndex, colIndex) {
+      socket.emit("cellFocus", {
+        rowIndex: rowIndex,
+        colIndex: colIndex,
+        lobbyCode: sessionStorage.getItem("lobbyCode")
+      });
+    },
+    changeCelColor(rowIndex, colIndex) {
+      this.$refs.grid.setCellColor(rowIndex, colIndex, 'gray');
+    },
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
       this.sudokuGrid = [];
@@ -99,6 +109,12 @@ export default {
     this.vite = this.initialVite;
     this.initializeGrid(this.puzzle);
 
+    // reagisco al focus di un utente
+    socket.on("cellFocus", (data) => {
+      const { rowIndex, colIndex } = data;
+      this.changeCelColor(rowIndex, colIndex);
+
+    })
     socket.on("insertedNumber", (puzzle) => {
       this.initializeGrid(puzzle)
     })
@@ -159,8 +175,10 @@ export default {
         </div>
 
         <div class="sudoku-container">
-          <sudoku-grid :grid="sudokuGrid"
+          <sudoku-grid  ref="grid"
+                        :grid="sudokuGrid"
                        @cell-updated="handleCellUpdate"
+                       :onFocus="handelCellFocus"
                        :coloredCell="coloredCell"
           />
 

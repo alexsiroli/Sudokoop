@@ -26,6 +26,13 @@ module.exports = function registerGameHandlers(socket, io) {
     });
   });
 
+  socket.on('cellFocus', (data) => {
+    const {rowIndex, colIndex, lobbyCode} = data;
+    socket.to(lobbyCode).emit("cellFocus", {
+      rowIndex: rowIndex,
+      colIndex: colIndex,
+    })
+  })
 
   socket.on('cellUpdateMulti', (data) => {
     const {cellData, lobbyCode} = data;
