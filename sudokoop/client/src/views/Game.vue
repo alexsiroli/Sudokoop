@@ -80,9 +80,6 @@ export default {
       timerInterval: null,
       // Leaderboard
       showLeaderboard: false,
-
-      // username
-      currentUsername: ""
     };
   },
   computed: {
@@ -101,9 +98,7 @@ export default {
   },
   methods: {
     async startNewGame() {
-      // Stop eventuale timer in corso
       this.stopTimer();
-      // Resetta stati
       this.gameOver = false;
       this.gameOverMessage = "";
       this.vite = 3;
@@ -111,8 +106,6 @@ export default {
       this.gameId = null;
       this.final = false;
       this.showLeaderboard = false;
-
-      // Avvio cronometro
       this.startTimer();
 
       try {
@@ -130,7 +123,7 @@ export default {
     async handleCellUpdate(cellData) {
       if (!this.gameId) return;
 
-      // Resetta la colorazione di errore
+      // Resetta l'eventuale cella rossa precedentemente colorata
       this.coloredCell = null;
 
       try {
@@ -138,24 +131,25 @@ export default {
           gameId: this.gameId,
           row: cellData.row,
           col: cellData.col,
-          value: cellData.value,
+          value: cellData.value
         });
         const data = response.data;
+
         this.vite = data.vite;
 
         if (data.gameOver) {
           // Ferma il timer
           this.stopTimer();
 
-          // Determina se win o lose
+          // Determina se è vittoria o sconfitta
           let result = "lose";
           if (data.message.startsWith("Hai vinto")) {
             result = "win";
-            // Se vinto => salva il tempo in leaderboard
+            // Se vittoria => salva tempo in leaderboard
             await this.saveTimeToLeaderboard(this.timeSpent);
           }
 
-          // Aggiorna statistiche (win o lose)
+          // Aggiorna statistiche (win/lose) se hai un endpoint updateStats
           const username = sessionStorage.getItem("username") || "AnonUser";
           await axios.post("/game/updateStats", {username, result});
 
@@ -167,6 +161,15 @@ export default {
             this.initializeGridWithSolution(data.puzzle, data.solution);
           } else {
             this.initializeGrid(data.puzzle);
+          }
+
+          // SE VITTORIA: forza l'ultima cella a verde
+          if (result === "win") {
+            const {row, col} = cellData;
+            if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
+              this.sudokuGrid[row][col].isGreen = true;
+              this.sudokuGrid[row][col].readOnly = true;
+            }
           }
 
         } else {
@@ -187,18 +190,16 @@ export default {
       }
     },
 
-    // Cronometro: avvio
+    // Avvio cronometro
     startTimer() {
       this.timeSpent = 0;
       this.startTime = Date.now();
       if (this.timerInterval) clearInterval(this.timerInterval);
-
       this.timerInterval = setInterval(() => {
         this.timeSpent = Date.now() - this.startTime;
       }, 100);
     },
-
-    // Cronometro: stop
+    // Stop cronometro
     stopTimer() {
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
@@ -209,7 +210,6 @@ export default {
     // Salva il tempo nella leaderboard
     async saveTimeToLeaderboard(timeMs) {
       try {
-        // Recuperiamo l'username salvato in sessionStorage in fase di login
         const username = sessionStorage.getItem("username") || "AnonUser";
         await axios.post("/game/time", {
           username,
@@ -286,11 +286,9 @@ export default {
     if (["easy", "medium", "hard"].includes(diff)) {
       this.difficulty = diff;
     }
-    // Avvia la partita
     this.startNewGame();
   },
   beforeUnmount() {
-    // Stop timer se si esce dalla pagina
     this.stopTimer();
   }
 };
