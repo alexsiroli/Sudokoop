@@ -69,8 +69,15 @@ export default {
         lobbyCode: sessionStorage.getItem("lobbyCode")
       });
     },
-    changeCelColor(rowIndex, colIndex) {
-      this.$refs.grid.setCellColor(rowIndex, colIndex, 'gray');
+    handleCellDeselection(rowIndex, colIndex) {
+      socket.emit("cellDeselect", {
+        rowIndex: rowIndex,
+        colIndex: colIndex,
+        lobbyCode: sessionStorage.getItem("lobbyCode")
+      });
+    },
+    changeCelColor(rowIndex, colIndex, color) {
+      this.$refs.grid.setCellColor(rowIndex, colIndex, color);
     },
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
@@ -112,7 +119,13 @@ export default {
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       const { rowIndex, colIndex } = data;
-      this.changeCelColor(rowIndex, colIndex);
+      this.changeCelColor(rowIndex, colIndex, 'gray');
+
+    });
+
+    socket.on("cellDeselect", (data) => {
+      const { rowIndex, colIndex } = data;
+      this.changeCelColor(rowIndex, colIndex, 'white');
 
     })
     socket.on("insertedNumber", (puzzle) => {
@@ -179,6 +192,7 @@ export default {
                         :grid="sudokuGrid"
                        @cell-updated="handleCellUpdate"
                        :onFocus="handelCellFocus"
+                        :onDeselect="handleCellDeselection"
                        :coloredCell="coloredCell"
           />
 

@@ -34,6 +34,13 @@ module.exports = function registerGameHandlers(socket, io) {
     })
   })
 
+  socket.on('cellDeselect', (data) => {
+    const {rowIndex, colIndex, lobbyCode} = data;
+    socket.to(lobbyCode).emit("cellDeselect", {
+      rowIndex: rowIndex,
+      colIndex: colIndex,
+    })
+  })
   socket.on('cellUpdateMulti', (data) => {
     const {cellData, lobbyCode} = data;
     const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);

@@ -7,6 +7,7 @@ export default {
     coloredCell: { type: Object, default: null },
     final: { type: Boolean, default: false },
     onFocus: { type: Function, required: false },
+    onDeselect: { type: Function, required: false },
 
   },
   data() {
@@ -35,6 +36,10 @@ export default {
       console.log("hai selezionato ! ")
       this.setCellColor(rowIndex, colIndex, 'gray');
       this.onFocus(rowIndex, colIndex);
+    },
+    onCellDeselect(rowIndex, colIndex) {
+      this.setCellColor(rowIndex, colIndex, 'white');
+      this.onDeselect(rowIndex, colIndex);
     },
 
     // Metodo per aggiornare il colore di una cella
@@ -80,6 +85,7 @@ export default {
             :disabled="cell.readOnly"
             @focus="onCellSelect(rowIndex, colIndex)"
             @input="onCellInput(rowIndex, colIndex, cell.value)"
+            @blur="onCellDeselect(rowIndex, colIndex)"
           />
         </td>
       </tr>
@@ -161,6 +167,10 @@ input {
 
 .cell-gray input{
   background-color: cadetblue;
+}
+
+.cell-white input{
+  background-color: white;
 }
 
 .cell-filled input{
