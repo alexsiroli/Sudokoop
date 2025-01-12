@@ -76,7 +76,9 @@ export default {
         <td
           v-for="(cell, colIndex) in row"
           :key="colIndex"
-          :class="`cell-${cell.color}`"
+          :class="[
+              getCellClass(rowIndex, colIndex),
+              `cell-${cell.color}`]"
         >
           <input
             type="text"
