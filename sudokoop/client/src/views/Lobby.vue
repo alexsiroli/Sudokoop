@@ -27,9 +27,10 @@ export default {
       });
     },
     startMultiGame() {
-      socket.emit("startMultiGame", {
+      socket.emit("checkForStartMultiGame", {
         lobbyCode: this.currentLobbyCode,
         mode: this.selectedMode,
+        username: sessionStorage.getItem('username'),
         difficulty: this.selectedDifficulty,
       });
     }
@@ -58,14 +59,15 @@ export default {
     socket.on("players", (playersArr) => {
       this.players = playersArr;
     });
-    socket.on("gameStarted", mode => {
+
+    socket.on("gameCanStart", mode => {
 
       if (mode === "coop") {
         this.$router.push({ name: 'CoopGame'});
       } else {
         this.$router.push({ name: 'VersusGame' });
       }
-
+      // solo il master crea il gioco
 
     });
     socket.on("notEnoughPlayers", () => {
@@ -79,7 +81,6 @@ export default {
     socket.off("onLobbyCreated");
     socket.off("joinLobby");
     socket.off("players");
-    socket.off("gameStarted");
     socket.off("notMaster");
   },
 };

@@ -6,7 +6,7 @@ import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
 import Timer from "../components/Timer.vue";
 export default {
-  props: ['initialVite', 'puzzle', 'difficulty'],
+  props: ['initialVite', 'puzzle', 'difficulty', 'createNewGame'],
 
   components: { SudokuGrid, LobbyUser, Timer },
   data() {
@@ -21,17 +21,27 @@ export default {
       sudokuGrid: [],
       vite: 0,
       firstInitialization: true,
-
+      isMaster: false,
     };
   },
   computed: {
     hearts() {
       return "❤️".repeat(this.vite);
     },
+
   },
   methods: {
     startNewGame()  {
-      console.log("puzzle : " + this.puzzle);
+      //console.log("puzzle : " + this.puzzle);
+      if (this.gameOver) {
+        //faccio richiesta per nuovo gioco e torno indietro
+        socket.emit('createNewGame',
+          { lobbyCode: sessionStorage.getItem('lobbyCode'),
+            difficulty: this.difficulty
+          });
+        this.$router.push({ name: 'CoopGame'});
+      }
+      this.gameOver = false;
       this.vite = this.initialVite;
       this.initializeGrid(this.puzzle);
       this.firstInitialization = false;
@@ -133,6 +143,16 @@ export default {
 
     this.startNewGame();
 
+    socket.emit("isUserTheMaster",
+      {
+        username: sessionStorage.getItem('username'),
+        code: sessionStorage.getItem("lobbyCode")
+      });
+
+    socket.on("youAreTheMaster",() => {
+      this.isMaster = true;
+      console.log("i am the master")
+    } )
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       const { rowIndex, colIndex } = data;
@@ -193,6 +213,12 @@ export default {
   font-size: 1.1em;
   margin-top: 10px;
 }
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
 </style>
 <template>
   <div class="centered-container">
@@ -225,8 +251,15 @@ export default {
 
         <LobbyUser></LobbyUser>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
-        <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
-          <button class="button new-game-button">Inizia una Nuova Partita</button>
+        <div v-if="gameOver && isMaster" class="game-over-container" style="margin-top: 20px;">
+          <div class="buttons-row">
+            <button @click="startNewGame" class="button new-game-button">
+              Inizia una Nuova Partita
+            </button>
+            <button @click="backToLobby" class="button new-game-button">
+              Torna alla lobby
+            </button>
+          </div>
         </div>
       </div>
     </div>

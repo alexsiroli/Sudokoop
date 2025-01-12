@@ -1,5 +1,6 @@
 const gameController = require('../controllers/gameController');
 module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
+
   socket.on("createLobby", username => {
     console.log("Creating lobby " + username)
     const newLobby = lobbyController.createLobby(username);
@@ -38,9 +39,19 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     io.to(lobbyCode).emit("playersOfLobby", lobbyController.getPlayersOfLobby(lobbyCode));
   });
 
-  socket.on("startMultiGame", (data) => {
-    const { lobbyCode, mode, difficulty } = data;
-    const isMaster = lobbyController.isMaster(lobbyCode, socket.username);
+  socket.on('isUserTheMaster', (data) => {
+    const {username, code} = data;
+    if (lobbyController.isMaster(code, username)) {
+      console.log(username + "is the master")
+     ;
+      console.log("il mio socket id " + socket.id)
+      io.to(socket.id).emit("youAreTheMaster")
+    }
+  })
+
+  socket.on("checkForStartMultiGame", (data) => {
+    const { lobbyCode, mode, username, difficulty } = data;
+    const isMaster = lobbyController.isMaster(lobbyCode, username);
     if (!isMaster) {
       socket.emit("notMaster");
       return;
@@ -54,7 +65,11 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     console.log("mando agli altri il sudoku")
     // const game = gameController.newMultiPlayerGame(difficulty);
     //console.log("game" +  game.sudoku.puzzle);
-    gameController.setGameOfLobby(lobbyCode, difficulty);
-    io.to(lobbyCode).emit("gameStarted", mode);
+
+    // il gioco puo partire: viene creato
+
+    gameController.createNewGame(lobbyCode, difficulty);
+
+    io.to(lobbyCode).emit("gameCanStart", mode);
   });
 };
