@@ -4,10 +4,11 @@ import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
+import Timer from "../components/Timer.vue";
 export default {
   props: ['initialVite', 'puzzle'],
 
-  components: { SudokuGrid, LobbyUser },
+  components: { SudokuGrid, LobbyUser, Timer },
   data() {
     return {
       gameId: null,
@@ -30,6 +31,13 @@ export default {
     },
   },
   methods: {
+    startNewGame()  {
+      console.log("puzzle : " + this.puzzle);
+      this.vite = this.initialVite;
+      this.initializeGrid(this.puzzle);
+      this.firstInitialization = false;
+      this.$refs.timer.startTimer();
+    },
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -123,10 +131,8 @@ export default {
   },
 
   mounted() {
-    console.log("puzzle : " + this.puzzle);
-    this.vite = this.initialVite;
-    this.initializeGrid(this.puzzle);
-    this.firstInitialization = false;
+
+    this.startNewGame();
 
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
@@ -152,6 +158,7 @@ export default {
       // aggiorna vite
       this.vite = data.vite;
       if (data.gameOver) {
+        this.$refs.timer.stopTimer();
         // avviso sudokugrid
         this.final = true;
         this.gameOver = true;
@@ -202,6 +209,7 @@ export default {
       <div class="game-content">
         <div class="lives-container" v-if="!gameOver">
           <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+          <Timer ref="timer"></Timer>
         </div>
 
         <div class="sudoku-container">
