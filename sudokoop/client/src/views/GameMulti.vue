@@ -20,6 +20,7 @@ export default {
       userFilledCells: null,
       sudokuGrid: [],
       vite: 0,
+      firstInitialization: true,
 
     };
   },
@@ -37,10 +38,16 @@ export default {
           const index = i * 9 + j;
           const char = puzzle[index];
           const isReadOnly = char !== "-";
+          const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
+          console.log("firstIn "  + this.firstInitialization)
+
+          const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color ;
+          //console.log("previous", previous);
+          console.log("previousCol", previousCol);
           row.push({
             value: isReadOnly ? char : "",
             readOnly: isReadOnly,
-            color: isReadOnly ? 'filled' : '', // Colore iniziale per celle fisse
+            color: this.firstInitialization && isReadOnly ? 'filled' :previousCol, // Colore iniziale per celle fisse
           });
         }
         newGrid.push(row);
@@ -70,13 +77,17 @@ export default {
       });
     },
     handleCellDeselection(rowIndex, colIndex) {
-      socket.emit("cellDeselect", {
-        rowIndex: rowIndex,
-        colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
-      });
+
+
+        socket.emit("cellDeselect", {
+          rowIndex: rowIndex,
+          colIndex: colIndex,
+          lobbyCode: sessionStorage.getItem("lobbyCode")
+        });
+
     },
     changeCelColor(rowIndex, colIndex, color) {
+      this.sudokuGrid[rowIndex][colIndex].color = color;
       this.$refs.grid.setCellColor(rowIndex, colIndex, color);
     },
     initializeGridWithSolution(puzzle, solution) {
@@ -115,6 +126,7 @@ export default {
     console.log("puzzle : " + this.puzzle);
     this.vite = this.initialVite;
     this.initializeGrid(this.puzzle);
+    this.firstInitialization = false;
 
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
@@ -125,7 +137,11 @@ export default {
 
     socket.on("cellDeselect", (data) => {
       const { rowIndex, colIndex } = data;
-      this.changeCelColor(rowIndex, colIndex, 'white');
+      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly)
+      {
+        this.changeCelColor(rowIndex, colIndex, 'white');
+      }
+
 
     })
     socket.on("insertedNumber", (puzzle) => {
@@ -142,15 +158,16 @@ export default {
         this.gameOverMessage = data.message;
       } else {
         this.initializeGrid(data.puzzle)
+        const { row, col } = data.cellData;
         if (data.message.startsWith("Giusto")) {
-           const { row, col } = data.cellData;
+
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
-            this.sudokuGrid[row][col].isGreen = true;
             this.sudokuGrid[row][col].readOnly = true;
+            this.changeCelColor(row, col, 'green')
+
           }
         } else if (data.message.startsWith("Sbagliato")) {
-          this.coloredCell = { row: data.cellData.row, col: data.cellData.col, color: "red" };
-
+          this.changeCelColor(row, col, 'red')
 
         }
       }

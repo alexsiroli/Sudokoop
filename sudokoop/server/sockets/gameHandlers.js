@@ -28,7 +28,7 @@ module.exports = function registerGameHandlers(socket, io) {
 
   socket.on('cellFocus', (data) => {
     const {rowIndex, colIndex, lobbyCode} = data;
-    socket.to(lobbyCode).emit("cellFocus", {
+    io.to(lobbyCode).emit("cellFocus", {
       rowIndex: rowIndex,
       colIndex: colIndex,
     })
@@ -36,7 +36,7 @@ module.exports = function registerGameHandlers(socket, io) {
 
   socket.on('cellDeselect', (data) => {
     const {rowIndex, colIndex, lobbyCode} = data;
-    socket.to(lobbyCode).emit("cellDeselect", {
+    io.to(lobbyCode).emit("cellDeselect", {
       rowIndex: rowIndex,
       colIndex: colIndex,
     })
