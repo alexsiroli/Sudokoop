@@ -5,10 +5,12 @@ module.exports = function registerGameHandlers(socket, io) {
   const games = {};
 
   socket.on("getGame", (lobbyCode) => {
+
     io.to( lobbyCode).emit("game",
         {
           vite: gameController.getGameOfLobby(lobbyCode).vite,
           sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
+          difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
 
         });
   });

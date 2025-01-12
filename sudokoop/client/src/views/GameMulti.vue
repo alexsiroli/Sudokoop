@@ -6,7 +6,7 @@ import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
 import Timer from "../components/Timer.vue";
 export default {
-  props: ['initialVite', 'puzzle'],
+  props: ['initialVite', 'puzzle', 'difficulty'],
 
   components: { SudokuGrid, LobbyUser, Timer },
   data() {
@@ -15,7 +15,6 @@ export default {
       message: "",
       gameOver: false,
       gameOverMessage: "",
-      difficulty: "easy",
       coloredCell: null,
       final: false,
       userFilledCells: null,
@@ -199,7 +198,8 @@ export default {
   <div class="centered-container">
     <div class="rounded-box game-container">
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
-      <h1 class="title">Gioco Multiplayer </h1>
+      <h1 class="title">Gioco Multiplayer</h1>
+      <h3>Difficoltà: {{this.difficulty}}</h3>
 
       <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
       <div v-if="gameOver" class="game-over-container">
