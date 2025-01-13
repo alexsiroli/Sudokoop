@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-box">
+  <div class="chat-box" v-if="lobbyCode">
     <div class="messages">
       <div
         v-for="(message, index) in messages"
@@ -24,57 +24,52 @@ import socket from "../plugins/socket.js";
 
 export default {
   name: 'ChatBox',
+  props: {
+    lobbyCode: { type: String, required: true }
+  },
   data() {
     return {
       messages: [],
       newMessage: '',
-      lobbyCode: "",
       username: ""
     };
   },
   mounted() {
-    // Leggiamo la lobbyCode e username da sessionStorage
-    this.lobbyCode = sessionStorage.getItem("lobbyCode") || "";
+    // Inizializza l'username al montaggio
     this.username = sessionStorage.getItem("username") || "AnonUser";
-
-    console.log("[DELME] ChatBox mounted => user:", this.username, " code:", this.lobbyCode);
+    console.log("[DELME] ChatBox mounted => user:", this.username, " lobbyCode prop:", this.lobbyCode);
 
     // Ascolta i messaggi in arrivo dal server
     socket.on("lobbyMessage", (msg) => {
-      console.log("[DELME] ChatBox => 'lobbyMessage' ricevuto dal server:", msg);
+      console.log("[DELME] ChatBox => 'lobbyMessage' ricevuto:", msg);
       this.messages.push(msg);
     });
   },
   unmounted() {
-    // Rimuoviamo il listener per evitare duplicati se il componente si smonta
     socket.off("lobbyMessage");
     console.log("[DELME] ChatBox unmounted => listener 'lobbyMessage' rimosso");
   },
   methods: {
     sendMessage() {
+      console.log("[DELME] ChatBox => sendMessage() chiamato. newMessage:", this.newMessage);
+
       if (!this.newMessage.trim()) {
         console.log("[DELME] ChatBox => messaggio vuoto, non invio.");
         return;
       }
       if (!this.lobbyCode) {
-        console.warn("[DELME] ChatBox => nessun lobbyCode disponibile, impossibile inviare messaggi.");
+        console.warn("[DELME] ChatBox => nessun lobbyCode disponibile.");
         return;
       }
-      // Log di debug
-      console.log("[DELME] ChatBox => invio 'lobbyMessage' con:", {
-        lobbyCode: this.lobbyCode,
-        author: this.username,
-        text: this.newMessage
-      });
 
-      // Emettiamo l'evento al server
+      console.log("[DELME] ChatBox => invio messaggio a lobbyCode:", this.lobbyCode);
       socket.emit("lobbyMessage", {
         lobbyCode: this.lobbyCode,
         author: this.username,
         text: this.newMessage
       });
 
-      // Svuota il campo
+      console.log("[DELME] ChatBox => messaggio inviato");
       this.newMessage = "";
     },
   },

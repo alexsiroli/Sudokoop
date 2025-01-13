@@ -16,7 +16,6 @@ class LobbyController {
         return newLobby;
     }
 
-
     findLobby(code) {
         return this.lobbies.find((l) => l.code === code);
     }
@@ -34,6 +33,22 @@ class LobbyController {
         // Aggiunge come non-master
         lobby.players.push({ username, isMaster: false });
         return { success: true };
+    }
+
+    removePlayer(code, username) {
+        const lobby = this.findLobby(code);
+        if (!lobby) return;
+        lobby.players = lobby.players.filter(p => p.username !== username);
+        // Se la lobby ora è vuota, rimuoviamo la lobby
+        if (lobby.players.length === 0) {
+            this.removeLobby(code);
+        } else {
+            // Se manca il master, assegna a uno a caso
+            const masterStillPresent = lobby.players.some(p => p.isMaster);
+            if (!masterStillPresent && lobby.players.length > 0) {
+                lobby.players[0].isMaster = true;
+            }
+        }
     }
 
     getPlayersOfLobby(code) {
