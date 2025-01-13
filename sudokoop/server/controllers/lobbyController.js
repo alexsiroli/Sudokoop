@@ -1,5 +1,3 @@
-const gameController = require("./gameController");
-
 class LobbyController {
     constructor() {
         this.lobbies = [];

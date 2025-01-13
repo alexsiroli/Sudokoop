@@ -102,14 +102,21 @@ export default {
       console.log("[DELME] Lobby.vue => startMultiGame => code:", this.currentLobbyCode,
         " mode:", this.selectedMode, " difficulty:", this.selectedDifficulty);
       socket.emit("checkForStartMultiGame", {
-      console.log("[DELME] Lobby.vue => startMultiGame => code:", this.currentLobbyCode,
-        " mode:", this.selectedMode, " difficulty:", this.selectedDifficulty);
-      socket.emit("startMultiGame", {
         lobbyCode: this.currentLobbyCode,
         mode: this.selectedMode,
         username: sessionStorage.getItem('username'),
         difficulty: this.selectedDifficulty,
       });
+    },
+    leaveLobbyAndGoHome() {
+      // Implementa la logica per abbandonare la lobby e tornare alla home
+      console.log("Abbandono lobby e torno alla Home");
+      // Puoi emettere un socket o cambiare rotta qui
+    },
+    copyLobbyCode() {
+      navigator.clipboard.writeText(this.currentLobbyCode)
+        .then(() => console.log("Codice lobby copiato!"))
+        .catch(err => console.error("Errore nella copia:", err));
     }
   },
   mounted() {
@@ -134,14 +141,12 @@ export default {
         this.lobbyCodeError = "Lobby piena (max 10)!";
       }
     });
-    // Ricevo players come array di { username, isMaster }
     socket.on("players", (playersArr) => {
       console.log("[DELME] Lobby.vue => players =>", playersArr);
       this.players = playersArr;
       this.isMaster = playersArr.some(p =>
         p.username === sessionStorage.getItem('username') && p.isMaster);
     });
-
     socket.on("gameCanStart", mode => {
       console.log("[DELME] Lobby.vue => gameStarted => mode:", mode);
       if (mode === "coop") {
@@ -166,12 +171,11 @@ export default {
     socket.off("gameStarted");
     socket.off("notEnoughPlayers");
     socket.off("notMaster");
-  },
+  }
 };
 </script>
 
 <style scoped>
-
 /* Stili per la sezione master */
 .master-panel {
   margin-top: 20px;
