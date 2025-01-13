@@ -14,16 +14,24 @@ export default {
       difficulty: "",
     };
   },
-
+  methods: {
+    restartNewGame() {
+      this.isInitialized = false;
+      this.getGameData();
+    },
+    getGameData() {
+      socket.emit('getGame', sessionStorage.getItem('lobbyCode'))
+      socket.on("game", (data) => {
+        const {sudoku, vite, difficulty} = data;
+        this.sudokuGrid = sudoku;
+        this.vite = vite;
+        this.isInitialized = true;
+        this.difficulty = difficulty;
+      })
+    }
+  },
   mounted() {
-    socket.emit('getGame', sessionStorage.getItem('lobbyCode'))
-    socket.on("game", (data) => {
-      const {sudoku, vite, difficulty} = data;
-      this.sudokuGrid = sudoku;
-      this.vite = vite;
-      this.isInitialized = true;
-      this.difficulty = difficulty;
-    })
+    this.getGameData();
   },
 };
 </script>
@@ -32,5 +40,6 @@ export default {
 
 </style>
 <template>
-   <GameMulti v-if="this.isInitialized" :initialVite="vite" :puzzle="sudokuGrid" :difficulty="this.difficulty"></GameMulti>
+   <GameMulti v-if="this.isInitialized" :initialVite="vite" :puzzle="sudokuGrid" :difficulty="this.difficulty"
+   :restartNewGame = "restartNewGame"></GameMulti>
 </template>

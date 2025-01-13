@@ -1,14 +1,14 @@
-
 <script>
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
 import Timer from "../components/Timer.vue";
-export default {
-  props: ['initialVite', 'puzzle', 'difficulty', 'createNewGame'],
 
-  components: { SudokuGrid, LobbyUser, Timer },
+export default {
+  props: ['initialVite', 'puzzle', 'difficulty', 'restartNewGame'],
+
+  components: {SudokuGrid, LobbyUser, Timer},
   data() {
     return {
       gameId: null,
@@ -31,21 +31,29 @@ export default {
 
   },
   methods: {
-    startNewGame()  {
+    startNewGame() {
       //console.log("puzzle : " + this.puzzle);
       if (this.gameOver) {
-        //faccio richiesta per nuovo gioco e torno indietro
+        //faccio richiesta per nuovo gioco e torno indietro (sono il master)
         socket.emit('createNewGame',
-          { lobbyCode: sessionStorage.getItem('lobbyCode'),
+          {
+            lobbyCode: sessionStorage.getItem('lobbyCode'),
             difficulty: this.difficulty
           });
-        this.$router.push({ name: 'CoopGame'});
+        this.restartNewGame();
       }
+      this.isInitialized = true;
       this.gameOver = false;
       this.vite = this.initialVite;
+      this.firstInitialization = true;
+      this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
-      this.firstInitialization = false;
-      this.$refs.timer.startTimer();
+
+      this.$nextTick(() => {
+        if (this.$refs.timer) {
+          this.$refs.timer.startTimer();
+        }
+      });
     },
     initializeGrid(puzzle) {
       let newGrid = [];
@@ -56,15 +64,15 @@ export default {
           const char = puzzle[index];
           const isReadOnly = char !== "-";
           const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
-          console.log("firstIn "  + this.firstInitialization)
+          console.log("firstIn " + this.firstInitialization)
 
-          const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color ;
+          const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color;
           //console.log("previous", previous);
           console.log("previousCol", previousCol);
           row.push({
             value: isReadOnly ? char : "",
             readOnly: isReadOnly,
-            color: this.firstInitialization && isReadOnly ? 'filled' :previousCol, // Colore iniziale per celle fisse
+            color: this.firstInitialization && isReadOnly ? 'filled' : previousCol, // Colore iniziale per celle fisse
           });
         }
         newGrid.push(row);
@@ -77,7 +85,7 @@ export default {
       // Resetta il colore della cella errata al nuovo inserimento
       this.coloredCell = null;
       console.log("handleCellUpdate", cellData);
-        // dico al server che ho inserito
+      // dico al server che ho inserito
       socket.emit("cellUpdateMulti", {
         cellData: cellData,
         lobbyCode: sessionStorage.getItem("lobbyCode")
@@ -94,18 +102,20 @@ export default {
       });
     },
     handleCellDeselection(rowIndex, colIndex) {
-
-
-        socket.emit("cellDeselect", {
-          rowIndex: rowIndex,
-          colIndex: colIndex,
-          lobbyCode: sessionStorage.getItem("lobbyCode")
-        });
+      socket.emit("cellDeselect", {
+        rowIndex: rowIndex,
+        colIndex: colIndex,
+        lobbyCode: sessionStorage.getItem("lobbyCode")
+      });
 
     },
     changeCelColor(rowIndex, colIndex, color) {
       this.sudokuGrid[rowIndex][colIndex].color = color;
-      this.$refs.grid.setCellColor(rowIndex, colIndex, color);
+      this.$nextTick(() => {
+        if (this.$refs.grid) {
+          this.$refs.grid.setCellColor(rowIndex, colIndex, color);
+        }
+      });
     },
     initializeGridWithSolution(puzzle, solution) {
       const previousGrid = this.sudokuGrid;
@@ -149,21 +159,25 @@ export default {
         code: sessionStorage.getItem("lobbyCode")
       });
 
-    socket.on("youAreTheMaster",() => {
+    socket.on("restartTheGame", () => {
+
+      this.restartNewGame();
+    })
+    socket.on("youAreTheMaster", () => {
       this.isMaster = true;
       console.log("i am the master")
-    } )
+    })
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
-      const { rowIndex, colIndex } = data;
+      console.log("cellFocus!!!");
+      const {rowIndex, colIndex} = data;
       this.changeCelColor(rowIndex, colIndex, 'gray');
 
     });
 
     socket.on("cellDeselect", (data) => {
-      const { rowIndex, colIndex } = data;
-      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly)
-      {
+      const {rowIndex, colIndex} = data;
+      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly) {
         this.changeCelColor(rowIndex, colIndex, 'white');
       }
 
@@ -177,14 +191,18 @@ export default {
       // aggiorna vite
       this.vite = data.vite;
       if (data.gameOver) {
-        this.$refs.timer.stopTimer();
+        this.$nextTick(() => {
+          if (this.$refs.timer) {
+            this.$refs.timer.stopTimer();
+          }
+        });
         // avviso sudokugrid
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
       } else {
         this.initializeGrid(data.puzzle)
-        const { row, col } = data.cellData;
+        const {row, col} = data.cellData;
         if (data.message.startsWith("Giusto")) {
 
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
@@ -197,7 +215,6 @@ export default {
 
         }
       }
-
     });
   },
 };
@@ -209,10 +226,12 @@ export default {
   font-weight: bold;
   margin-bottom: 20px;
 }
+
 .message-container {
   font-size: 1.1em;
   margin-top: 10px;
 }
+
 .buttons-row {
   display: flex;
   gap: 20px;
@@ -225,11 +244,11 @@ export default {
     <div class="rounded-box game-container">
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
       <h1 class="title">Gioco Multiplayer</h1>
-      <h3>Difficoltà: {{this.difficulty}}</h3>
+      <h3>Difficoltà: {{ this.difficulty }}</h3>
 
       <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
       <div v-if="gameOver" class="game-over-container">
-        <p class="game-over-message"> {{this.gameOverMessage}}</p>
+        <p class="game-over-message"> {{ this.gameOverMessage }}</p>
       </div>
 
       <div class="game-content">
@@ -240,10 +259,10 @@ export default {
 
         <div class="sudoku-container">
           <sudoku-grid  ref="grid"
-                        :grid="sudokuGrid"
+                       :grid="sudokuGrid"
                        @cell-updated="handleCellUpdate"
                        :onFocus="handelCellFocus"
-                        :onDeselect="handleCellDeselection"
+                       :onDeselect="handleCellDeselection"
                        :coloredCell="coloredCell"
           />
 

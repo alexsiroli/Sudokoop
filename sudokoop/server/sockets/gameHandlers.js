@@ -17,6 +17,7 @@ module.exports = function registerGameHandlers(socket, io) {
         console.log("creating new game")
         const {lobbyCode, difficulty} = data;
         gameController.createNewGame(lobbyCode, difficulty);
+        io.to(lobbyCode).emit("restartTheGame")
     });
 
     // Avvio partita single player

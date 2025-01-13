@@ -44,8 +44,11 @@ export default {
 
     // Metodo per aggiornare il colore di una cella
     setCellColor(rowIndex, colIndex, color) {
+      console.log("THE PUZZLE IS " + this.grid[0][0] + this.grid[1][0] + this.grid[2][0] + this.grid[3][0]);
       const cell = this.grid[rowIndex][colIndex];
       if (!cell) return;
+      console.log("the cell is " + cell)
+      console.log("cell color " + cell.color)
       console.log("changinbg color to " + color)
       // Imposta il colore direttamente
       cell.color = color;
