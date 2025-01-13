@@ -30,11 +30,10 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       }
       return;
     }
-    // Se join avviene con successo
+
     socket.join(code);
     socket.emit("joinLobby", "Ok");
-
-    // Aggiorna la lista dei giocatori nella lobby
+    // Re-invia la lista aggiornata (array di obj)
     const lobby = lobbyController.findLobby(code);
     if (lobby) {
       io.to(code).emit("players", lobby.players);
@@ -76,21 +75,37 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   });
 
   // Avvio partita multiplayer
-  socket.on("startMultiGame", (data) => {
-    const { lobbyCode, mode, difficulty } = data;
-    console.log("[DELME] SERVER: startMultiGame => code:", lobbyCode, " mode:", mode);
+  socket.on('isUserTheMaster', (data) => {
+    const {username, code} = data;
+    if (lobbyController.isMaster(code, username)) {
+      console.log(username + "is the master")
+     ;
+      console.log("il mio socket id " + socket.id)
+      io.to(socket.id).emit("youAreTheMaster")
+    }
+  })
 
-    const isMaster = lobbyController.isMaster(lobbyCode, socket.username);
+  socket.on("checkForStartMultiGame", (data) => {
+    const { lobbyCode, mode, username, difficulty } = data;
+    const isMaster = lobbyController.isMaster(lobbyCode, username);
     if (!isMaster) {
       socket.emit("notMaster");
       return;
     }
+    // se ci sono meno di due giocatori nella lobby, il gioco non può iniziare
     if (lobbyController.getPlayersOfLobby(lobbyCode).length < 2) {
       io.to(lobbyCode).emit("notEnoughPlayers");
       return;
     }
-    gameController.setGameOfLobby(lobbyCode, difficulty);
-    io.to(lobbyCode).emit("gameStarted", mode);
-    console.log("[DELME] SERVER: gameStarted => mode:", mode, "in lobby:", lobbyCode);
+    // inizia il gioco, chiedo al gestore dei game di mandare la griglia
+    console.log("mando agli altri il sudoku")
+    // const game = gameController.newMultiPlayerGame(difficulty);
+    //console.log("game" +  game.sudoku.puzzle);
+
+    // il gioco puo partire: viene creato
+
+    gameController.createNewGame(lobbyCode, difficulty);
+
+    io.to(lobbyCode).emit("gameCanStart", mode);
   });
 };

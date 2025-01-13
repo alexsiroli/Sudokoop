@@ -76,7 +76,7 @@ export default {
     return {
       inLobby: false,
       currentLobbyCode: "",
-      players: [],
+      players: [], // array di oggetti { username, isMaster }
       isMaster: false,
       selectedMode: "coop",
       selectedDifficulty: "easy",
@@ -101,27 +101,15 @@ export default {
     startMultiGame() {
       console.log("[DELME] Lobby.vue => startMultiGame => code:", this.currentLobbyCode,
         " mode:", this.selectedMode, " difficulty:", this.selectedDifficulty);
+      socket.emit("checkForStartMultiGame", {
+      console.log("[DELME] Lobby.vue => startMultiGame => code:", this.currentLobbyCode,
+        " mode:", this.selectedMode, " difficulty:", this.selectedDifficulty);
       socket.emit("startMultiGame", {
         lobbyCode: this.currentLobbyCode,
         mode: this.selectedMode,
+        username: sessionStorage.getItem('username'),
         difficulty: this.selectedDifficulty,
       });
-    },
-    leaveLobbyAndGoHome() {
-      if (this.currentLobbyCode) {
-        const username = sessionStorage.getItem("username") || "AnonUser";
-        socket.emit("leaveLobby", {code: this.currentLobbyCode, username});
-        socket.emit("leaveLobbyRoom", this.currentLobbyCode);
-        sessionStorage.removeItem("lobbyCode");
-      }
-      this.$router.push({name: "Home"});
-    },
-    copyLobbyCode() {
-      if (this.currentLobbyCode) {
-        navigator.clipboard.writeText(this.currentLobbyCode)
-          .then(() => console.log("[DELME] Lobby.vue => Codice copiato"))
-          .catch(err => console.error("[DELME] Lobby.vue => Errore nel copiare il codice:", err));
-      }
     }
   },
   mounted() {
@@ -146,13 +134,15 @@ export default {
         this.lobbyCodeError = "Lobby piena (max 10)!";
       }
     });
+    // Ricevo players come array di { username, isMaster }
     socket.on("players", (playersArr) => {
       console.log("[DELME] Lobby.vue => players =>", playersArr);
       this.players = playersArr;
       this.isMaster = playersArr.some(p =>
         p.username === sessionStorage.getItem('username') && p.isMaster);
     });
-    socket.on("gameStarted", (mode) => {
+
+    socket.on("gameCanStart", mode => {
       console.log("[DELME] Lobby.vue => gameStarted => mode:", mode);
       if (mode === "coop") {
         this.$router.push({name: 'CoopGame'});

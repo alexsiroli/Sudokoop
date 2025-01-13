@@ -58,11 +58,12 @@ const gameController = {
         });
     },
 
-    setGameOfLobby: (lobbyCode, difficulty) => {
+    createNewGame: (lobbyCode, difficulty) => {
         lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
     },
 
     getGameOfLobby: (lobbyCode) => {
+
         if (!lobbyGame[lobbyCode]) {
             console.log("Lobby not found for code: " + lobbyCode);
             return null;

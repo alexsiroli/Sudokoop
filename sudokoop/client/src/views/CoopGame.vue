@@ -1,26 +1,28 @@
-
 <script>
 import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
 import GameMulti from './GameMulti.vue';
+
 export default {
   name: 'CoopGame',
-  components: { SudokuGrid, GameMulti },
+  components: {SudokuGrid, GameMulti},
   data() {
     return {
       sudokuGrid: "",
       vite: 0,
       isInitialized: false,
+      difficulty: "",
     };
   },
 
   mounted() {
-    socket.emit('getGame', sessionStorage.getItem('lobbyCode'));
+    socket.emit('getGame', sessionStorage.getItem('lobbyCode'))
     socket.on("game", (data) => {
-      const { sudoku, vite } = data;
+      const {sudoku, vite, difficulty} = data;
       this.sudokuGrid = sudoku;
       this.vite = vite;
       this.isInitialized = true;
+      this.difficulty = difficulty;
     })
   },
 };
@@ -30,5 +32,5 @@ export default {
 
 </style>
 <template>
-  <GameMulti v-if="this.isInitialized" :initialVite ="vite" :puzzle="sudokuGrid"></GameMulti>
+   <GameMulti v-if="this.isInitialized" :initialVite="vite" :puzzle="sudokuGrid" :difficulty="this.difficulty"></GameMulti>
 </template>

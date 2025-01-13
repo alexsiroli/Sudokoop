@@ -4,31 +4,49 @@ import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
+import Timer from "../components/Timer.vue";
 export default {
-  props: ['initialVite', 'puzzle'],
+  props: ['initialVite', 'puzzle', 'difficulty', 'createNewGame'],
 
-  components: { SudokuGrid, LobbyUser },
+  components: { SudokuGrid, LobbyUser, Timer },
   data() {
     return {
       gameId: null,
       message: "",
       gameOver: false,
       gameOverMessage: "",
-      difficulty: "easy",
       coloredCell: null,
       final: false,
       userFilledCells: null,
       sudokuGrid: [],
       vite: 0,
-
+      firstInitialization: true,
+      isMaster: false,
     };
   },
   computed: {
     hearts() {
       return "❤️".repeat(this.vite);
     },
+
   },
   methods: {
+    startNewGame()  {
+      //console.log("puzzle : " + this.puzzle);
+      if (this.gameOver) {
+        //faccio richiesta per nuovo gioco e torno indietro
+        socket.emit('createNewGame',
+          { lobbyCode: sessionStorage.getItem('lobbyCode'),
+            difficulty: this.difficulty
+          });
+        this.$router.push({ name: 'CoopGame'});
+      }
+      this.gameOver = false;
+      this.vite = this.initialVite;
+      this.initializeGrid(this.puzzle);
+      this.firstInitialization = false;
+      this.$refs.timer.startTimer();
+    },
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -37,10 +55,16 @@ export default {
           const index = i * 9 + j;
           const char = puzzle[index];
           const isReadOnly = char !== "-";
+          const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
+          console.log("firstIn "  + this.firstInitialization)
+
+          const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color ;
+          //console.log("previous", previous);
+          console.log("previousCol", previousCol);
           row.push({
             value: isReadOnly ? char : "",
             readOnly: isReadOnly,
-            color: isReadOnly ? 'filled' : '', // Colore iniziale per celle fisse
+            color: this.firstInitialization && isReadOnly ? 'filled' :previousCol, // Colore iniziale per celle fisse
           });
         }
         newGrid.push(row);
@@ -70,13 +94,17 @@ export default {
       });
     },
     handleCellDeselection(rowIndex, colIndex) {
-      socket.emit("cellDeselect", {
-        rowIndex: rowIndex,
-        colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
-      });
+
+
+        socket.emit("cellDeselect", {
+          rowIndex: rowIndex,
+          colIndex: colIndex,
+          lobbyCode: sessionStorage.getItem("lobbyCode")
+        });
+
     },
     changeCelColor(rowIndex, colIndex, color) {
+      this.sudokuGrid[rowIndex][colIndex].color = color;
       this.$refs.grid.setCellColor(rowIndex, colIndex, color);
     },
     initializeGridWithSolution(puzzle, solution) {
@@ -112,10 +140,19 @@ export default {
   },
 
   mounted() {
-    console.log("puzzle : " + this.puzzle);
-    this.vite = this.initialVite;
-    this.initializeGrid(this.puzzle);
 
+    this.startNewGame();
+
+    socket.emit("isUserTheMaster",
+      {
+        username: sessionStorage.getItem('username'),
+        code: sessionStorage.getItem("lobbyCode")
+      });
+
+    socket.on("youAreTheMaster",() => {
+      this.isMaster = true;
+      console.log("i am the master")
+    } )
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       const { rowIndex, colIndex } = data;
@@ -125,7 +162,11 @@ export default {
 
     socket.on("cellDeselect", (data) => {
       const { rowIndex, colIndex } = data;
-      this.changeCelColor(rowIndex, colIndex, 'white');
+      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly)
+      {
+        this.changeCelColor(rowIndex, colIndex, 'white');
+      }
+
 
     })
     socket.on("insertedNumber", (puzzle) => {
@@ -136,21 +177,23 @@ export default {
       // aggiorna vite
       this.vite = data.vite;
       if (data.gameOver) {
+        this.$refs.timer.stopTimer();
         // avviso sudokugrid
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
       } else {
         this.initializeGrid(data.puzzle)
+        const { row, col } = data.cellData;
         if (data.message.startsWith("Giusto")) {
-           const { row, col } = data.cellData;
+
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
-            this.sudokuGrid[row][col].isGreen = true;
             this.sudokuGrid[row][col].readOnly = true;
+            this.changeCelColor(row, col, 'green')
+
           }
         } else if (data.message.startsWith("Sbagliato")) {
-          this.coloredCell = { row: data.cellData.row, col: data.cellData.col, color: "red" };
-
+          this.changeCelColor(row, col, 'red')
 
         }
       }
@@ -170,12 +213,19 @@ export default {
   font-size: 1.1em;
   margin-top: 10px;
 }
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
 </style>
 <template>
   <div class="centered-container">
     <div class="rounded-box game-container">
       <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
-      <h1 class="title">Gioco Multiplayer </h1>
+      <h1 class="title">Gioco Multiplayer</h1>
+      <h3>Difficoltà: {{this.difficulty}}</h3>
 
       <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
       <div v-if="gameOver" class="game-over-container">
@@ -185,6 +235,7 @@ export default {
       <div class="game-content">
         <div class="lives-container" v-if="!gameOver">
           <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+          <Timer ref="timer"></Timer>
         </div>
 
         <div class="sudoku-container">
@@ -200,8 +251,15 @@ export default {
 
         <LobbyUser></LobbyUser>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
-        <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
-          <button class="button new-game-button">Inizia una Nuova Partita</button>
+        <div v-if="gameOver && isMaster" class="game-over-container" style="margin-top: 20px;">
+          <div class="buttons-row">
+            <button @click="startNewGame" class="button new-game-button">
+              Inizia una Nuova Partita
+            </button>
+            <button @click="backToLobby" class="button new-game-button">
+              Torna alla lobby
+            </button>
+          </div>
         </div>
       </div>
     </div>
