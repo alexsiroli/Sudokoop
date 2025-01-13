@@ -92,6 +92,7 @@ const gameController = {
             return ({
                 puzzle: game.sudoku.puzzle,
                 solution: game.sudoku.solution,
+                cellData: cellData,
                 vite: game.vite,
                 message: 'Hai vinto!',
                 gameOver: true,

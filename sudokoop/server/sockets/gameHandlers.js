@@ -52,8 +52,10 @@ module.exports = function registerGameHandlers(socket, io) {
     socket.on('cellUpdateMulti', (data) => {
         const {cellData, lobbyCode} = data;
         const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
-        io.to(lobbyCode).emit("insertedNumber", partialResult)
         const result = gameController.insertNumberMulti(cellData, lobbyCode);
+        if (!result.gameOver) {
+            io.to(lobbyCode).emit("insertedNumber", partialResult)
+        }
         console.log("result after update " + result);
         io.to(lobbyCode).emit("afterUpdating", result);
     });

@@ -116,32 +116,23 @@ export default {
         }
       });
     },
-    initializeGridWithSolution(puzzle, solution) {
-      const previousGrid = this.sudokuGrid;
-      this.sudokuGrid = [];
+
+    initializeGridWithSolution(solution) {
+      //const previousGrid = this.sudokuGrid;
+      //this.sudokuGrid = [];
+
       for (let i = 0; i < 9; i++) {
-        const row = [];
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
-          const char = puzzle[index];
-          const initiallyFilled = this.initialPuzzle[index] !== "-";
-          const previouslyGreen = previousGrid[i] && previousGrid[i][j] && previousGrid[i][j].isGreen;
-          let cellValue;
-          if (char === "-" && solution) {
-            cellValue = solution[index];
-          } else {
-            cellValue = char === "-" ? "" : char;
-          }
-          row.push({
-            value: cellValue,
-            readOnly: true,
-            isGreen: !initiallyFilled && previouslyGreen,
-            isRed: !initiallyFilled && !previouslyGreen
-          });
-        }
-        this.sudokuGrid.push(row);
-      }
 
+          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'green'
+          && !this.sudokuGrid[i][j].readOnly)) {
+            this.sudokuGrid[i][j].value = solution[index];
+            this.changeCelColor(i,j, 'red')
+          }
+          this.sudokuGrid[i][j].readOnly = true;
+        }
+      }
     },
     goToHome() {
       this.$router.push("/home");
@@ -192,6 +183,8 @@ export default {
       this.initializeGrid(puzzle)
     })
     socket.on("afterUpdating", (data) => {
+
+
       console.log("afterUpdating ", data);
       // aggiorna vite
       this.vite = data.vite;
@@ -205,8 +198,15 @@ export default {
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
+        // perso
+        if (this.vite === 0) {
+          console.log("inizializza con solizone ")
+          this.initializeGridWithSolution(data.solution);
+        } else {
+          // vinto: imposti l'ultimo inserimento a verde
+          this.changeCelColor(data.cellData.row, data.cellData.col, 'green')
+        }
       } else {
-
         const {row, col} = data.cellData;
         if (data.message.startsWith("Giusto")) {
 

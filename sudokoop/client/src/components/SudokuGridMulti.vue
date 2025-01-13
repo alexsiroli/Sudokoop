@@ -165,6 +165,7 @@ input {
 
 .cell-red input{
   background-color: lightcoral;
+  font-weight: bold;
 }
 
 .cell-gray input{
