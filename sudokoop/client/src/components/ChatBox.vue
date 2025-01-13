@@ -5,8 +5,17 @@
         v-for="(message, index) in messages"
         :key="index"
         class="message-item"
+        :style="getMessageStyle(message)"
       >
-        <strong>{{ message.author }}:</strong> {{ message.text }}
+        <template v-if="message.type === 'join'">
+          <strong>{{ message.author }}:</strong> {{ message.text }}
+        </template>
+        <template v-else-if="message.type === 'leave'">
+          <strong>{{ message.author }}:</strong> {{ message.text }}
+        </template>
+        <template v-else>
+          <strong>{{ message.author }}:</strong> {{ message.text }}
+        </template>
       </div>
     </div>
     <input
@@ -31,23 +40,50 @@ export default {
     return {
       messages: [],
       newMessage: '',
-      username: ""
+      username: "",
+      knownPlayers: []  // Per tenere traccia dei giocatori già noti
     };
   },
   mounted() {
-    // Inizializza l'username al montaggio
     this.username = sessionStorage.getItem("username") || "AnonUser";
     console.log("[DELME] ChatBox mounted => user:", this.username, " lobbyCode prop:", this.lobbyCode);
 
-    // Ascolta i messaggi in arrivo dal server
+    // Gestione dei messaggi in arrivo
     socket.on("lobbyMessage", (msg) => {
       console.log("[DELME] ChatBox => 'lobbyMessage' ricevuto:", msg);
-      this.messages.push(msg);
+      this.messages.push({ ...msg, type: 'chat' });
+    });
+
+    // Ascolta aggiornamenti dei giocatori per generare messaggi di sistema
+    socket.on("players", (playersArr) => {
+      console.log("[DELME] ChatBox => 'players' evento ricevuto:", playersArr);
+      // Determina chi è entrato e chi è uscito
+      const newPlayers = playersArr.filter(p => !this.knownPlayers.some(k => k.username === p.username));
+      const leftPlayers = this.knownPlayers.filter(k => !playersArr.some(p => p.username === k.username));
+
+      newPlayers.forEach(p => {
+        this.messages.push({
+          author: "lobby",
+          text: `${p.username} si è unito alla lobby`,
+          type: 'join'
+        });
+      });
+
+      leftPlayers.forEach(p => {
+        this.messages.push({
+          author: "lobby",
+          text: `${p.username} ha lasciato la lobby`,
+          type: 'leave'
+        });
+      });
+
+      this.knownPlayers = playersArr;
     });
   },
   unmounted() {
     socket.off("lobbyMessage");
-    console.log("[DELME] ChatBox unmounted => listener 'lobbyMessage' rimosso");
+    socket.off("players");
+    console.log("[DELME] ChatBox unmounted => listener rimosso");
   },
   methods: {
     sendMessage() {
@@ -72,7 +108,16 @@ export default {
       console.log("[DELME] ChatBox => messaggio inviato");
       this.newMessage = "";
     },
-  },
+    getMessageStyle(message) {
+      // Imposta stili in base al tipo di messaggio di sistema
+      if (message.type === 'join') {
+        return { color: 'green' };
+      } else if (message.type === 'leave') {
+        return { color: 'red' };
+      }
+      return {};
+    }
+  }
 };
 </script>
 
