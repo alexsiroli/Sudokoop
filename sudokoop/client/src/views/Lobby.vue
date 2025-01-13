@@ -18,9 +18,12 @@
         </div>
         <p class="text-bg-danger" v-if="lobbyCodeError">{{ lobbyCodeError }}</p>
       </div>
-
       <div v-else>
-        <p>Codice Lobby: {{ currentLobbyCode }}</p>
+        <p>
+          Codice Lobby:
+          <strong>{{ currentLobbyCode }}</strong>
+          <button class="copy-button" @click="copyLobbyCode">Copia</button>
+        </p>
         <h3>Giocatori:</h3>
         <ul>
           <li v-for="p in players" :key="p.username">
@@ -104,6 +107,13 @@ export default {
         sessionStorage.removeItem("lobbyCode");
       }
       this.$router.push({name: "Home"});
+    },
+    copyLobbyCode() {
+      if (this.currentLobbyCode) {
+        navigator.clipboard.writeText(this.currentLobbyCode)
+          .then(() => console.log("[DELME] Lobby.vue => Codice copiato"))
+          .catch(err => console.error("[DELME] Lobby.vue => Errore nel copiare il codice:", err));
+      }
     }
   },
   mounted() {
@@ -163,5 +173,9 @@ export default {
 </script>
 
 <style scoped>
-/* Stili locali (eventuali) */
+.copy-button {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 0.8em;
+}
 </style>
