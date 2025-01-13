@@ -147,10 +147,6 @@ input {
   border-bottom: 2px solid var(--border-color);
 }
 
-.cell-readonly input {
-  background-color: #eaeaea;
-  font-weight: bold;
-}
 
 /* Stili specifici per Single Player */
 .sp-green input {
@@ -164,6 +160,7 @@ input {
 /* Stili specifici per Single Player */
 .cell-green input {
   background-color: lightgreen;
+  font-weight: bold;
 }
 
 .cell-red input{
@@ -179,6 +176,7 @@ input {
 }
 
 .cell-filled input{
-  background-color: gray;
+  background-color: rgb(234, 234, 234);
+  font-weight: bold;
 }
 </style>

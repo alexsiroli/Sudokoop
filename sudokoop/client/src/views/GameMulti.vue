@@ -22,6 +22,7 @@ export default {
       vite: 0,
       firstInitialization: true,
       isMaster: false,
+      lastCell: null,
     };
   },
   computed: {
@@ -54,6 +55,7 @@ export default {
           this.$refs.timer.startTimer();
         }
       });
+      this.firstInitialization = false;
     },
     initializeGrid(puzzle) {
       let newGrid = [];
@@ -64,11 +66,8 @@ export default {
           const char = puzzle[index];
           const isReadOnly = char !== "-";
           const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
-          console.log("firstIn " + this.firstInitialization)
-
           const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color;
           //console.log("previous", previous);
-          console.log("previousCol", previousCol);
           row.push({
             value: isReadOnly ? char : "",
             readOnly: isReadOnly,
@@ -207,19 +206,30 @@ export default {
         this.gameOver = true;
         this.gameOverMessage = data.message;
       } else {
-        this.initializeGrid(data.puzzle)
+
         const {row, col} = data.cellData;
         if (data.message.startsWith("Giusto")) {
 
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
+            if (this.lastCell != null ) {
+              console.log("lastCell is null")
+              this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
+            }
             this.sudokuGrid[row][col].readOnly = true;
             this.changeCelColor(row, col, 'green')
+            this.lastCell = null;
 
           }
         } else if (data.message.startsWith("Sbagliato")) {
+          console.log("Last CEll " + data.cellData)
+          if (this.lastCell != null) {
+            this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
+          }
+          this.lastCell = data.cellData;
           this.changeCelColor(row, col, 'red')
 
         }
+        this.initializeGrid(data.puzzle)
       }
     });
   },
