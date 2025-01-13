@@ -57,7 +57,7 @@
           </div>
           <button
             @click="startMultiGame"
-            class="start-button">Avvia Partita</button>
+            class="button">Avvia Partita</button>
           <p class="text-danger">{{ errorOnStart }}</p>
         </div>
       </div>
@@ -224,21 +224,6 @@ export default {
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
-}
-
-.start-button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #4363d8;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.start-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .copy-button {
