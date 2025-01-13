@@ -1,6 +1,6 @@
 <template>
   <div class="chat-box" v-if="lobbyCode">
-    <div class="messages">
+    <div class="messages" ref="messagesContainer">
       <div
         v-for="(message, index) in messages"
         :key="index"
@@ -41,27 +41,38 @@ export default {
       messages: [],
       newMessage: '',
       username: "",
-      knownPlayers: []  // Per tenere traccia dei giocatori già noti
+      knownPlayers: [],
+      colors: [
+        '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
+        '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe'
+      ],
+      userColorMap: {},       // Mappa degli utenti ai colori assegnati
+      currentColorIndex: 0    // Indice per l'assegnazione sequenziale dei colori
     };
   },
   mounted() {
     this.username = sessionStorage.getItem("username") || "AnonUser";
     console.log("[DELME] ChatBox mounted => user:", this.username, " lobbyCode prop:", this.lobbyCode);
 
-    // Gestione dei messaggi in arrivo
     socket.on("lobbyMessage", (msg) => {
       console.log("[DELME] ChatBox => 'lobbyMessage' ricevuto:", msg);
       this.messages.push({ ...msg, type: 'chat' });
+      this.scrollToBottom();
     });
 
-    // Ascolta aggiornamenti dei giocatori per generare messaggi di sistema
     socket.on("players", (playersArr) => {
       console.log("[DELME] ChatBox => 'players' evento ricevuto:", playersArr);
-      // Determina chi è entrato e chi è uscito
+      // Determina i nuovi giocatori e quelli che hanno lasciato la lobby
       const newPlayers = playersArr.filter(p => !this.knownPlayers.some(k => k.username === p.username));
       const leftPlayers = this.knownPlayers.filter(k => !playersArr.some(p => p.username === k.username));
 
+      // Assegna colori ai nuovi giocatori in ordine
       newPlayers.forEach(p => {
+        // Assegna colore solo se non già assegnato
+        if (!this.userColorMap[p.username]) {
+          this.userColorMap[p.username] = this.colors[this.currentColorIndex];
+          this.currentColorIndex = (this.currentColorIndex + 1) % this.colors.length;
+        }
         this.messages.push({
           author: "lobby",
           text: `${p.username} si è unito alla lobby`,
@@ -69,7 +80,9 @@ export default {
         });
       });
 
+      // Rimuove i giocatori che hanno lasciato dalla mappa colori
       leftPlayers.forEach(p => {
+        delete this.userColorMap[p.username];
         this.messages.push({
           author: "lobby",
           text: `${p.username} ha lasciato la lobby`,
@@ -78,6 +91,7 @@ export default {
       });
 
       this.knownPlayers = playersArr;
+      this.scrollToBottom();
     });
   },
   unmounted() {
@@ -98,7 +112,6 @@ export default {
         return;
       }
 
-      console.log("[DELME] ChatBox => invio messaggio a lobbyCode:", this.lobbyCode);
       socket.emit("lobbyMessage", {
         lobbyCode: this.lobbyCode,
         author: this.username,
@@ -109,13 +122,24 @@ export default {
       this.newMessage = "";
     },
     getMessageStyle(message) {
-      // Imposta stili in base al tipo di messaggio di sistema
       if (message.type === 'join') {
         return { color: 'green' };
       } else if (message.type === 'leave') {
         return { color: 'red' };
       }
-      return {};
+      return { color: this.getUserColor(message.author) };
+    },
+    getUserColor(username) {
+      // Restituisce il colore assegnato all'utente dalla mappa, oppure nero se non trovato
+      return this.userColorMap[username] || '#000000';
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.messagesContainer;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
     }
   }
 };
