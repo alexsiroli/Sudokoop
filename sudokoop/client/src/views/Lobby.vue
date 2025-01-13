@@ -109,9 +109,27 @@ export default {
       });
     },
     leaveLobbyAndGoHome() {
-      // Implementa la logica per abbandonare la lobby e tornare alla home
-      console.log("Abbandono lobby e torno alla Home");
-      // Puoi emettere un socket o cambiare rotta qui
+        const username = sessionStorage.getItem('username');
+        const lobbyCode = this.currentLobbyCode;
+
+        console.log("Abbandono lobby e torno alla Home");
+
+        // Se l'utente è attualmente in lobby, invia l'evento di abbandono al server
+        if (this.inLobby && lobbyCode && username) {
+          socket.emit("leaveLobby", { code: lobbyCode, username });
+        }
+
+        // Pulizia dello stato locale relativo alla lobby
+        sessionStorage.removeItem("lobbyCode");
+        this.inLobby = false;
+        this.currentLobbyCode = "";
+        this.players = [];
+        this.isMaster = false;
+        this.lobbyCode = "";
+        this.lobbyCodeError = "";
+        this.errorOnStart = "";
+
+        this.$router.push({ name: 'Home' });
     },
     copyLobbyCode() {
       navigator.clipboard.writeText(this.currentLobbyCode)
