@@ -30,28 +30,36 @@
             {{ p.username }} <span v-if="p.isMaster"> (Master)</span>
           </li>
         </ul>
-        <div v-if="isMaster">
-          <label>Modalità:</label>
-          <select v-model="selectedMode">
-            <option value="coop">Coop</option>
-            <option value="versus">Versus</option>
-          </select>
-          <div v-if="selectedMode==='coop'">
-            <label>Difficoltà:</label>
-            <select v-model="selectedDifficulty">
-              <option value="easy">Facile</option>
-              <option value="medium">Medio</option>
-              <option value="hard">Difficile</option>
-            </select>
+
+        <!-- ChatBox visibile solo se inLobby è true -->
+        <div style="margin-top: 20px;" v-if="inLobby">
+          <chat-box :lobbyCode="currentLobbyCode" />
+        </div>
+
+        <!-- Sezione Master spostata sotto la ChatBox -->
+        <div v-if="isMaster" class="master-panel">
+          <div class="options">
+            <label>Modalità:
+              <select v-model="selectedMode">
+                <option value="coop">Coop</option>
+                <option value="versus">Versus</option>
+              </select>
+            </label>
+            <div v-if="selectedMode==='coop'">
+              <label>Difficoltà:
+                <select v-model="selectedDifficulty">
+                  <option value="easy">Facile</option>
+                  <option value="medium">Medio</option>
+                  <option value="hard">Difficile</option>
+                </select>
+              </label>
+            </div>
           </div>
-          <button @click="startMultiGame">Avvia Partita</button>
+          <button
+            @click="startMultiGame"
+            class="start-button">Avvia Partita</button>
           <p class="text-danger">{{ errorOnStart }}</p>
         </div>
-      </div>
-
-      <!-- ChatBox visibile solo se inLobby è true -->
-      <div style="margin-top: 20px;" v-if="inLobby">
-        <chat-box :lobbyCode="currentLobbyCode" />
       </div>
     </div>
   </div>
@@ -173,6 +181,52 @@ export default {
 </script>
 
 <style scoped>
+
+/* Stili per la sezione master */
+.master-panel {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: var(--box-bg-color);
+  width: 300px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.options label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.options select {
+  margin-top: 5px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.start-button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #4363d8;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .copy-button {
   margin-left: 10px;
   padding: 5px;
