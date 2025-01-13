@@ -33,6 +33,13 @@ module.exports = function registerGameHandlers(socket, io) {
             emptyPlace: game.emptyPlace,
         });
     });
+    socket.on("joinTeam", (data) => {
+        const { color, username, lobbyCode } = data;
+        io.to(lobbyCode).emit("onJoinTeam", {
+            color: color,
+            username: username,
+        });
+    })
 
     socket.on('cellFocus', (data) => {
         const {rowIndex, colIndex, lobbyCode} = data;

@@ -24,7 +24,9 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       console.log("Invio i players")
       io.to(lobbyCode).emit("players", lobby.players);
     }
-  })
+  });
+
+
   // Join lobby
   socket.on("joinLobby", (data) => {
     const { username, code } = data;
