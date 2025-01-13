@@ -16,6 +16,15 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     console.log("[DELME] SERVER: Lobby creata => code:", newLobby.code);
   });
 
+  socket.on("backToLobby", lobbyCode => {
+    io.to(lobbyCode).emit("backToLobby");
+    // reinvio anche i giocatori
+    const lobby = lobbyController.findLobby(lobbyCode);
+    if (lobby) {
+      console.log("Invio i players")
+      io.to(lobbyCode).emit("players", lobby.players);
+    }
+  })
   // Join lobby
   socket.on("joinLobby", (data) => {
     const { username, code } = data;

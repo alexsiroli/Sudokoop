@@ -162,6 +162,8 @@ export default {
     socket.on("players", (playersArr) => {
       console.log("[DELME] Lobby.vue => players =>", playersArr);
       this.players = playersArr;
+      this.inLobby = true;
+      this.currentLobbyCode = sessionStorage.getItem("lobbyCode");
       this.isMaster = playersArr.some(p =>
         p.username === sessionStorage.getItem('username') && p.isMaster);
     });

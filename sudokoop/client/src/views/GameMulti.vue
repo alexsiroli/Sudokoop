@@ -147,6 +147,9 @@ export default {
     goToHome() {
       this.$router.push("/home");
     },
+    backToLobby() {
+      socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
+    }
   },
 
   mounted() {
@@ -159,6 +162,9 @@ export default {
         code: sessionStorage.getItem("lobbyCode")
       });
 
+    socket.on("backToLobby", () => {
+      this.$router.push({name: 'Lobby'});
+    })
     socket.on("restartTheGame", () => {
 
       this.restartNewGame();
