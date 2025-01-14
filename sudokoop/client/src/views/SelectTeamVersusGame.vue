@@ -48,6 +48,7 @@ export default {
     },
     emitStartGame() {
       // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
+
       socket.emit('createVersusGame', {
         lobbyCode: sessionStorage.getItem('lobbyCode'),
         difficulty: this.selectedDifficulty,

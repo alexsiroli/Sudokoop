@@ -6,7 +6,7 @@ export default {
 </script>
 
 <template>
-  <div class="team-container {{this.teamName}}-team">
+  <div :class="['team-container', `${teamName}-team`]">
   <h3>Squadra {{this.teamName}}</h3>
   <ul>
     <li v-for="player in this.players" :key="player">{{ player }}</li>
@@ -16,14 +16,14 @@ export default {
 
 <style scoped>
 .team-container {
-  width: 20%; /* Dimensiona le sezioni delle squadre */
-  padding: 10px;
+  width: 17%; /* Dimensiona le sezioni delle squadre */
+  padding: 5px;
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
 }
 
-.Giallo-team {
+.Gialla-team {
   background-color: #fffbe6;
 }
 
@@ -33,6 +33,7 @@ export default {
 .team-container h3 {
   color: black;
 }
+
 
 .team-container ul {
   list-style: none;

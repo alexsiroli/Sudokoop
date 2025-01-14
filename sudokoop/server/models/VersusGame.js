@@ -32,4 +32,4 @@ class VersusGame extends Game {
 }
 
 // Esporta la classe Game con module.exports
-module.exports = Game;
+module.exports = VersusGame;

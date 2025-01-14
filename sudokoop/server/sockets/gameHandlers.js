@@ -33,6 +33,7 @@ module.exports = function registerGameHandlers(socket, io) {
     socket.on("createVersusGame", (data) => {
         const {lobbyCode, difficulty} = data;
         gameController.createVersusGame(lobbyCode, difficulty);
+        console.log("versusgame can start")
         io.to(lobbyCode).emit("versusGameCanStart")
     });
 

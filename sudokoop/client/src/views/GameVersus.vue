@@ -138,7 +138,8 @@ export default {
   },
 
   mounted() {
-
+    console.log("yelloWTeam " + this.yellowTeam)
+    console.log("bluTeam " + this.blueTeam)
     this.startNewGame();
 
     socket.emit("isUserTheMaster",
@@ -276,11 +277,11 @@ export default {
         <p class="game-over-message"> {{ this.gameOverMessage }}</p>
       </div>
 
-      <div class="game-layout">
+      <div class="game-content">
         <div class="lives-container" v-if="!gameOver">
           <Timer ref="timer"></Timer>
         </div>
-
+        <div class="game-layout">
         <TeamContainer :team-name="'Gialla'" :players="this.yellowTeam"></TeamContainer>
 
         <div class="sudoku-container">
@@ -296,7 +297,7 @@ export default {
 
         <TeamContainer :team-name="'Blu'" :players="this.blueTeam"></TeamContainer>
 
-
+        </div>
         <LobbyUser></LobbyUser>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
         <div v-if="gameOver && isMaster" class="game-over-container" style="margin-top: 20px;">

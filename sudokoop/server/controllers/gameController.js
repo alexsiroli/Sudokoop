@@ -92,6 +92,9 @@ const gameController = {
         return lobbyGame[lobbyCode];
     },
     createVersusGame: (lobbyCode, difficulty) => {
+        console.log("creo un nuovo gioco con squadre ");
+        console.log("yellow " + lobbyTeams[lobbyCode].yellowTeam)
+        console.log("blue " + lobbyTeams[lobbyCode].blueTeam)
         lobbyGame[lobbyCode] = new VersusGame(difficulty,
             lobbyTeams[lobbyCode].yellowTeam, lobbyTeams[lobbyCode].blueTeam);
     },
