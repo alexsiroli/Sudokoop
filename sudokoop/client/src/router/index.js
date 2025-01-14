@@ -8,6 +8,7 @@ import SelectTeamVersusGame from '../views/SelectTeamVersusGame.vue';
 import CreateLobby from "../views/CreateLobby.vue";
 import Login from "../views/Login.vue";
 import Register from '../views/Register.vue';
+import VersusGame from "../views/VersusGame.vue";
 
 const routes = [
   { path: '/', name: 'Login', component: Login },
@@ -19,6 +20,8 @@ const routes = [
   { path: '/selectTeam', name: 'SelectTeamVersusGame', component: SelectTeamVersusGame },
   { path: '/createLobby', name: 'CreateLobby', component: CreateLobby },
   { path: '/register', name: 'Register', component: Register },
+  { path: '/versusGame', name: 'VersusGame', component: VersusGame },
+
 ];
 
 const router = createRouter({

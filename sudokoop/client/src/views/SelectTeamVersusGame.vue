@@ -47,8 +47,11 @@ export default {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
     },
     emitStartGame() {
-      socket.emit('getGame', sessionStorage.getItem('lobbyCode'));
-      socket.emit('startVersusGame', sessionStorage.getItem('lobbyCode'));
+      // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
+      socket.emit('createVersusGame', {
+        lobbyCode: sessionStorage.getItem('lobbyCode'),
+        difficulty: this.selectedDifficulty,
+      });
     },
   },
   mounted() {
@@ -60,8 +63,8 @@ export default {
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
-    socket.on("startVersusGame", () => {
-      this.$router.push({name: 'GameMulti'});
+    socket.on("versusGameCanStart", () => {
+      this.$router.push({name: 'VersusGame'});
     })
     socket.emit("isUserTheMaster",
       {

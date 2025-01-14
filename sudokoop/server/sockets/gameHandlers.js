@@ -3,11 +3,19 @@ const gameController = require('../controllers/gameController');
 module.exports = function registerGameHandlers(socket, io) {
     // Oggetto per tenere traccia delle partite single player
     const games = {};
-
+    // mi salvo i giocatori delle due squadre
     socket.on("getGame", (lobbyCode) => {
         io.to(lobbyCode).emit("game",
             {
                 vite: gameController.getGameOfLobby(lobbyCode).vite,
+                sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
+                difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
+            });
+    });
+
+    socket.on("getVersusGame", (lobbyCode) => {
+        io.to(lobbyCode).emit("game",
+            {
                 sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
                 difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
             });
@@ -18,6 +26,12 @@ module.exports = function registerGameHandlers(socket, io) {
         const {lobbyCode, difficulty} = data;
         gameController.createNewGame(lobbyCode, difficulty);
         io.to(lobbyCode).emit("restartTheGame")
+    });
+
+    socket.on("createVersusGame", (data) => {
+        const {lobbyCode, difficulty} = data;
+        gameController.createVersusGame(lobbyCode, difficulty);
+        io.to(lobbyCode).emit("versusGameCanStart")
     });
 
     // Avvio partita single player
@@ -33,13 +47,15 @@ module.exports = function registerGameHandlers(socket, io) {
             emptyPlace: game.emptyPlace,
         });
     });
+
     socket.on("joinTeam", (data) => {
         const { color, username, lobbyCode } = data;
+        gameController.addPlayerToTeam(lobbyCode, color, username);
         io.to(lobbyCode).emit("onJoinTeam", {
             color: color,
             username: username,
         });
-    })
+    });
 
     socket.on('cellFocus', (data) => {
         const {rowIndex, colIndex, lobbyCode} = data;

@@ -1,12 +1,14 @@
 // server/src/controllers/gameController.js
 const Game = require('../models/GameWithVite');
+const VersusGame = require('../models/VersusGame');
+
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User'); // Import del modello User
 
 // Mappa in memoria per associare gameId alle istanze di Game
 const activeGames = {};
 const lobbyGame = {};
-
+const lobbyTeams = {}
 const gameController = {
 
     // Salva il tempo su DB
@@ -62,6 +64,22 @@ const gameController = {
         lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
     },
 
+    addPlayerToTeam: (lobbyCode, color, username) => {
+        if (!lobbyTeams[lobbyCode]) {
+            lobbyTeams[lobbyCode] = {
+                yellowTeam: [],
+                blueTeam: [],
+            };
+        }
+        switch (color) {
+            case "yellow":
+                lobbyTeams[lobbyCode].yellowTeam.push(username)
+                break;
+            case "blue":
+                lobbyTeams[lobbyCode].blueTeam.push(username)
+                break;
+        }
+    },
     getGameOfLobby: (lobbyCode) => {
 
         if (!lobbyGame[lobbyCode]) {
@@ -70,8 +88,12 @@ const gameController = {
         }
         console.log("Game " + JSON.stringify(lobbyGame[lobbyCode]));
         console.log("sudoku " + JSON.stringify(lobbyGame[lobbyCode].sudoku));
-        console.log("vite " + lobbyGame[lobbyCode].vite);
+        //console.log("vite " + lobbyGame[lobbyCode].vite);
         return lobbyGame[lobbyCode];
+    },
+    createVersusGame: (lobbyCode, difficulty) => {
+        lobbyGame[lobbyCode] = new VersusGame(difficulty,
+            lobbyTeams[lobbyCode].yellowTeam, lobbyTeams[lobbyCode].blueTeam);
     },
 
     newMultiPlayerGame: (difficulty)  => {
