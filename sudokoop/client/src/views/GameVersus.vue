@@ -4,11 +4,12 @@ import SudokuGrid from "../components/SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "../components/LobbyUsers.vue";
 import Timer from "../components/Timer.vue";
+import TeamContainer from "../components/TeamContainer.vue";
 
 export default {
-  props: ['puzzle', 'difficulty', 'restartNewGame'],
+  props: ['puzzle', 'difficulty', 'restartNewGame', 'yellowTeam', 'blueTeam'],
   name: 'GameVersus',
-  components: {SudokuGrid, LobbyUser, Timer},
+  components: {SudokuGrid, LobbyUser, Timer, TeamContainer},
   data() {
     return {
       gameId: null,
@@ -22,11 +23,10 @@ export default {
       firstInitialization: true,
       isMaster: false,
       lastCell: null,
+
     };
   },
-  computed: {
-
-  },
+  computed: {},
   methods: {
     startNewGame() {
       //console.log("puzzle : " + this.puzzle);
@@ -121,9 +121,9 @@ export default {
           const index = i * 9 + j;
 
           if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'green'
-          && !this.sudokuGrid[i][j].readOnly)) {
+            && !this.sudokuGrid[i][j].readOnly)) {
             this.sudokuGrid[i][j].value = solution[index];
-            this.changeCelColor(i,j, 'red')
+            this.changeCelColor(i, j, 'red')
           }
           this.sudokuGrid[i][j].readOnly = true;
         }
@@ -208,7 +208,7 @@ export default {
         if (data.message.startsWith("Giusto")) {
 
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
-            if (this.lastCell != null ) {
+            if (this.lastCell != null) {
               console.log("lastCell is null")
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
@@ -245,11 +245,23 @@ export default {
   margin-top: 10px;
 }
 
+.sudoku-container {
+  flex-grow: 1; /* Consenti alla griglia Sudoku di occupare lo spazio centrale */
+  margin: 0 20px; /* Margine laterale per distanziare dalle squadre */
+  text-align: center;
+}
+
 .buttons-row {
   display: flex;
   gap: 20px;
   justify-content: center;
   margin-top: 10px;
+}
+
+.game-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 </style>
 <template>
@@ -264,13 +276,15 @@ export default {
         <p class="game-over-message"> {{ this.gameOverMessage }}</p>
       </div>
 
-      <div class="game-content">
+      <div class="game-layout">
         <div class="lives-container" v-if="!gameOver">
           <Timer ref="timer"></Timer>
         </div>
 
+        <TeamContainer :team-name="'Gialla'" :players="this.yellowTeam"></TeamContainer>
+
         <div class="sudoku-container">
-          <sudoku-grid  ref="grid"
+          <sudoku-grid ref="grid"
                        :grid="sudokuGrid"
                        @cell-updated="handleCellUpdate"
                        :onFocus="handelCellFocus"
@@ -279,6 +293,9 @@ export default {
           />
 
         </div>
+
+        <TeamContainer :team-name="'Blu'" :players="this.blueTeam"></TeamContainer>
+
 
         <LobbyUser></LobbyUser>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->

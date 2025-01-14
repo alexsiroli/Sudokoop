@@ -18,6 +18,8 @@ module.exports = function registerGameHandlers(socket, io) {
             {
                 sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
                 difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
+                yellowTeam: gameController.getGameOfLobby(lobbyCode).yellowTeam,
+                blueTeam: gameController.getGameOfLobby(lobbyCode).blueTeam,
             });
     });
 

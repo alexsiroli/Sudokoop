@@ -1,16 +1,18 @@
 <script>
 import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
-import GameMulti from './GameMulti.vue';
+import GameVersus from './GameVersus.vue';
 
 export default {
   name: 'VersusGame',
-  components: {SudokuGrid, GameMulti},
+  components: {SudokuGrid, GameVersus},
   data() {
     return {
       sudokuGrid: "",
       isInitialized: false,
       difficulty: "",
+      yellowTeam: [],
+      blueTeam: [],
     };
   },
   methods: {
@@ -21,10 +23,12 @@ export default {
     getGameData() {
       socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
       socket.on("game", (data) => {
-        const {sudoku, difficulty} = data;
+        const {sudoku, difficulty, yellowTeam, blueTeam} = data;
         this.sudokuGrid = sudoku;
         this.isInitialized = true;
         this.difficulty = difficulty;
+        this.yellowTeam = yellowTeam;
+        this.blueTeam = blueTeam;
       })
     }
   },
@@ -38,6 +42,7 @@ export default {
 
 </style>
 <template>
-  <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :difficulty="this.difficulty"
-             :restartNewGame = "restartNewGame"></GameMulti>
+  <GameVersus v-if="this.isInitialized" :puzzle="sudokuGrid" :difficulty="this.difficulty"
+             :yellowTeam ="this.yellowTeam" :blueTeam="this.blueTeam"
+             :restartNewGame = "restartNewGame"></GameVersus>
 </template>
