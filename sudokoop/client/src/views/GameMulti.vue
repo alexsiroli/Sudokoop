@@ -7,7 +7,7 @@ import Timer from "../components/Timer.vue";
 
 export default {
   props: ['initialVite', 'puzzle', 'difficulty', 'restartNewGame'],
-
+  name: 'GameMulti',
   components: {SudokuGrid, LobbyUser, Timer},
   data() {
     return {

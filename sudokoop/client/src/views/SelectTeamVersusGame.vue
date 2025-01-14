@@ -3,7 +3,7 @@ import LobbyUsers from "../components/LobbyUsers.vue";
 import socket from '../plugins/socket.js';
 
 export default {
-  name: 'VersusGame',
+  name: 'SelectTeamVersusGame',
   components: {LobbyUsers},
   data() {
     return {
@@ -12,10 +12,16 @@ export default {
       buttonDisabled: false,
       numPlayers: 0,
       isMaster: false,
+      selectedDifficulty: "easy",
     };
   },
   computed: {
     canStart() {
+      console.log("gioc tot " + this.numPlayers);
+      console.log("gioc gialli " + this.yellowTeam.length);
+      console.log("gioc blu " + this.blueTeam.length);
+      console.log("somma" + (this.blueTeam.length + this.yellowTeam.length));
+      console.log("puo iniziare", (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers);
       return (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers;
     }
   },
@@ -27,6 +33,7 @@ export default {
         lobbyCode: sessionStorage.getItem("lobbyCode"),
       });
       this.buttonDisabled = true;
+
     },
     joinBlueTeam() {
       socket.emit("joinTeam", {
@@ -39,17 +46,23 @@ export default {
     backToLobby() {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
     },
-
+    emitStartGame() {
+      socket.emit('getGame', sessionStorage.getItem('lobbyCode'));
+      socket.emit('startVersusGame', sessionStorage.getItem('lobbyCode'));
+    },
   },
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
     socket.on("playersOfLobby", (players) => {
+      console.log(players);
       this.numPlayers = players.length;
     });
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
-
+    socket.on("startVersusGame", () => {
+      this.$router.push({name: 'GameMulti'});
+    })
     socket.emit("isUserTheMaster",
       {
         username: sessionStorage.getItem('username'),
@@ -110,8 +123,15 @@ export default {
 
     <LobbyUsers></LobbyUsers>
     <!-- Pulsante Start -->
-    <div class="controls">
-      <button v-if="this.isMaster" class="start-button" @click="startGame" :disabled="!canStart">
+    <div class="controls" v-if="this.isMaster">
+      <label>Difficoltà:
+        <select v-model="selectedDifficulty">
+          <option value="easy">Facile</option>
+          <option value="medium">Medio</option>
+          <option value="hard">Difficile</option>
+        </select>
+      </label>
+      <button class="start-button" @click="emitStartGame" :disabled="!this.canStart">
         Inizia la Partita
       </button>
     </div>
@@ -142,6 +162,13 @@ li {
   width: 80%;
   margin-bottom: 20px;
   padding-top: 20px;
+}
+.controls {
+  display: flex;
+  flex-direction: column; /* Dispone gli elementi in colonna */
+  align-items: center; /* Centra gli elementi orizzontalmente */
+  gap: 15px; /* Spazio tra gli elementi */
+  margin-top: 20px; /* Margine superiore per separare dal resto */
 }
 
 .team {
@@ -181,7 +208,6 @@ li {
 .start-button {
   padding: 15px 30px;
   font-size: 18px;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
