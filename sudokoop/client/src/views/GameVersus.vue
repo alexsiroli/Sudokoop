@@ -88,6 +88,7 @@ export default {
         cellData: cellData,
         lobbyCode: sessionStorage.getItem("lobbyCode"),
         color: this.team,
+        username: sessionStorage.getItem("username"),
       });
 
     },
@@ -198,7 +199,7 @@ export default {
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
-        // perso
+
         /*if (this.vite === 0) {
           console.log("inizializza con solizone ")
           this.initializeGridWithSolution(data.solution);

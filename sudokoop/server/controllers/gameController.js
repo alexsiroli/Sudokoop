@@ -107,10 +107,10 @@ const gameController = {
         return game.insertNumberWithoutCheck(cellData.row, cellData.col, cellData.value);
     },
 
-    insertNumberMulti: (cellData, lobbyCode) => {
+    insertNumberMulti: (cellData, lobbyCode, username) => {
         // recupero il gioco e chiamo l insert
         const game = gameController.getGameOfLobby(lobbyCode);
-        const result = game.insertNumber(cellData.row, cellData.col, cellData.value);
+        const result = game.insertNumber(cellData.row, cellData.col, cellData.value, username);
 
         if (result === undefined) {
 
@@ -133,7 +133,13 @@ const gameController = {
                 gameOver: true,
             });
         }
-
+        if (result === 'Blu vince' || result === 'Giallo vince') {
+            return ({
+                puzzle: game.sudoku.puzzle,
+                gameOver: true,
+                message: result,
+            })
+        }
         return ({
             puzzle: game.sudoku.puzzle,
             cellData: cellData,

@@ -17,13 +17,14 @@ class VersusGame extends Game {
             // Rimuovi il giocatore dalla squadra blu, se presente
             this.blueTeam = this.blueTeam.filter(player => player !== username);
 
-            if (this.yellowTeam === 0) {
+            console.log("blueTeam", this.blueTeam);
+            console.log("yellowTeam", this.yellowTeam);
+            if (this.yellowTeam.length === 0) {
                 return 'Blu vince'; // Gioco terminato
             }
-            if (this.blueTeam === 0) {
+            if (this.blueTeam.length === 0) {
                 return 'Giallo vince';
             }
-            return 'Eliminato'
         }
 
         return result; // Restituisci il risultato originale per gli altri casi
