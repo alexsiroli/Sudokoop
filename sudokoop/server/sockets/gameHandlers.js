@@ -61,11 +61,11 @@ module.exports = function registerGameHandlers(socket, io) {
     });
 
     socket.on('cellFocus', (data) => {
-        const {rowIndex, colIndex, lobbyCode, username} = data;
+        const {rowIndex, colIndex, lobbyCode, color} = data;
         io.to(lobbyCode).emit("cellFocus", {
             rowIndex: rowIndex,
             colIndex: colIndex,
-            username: username,
+            color: color,
         })
     })
 
@@ -78,14 +78,16 @@ module.exports = function registerGameHandlers(socket, io) {
         })
     })
     socket.on('cellUpdateMulti', (data) => {
-        const {cellData, lobbyCode} = data;
+        const {cellData, lobbyCode, color} = data;
         const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
         const result = gameController.insertNumberMulti(cellData, lobbyCode);
         if (!result.gameOver) {
             io.to(lobbyCode).emit("insertedNumber", partialResult)
         }
         console.log("result after update " + result);
-        io.to(lobbyCode).emit("afterUpdating", result);
+        io.to(lobbyCode).emit("afterUpdating",
+            { data: result,
+            color: color});
     });
 
     // Aggiornamento cella

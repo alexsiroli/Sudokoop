@@ -86,7 +86,8 @@ export default {
       // dico al server che ho inserito
       socket.emit("cellUpdateMulti", {
         cellData: cellData,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
+        color: this.team,
       });
 
     },
@@ -97,7 +98,7 @@ export default {
         rowIndex: rowIndex,
         colIndex: colIndex,
         lobbyCode: sessionStorage.getItem("lobbyCode"),
-        username: sessionStorage.getItem("username"),
+        color: this.team,
       });
     },
     handleCellDeselection(rowIndex, colIndex) {
@@ -167,8 +168,7 @@ export default {
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       console.log("cellFocus!!!");
-      const {rowIndex, colIndex, username} = data;
-      const color = this.yellowTeam.includes(username) ? 'yellow' : 'blue';
+      const {rowIndex, colIndex, color} = data;
       console.log("Color " + color);
       this.changeCelColor(rowIndex, colIndex, color);
     });
@@ -184,12 +184,10 @@ export default {
     socket.on("insertedNumber", (puzzle) => {
       this.initializeGrid(puzzle)
     })
-    socket.on("afterUpdating", (data) => {
-
-
-      console.log("afterUpdating ", data);
+    socket.on("afterUpdating", (result) => {
+      const {data, color} = result;
+      console.log("data " + data)
       // aggiorna vite
-      this.vite = data.vite;
       if (data.gameOver) {
         this.$nextTick(() => {
           if (this.$refs.timer) {
@@ -220,7 +218,7 @@ export default {
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
             this.sudokuGrid[row][col].readOnly = true;
-            this.changeCelColor(row, col, 'green')
+            this.changeCelColor(row, col, color+"-selected")
             this.lastCell = null;
 
           }

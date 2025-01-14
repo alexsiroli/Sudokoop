@@ -174,6 +174,14 @@ input {
 .cell-blue input {
   background-color: lightblue;
 }
+.cell-yellow-selected input {
+  background-color: khaki;
+  font-weight: bold;
+}
+.cell-blue-selected input {
+  background-color: lightskyblue;
+  font-weight: bold;
+}
 .cell-gray input{
   background-color: cadetblue;
 }

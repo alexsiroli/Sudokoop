@@ -182,10 +182,10 @@ export default {
     socket.on("insertedNumber", (puzzle) => {
       this.initializeGrid(puzzle)
     })
-    socket.on("afterUpdating", (data) => {
+    socket.on("afterUpdating", (result) => {
 
 
-      console.log("afterUpdating ", data);
+      const {data, color} = result;
       // aggiorna vite
       this.vite = data.vite;
       if (data.gameOver) {
