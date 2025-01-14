@@ -20,10 +20,10 @@ class VersusGame extends Game {
             console.log("blueTeam", this.blueTeam);
             console.log("yellowTeam", this.yellowTeam);
             if (this.yellowTeam.length === 0) {
-                return 'Blu vince'; // Gioco terminato
+                return 'Blu vince!'; // Gioco terminato
             }
             if (this.blueTeam.length === 0) {
-                return 'Giallo vince';
+                return 'Giallo vince!';
             }
         }
 

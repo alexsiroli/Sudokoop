@@ -133,11 +133,12 @@ const gameController = {
                 gameOver: true,
             });
         }
-        if (result === 'Blu vince' || result === 'Giallo vince') {
+        if (result === 'Blu vince!' || result === 'Giallo vince!') {
             return ({
                 puzzle: game.sudoku.puzzle,
                 gameOver: true,
                 message: result,
+                solution: game.sudoku.solution,
             })
         }
         return ({

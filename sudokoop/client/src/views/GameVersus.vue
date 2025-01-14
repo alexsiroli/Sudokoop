@@ -127,8 +127,8 @@ export default {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
 
-          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'green'
-            && !this.sudokuGrid[i][j].readOnly)) {
+          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'blue-selected'
+            && this.sudokuGrid[i][j].color !== 'yellow-selected' && !this.sudokuGrid[i][j].readOnly)) {
             this.sudokuGrid[i][j].value = solution[index];
             this.changeCelColor(i, j, 'red')
           }
@@ -199,10 +199,10 @@ export default {
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
-
+        this.initializeGridWithSolution(data.solution);
         /*if (this.vite === 0) {
           console.log("inizializza con solizone ")
-          this.initializeGridWithSolution(data.solution);
+
         } else {
           // vinto: imposti l'ultimo inserimento a verde
           this.changeCelColor(data.cellData.row, data.cellData.col, 'green')
