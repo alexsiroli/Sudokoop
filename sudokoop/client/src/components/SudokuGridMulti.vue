@@ -168,6 +168,12 @@ input {
   font-weight: bold;
 }
 
+.cell-yellow input {
+  background-color: blanchedalmond;
+}
+.cell-blue input {
+  background-color: lightblue;
+}
 .cell-gray input{
   background-color: cadetblue;
 }

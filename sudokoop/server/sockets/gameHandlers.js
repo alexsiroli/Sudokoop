@@ -61,10 +61,11 @@ module.exports = function registerGameHandlers(socket, io) {
     });
 
     socket.on('cellFocus', (data) => {
-        const {rowIndex, colIndex, lobbyCode} = data;
+        const {rowIndex, colIndex, lobbyCode, username} = data;
         io.to(lobbyCode).emit("cellFocus", {
             rowIndex: rowIndex,
             colIndex: colIndex,
+            username: username,
         })
     })
 
@@ -73,6 +74,7 @@ module.exports = function registerGameHandlers(socket, io) {
         io.to(lobbyCode).emit("cellDeselect", {
             rowIndex: rowIndex,
             colIndex: colIndex,
+
         })
     })
     socket.on('cellUpdateMulti', (data) => {

@@ -23,10 +23,11 @@ export default {
       firstInitialization: true,
       isMaster: false,
       lastCell: null,
-
+      team: "",
     };
   },
-  computed: {},
+  computed: {
+  },
   methods: {
     startNewGame() {
       //console.log("puzzle : " + this.puzzle);
@@ -44,13 +45,16 @@ export default {
       this.firstInitialization = true;
       this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
-
+      this.team = this.yellowTeam.includes(sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.$nextTick(() => {
         if (this.$refs.timer) {
           this.$refs.timer.startTimer();
         }
       });
       this.firstInitialization = false;
+    },
+    colorTeam() {
+
     },
     initializeGrid(puzzle) {
       let newGrid = [];
@@ -92,14 +96,15 @@ export default {
       socket.emit("cellFocus", {
         rowIndex: rowIndex,
         colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
+        username: sessionStorage.getItem("username"),
       });
     },
     handleCellDeselection(rowIndex, colIndex) {
       socket.emit("cellDeselect", {
         rowIndex: rowIndex,
         colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
       });
 
     },
@@ -162,9 +167,10 @@ export default {
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       console.log("cellFocus!!!");
-      const {rowIndex, colIndex} = data;
-      this.changeCelColor(rowIndex, colIndex, 'gray');
-
+      const {rowIndex, colIndex, username} = data;
+      const color = this.yellowTeam.includes(username) ? 'yellow' : 'blue';
+      console.log("Color " + color);
+      this.changeCelColor(rowIndex, colIndex, color);
     });
 
     socket.on("cellDeselect", (data) => {
