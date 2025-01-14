@@ -1,6 +1,6 @@
 const sudokuGen = require('sudoku-gen');
 
-class Game {
+class GameWithVite {
   constructor(difficult) {
     this.sudoku = sudokuGen.getSudoku(difficult);
     this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
@@ -48,5 +48,5 @@ class Game {
   }
 }
 
-// Esporta la classe Game con module.exports
-module.exports = Game;
+// Esporta la classe GameWithVite con module.exports
+module.exports = GameWithVite;

@@ -1,4 +1,4 @@
-const Game = require('../models/Game');
+const Game = require('../models/GameWithVite');
 const gameController = require('../controllers/gameController');
 module.exports = function registerGameHandlers(socket, io) {
     // Oggetto per tenere traccia delle partite single player

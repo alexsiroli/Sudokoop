@@ -1,5 +1,5 @@
 // server/src/controllers/gameController.js
-const Game = require('../models/Game');
+const Game = require('../models/GameWithVite');
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User'); // Import del modello User
 
