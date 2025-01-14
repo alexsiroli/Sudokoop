@@ -172,7 +172,7 @@ export default {
       if (mode === "coop") {
         this.$router.push({name: 'CoopGame'});
       } else {
-        this.$router.push({name: 'VersusGame'});
+        this.$router.push({name: 'SelectTeamVersusGame'});
       }
     });
     socket.on("notEnoughPlayers", () => {
