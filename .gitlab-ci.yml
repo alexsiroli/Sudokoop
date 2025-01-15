@@ -8,8 +8,8 @@ stages:
 cache:
   key: "${CI_COMMIT_REF_SLUG}"
   paths:
-    - sudokoop/server/node_modules
-    - sudokoop/client/node_modules
+    - sudokoop/server/node_modules/
+    - sudokoop/client/node_modules/
 
 variables:
   NODE_ENV: test
@@ -17,25 +17,25 @@ variables:
 install_server:
   stage: install
   script:
-    - cd server
+    - cd sudokoop/server
     - npm ci
   artifacts:
     paths:
-      - server/node_modules/
+      - sudokoop/server/node_modules/
 
 install_client:
   stage: install
   script:
-    - cd client
+    - cd sudokoop/client
     - npm ci
   artifacts:
     paths:
-      - client/node_modules/
+      - sudokoop/client/node_modules/
 
 test_server:
   stage: test
   script:
-    - cd server
+    - cd sudokoop/server
     - npm run test
   dependencies:
     - install_server
@@ -43,7 +43,7 @@ test_server:
 test_client:
   stage: test
   script:
-    - cd client
+    - cd sudokoop/client
     - npm run test
   dependencies:
     - install_client
@@ -51,7 +51,7 @@ test_client:
 build_client:
   stage: build
   script:
-    - cd client
+    - cd sudokoop/client
     - npm run build
   dependencies:
     - install_client
