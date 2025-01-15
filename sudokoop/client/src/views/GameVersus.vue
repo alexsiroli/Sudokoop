@@ -224,7 +224,14 @@ export default {
         this.gameOverMessage = data.message;
         // non è stato eliminato nessuno, coloro ultima cella
         if (data.eliminated === "") {
-          this.changeCelColor(data.cellData.row, data.cellData.col, color+"-selected")
+          this.yellowPoint = data.yellowPoint;
+          this.bluePoint = data.bluePoint;
+          const {row, col} = data.cellData;
+          const index = row * 9 + col;
+          // vinto: imposti l'ultimo inserimento a verde e imposta il valore
+          this.sudokuGrid[row][col].value = data.solution[index];
+          this.sudokuGrid[row][col].readOnly = true;
+          this.changeCelColor(row, col, color+"-selected")
         } else {
           // perso
           this.onEliminatedPlayer(data.eliminated, color);
