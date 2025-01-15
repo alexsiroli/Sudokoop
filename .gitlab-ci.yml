@@ -6,10 +6,10 @@ stages:
   - build
 
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
+  key: "${CI_COMMIT_REF_SLUG}"
   paths:
-    - server/node_modules/
-    - client/node_modules/
+    - server/node_modules
+    - client/node_modules
 
 variables:
   NODE_ENV: test
