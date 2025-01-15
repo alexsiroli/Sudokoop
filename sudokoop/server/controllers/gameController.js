@@ -71,6 +71,7 @@ const gameController = {
             };
         }
     },
+
     addPlayerToTeam: (lobbyCode, color, username) => {
         if (!lobbyTeams[lobbyCode]) {
             lobbyTeams[lobbyCode] = {
@@ -80,13 +81,29 @@ const gameController = {
         }
         switch (color) {
             case "yellow":
+                if (lobbyTeams[lobbyCode].blueTeam.includes(username)) {
+                    lobbyTeams[lobbyCode].blueTeam = lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
+
+                }
                 lobbyTeams[lobbyCode].yellowTeam.push(username)
                 break;
             case "blue":
+                if (lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
+                    lobbyTeams[lobbyCode].yellowTeam = lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
+                }
                 lobbyTeams[lobbyCode].blueTeam.push(username)
                 break;
         }
+        return {
+            yellowTeam: lobbyTeams[lobbyCode].yellowTeam,
+            blueTeam: lobbyTeams[lobbyCode].blueTeam,
+        }
     },
+
+    versusGameCanStart: (lobbyCode) => {
+        return lobbyTeams[lobbyCode].yellowTeam.length > 0 && lobbyTeams[lobbyCode].blueTeam.length > 0;
+    },
+
     getGameOfLobby: (lobbyCode) => {
 
         if (!lobbyGame[lobbyCode]) {

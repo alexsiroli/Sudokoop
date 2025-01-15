@@ -32,9 +32,14 @@ module.exports = function registerGameHandlers(socket, io) {
 
     socket.on("createVersusGame", (data) => {
         const {lobbyCode, difficulty} = data;
-        gameController.createVersusGame(lobbyCode, difficulty);
-        console.log("versusgame can start")
-        io.to(lobbyCode).emit("versusGameCanStart")
+        if (gameController.versusGameCanStart(lobbyCode)) {
+            gameController.createVersusGame(lobbyCode, difficulty);
+            console.log("versusgame can start")
+            io.to(lobbyCode).emit("versusGameCanStart")
+        } else {
+            io.to(lobbyCode).emit("notValidTeams")
+        }
+
     });
 
     // Avvio partita single player
@@ -53,11 +58,9 @@ module.exports = function registerGameHandlers(socket, io) {
 
     socket.on("joinTeam", (data) => {
         const { color, username, lobbyCode } = data;
-        gameController.addPlayerToTeam(lobbyCode, color, username);
-        io.to(lobbyCode).emit("onJoinTeam", {
-            color: color,
-            username: username,
-        });
+        const res = gameController.addPlayerToTeam(lobbyCode, color, username);
+        console.log(res);
+        io.to(lobbyCode).emit("onJoinTeam", res);
     });
 
     socket.on('cellFocus', (data) => {

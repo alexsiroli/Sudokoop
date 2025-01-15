@@ -13,15 +13,12 @@ export default {
       numPlayers: 0,
       isMaster: false,
       selectedDifficulty: "easy",
+      showError: false,
+      errorMessage: "",
     };
   },
   computed: {
     canStart() {
-      console.log("gioc tot " + this.numPlayers);
-      console.log("gioc gialli " + this.yellowTeam.length);
-      console.log("gioc blu " + this.blueTeam.length);
-      console.log("somma" + (this.blueTeam.length + this.yellowTeam.length));
-      console.log("puo iniziare", (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers);
       return (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers;
     }
   },
@@ -32,7 +29,7 @@ export default {
         username: sessionStorage.getItem("username"),
         lobbyCode: sessionStorage.getItem("lobbyCode"),
       });
-      this.buttonDisabled = true;
+      //this.buttonDisabled = true;
 
     },
     joinBlueTeam() {
@@ -41,7 +38,7 @@ export default {
         username: sessionStorage.getItem("username"),
         lobbyCode: sessionStorage.getItem("lobbyCode"),
       });
-      this.buttonDisabled = true;
+      //this.buttonDisabled = true;
     },
     backToLobby() {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
@@ -64,6 +61,10 @@ export default {
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
+    socket.on("notValidTeams", () => {
+      this.showError = true;
+      this.errorMessage = "Ci deve essere almeno un giocatore per squadra"
+    })
     socket.on("versusGameCanStart", () => {
       this.$router.push({name: 'VersusGame'});
     })
@@ -78,17 +79,10 @@ export default {
       console.log("i am the master")
     })
 
-    socket.on("onJoinTeam", (data) => {
-      console.log("onJoinTeam", data);
-      const {color, username} = data;
-      switch (color) {
-        case "blue":
-          this.blueTeam.push(username);
-          break;
-        case "yellow":
-          this.yellowTeam.push(username);
-          break;
-      }
+    socket.on("onJoinTeam", (res) => {
+      console.log("onJoinTeam", res);
+      this.blueTeam = res.blueTeam;
+      this.yellowTeam = res.yellowTeam;
     })
 
   },
@@ -105,6 +99,7 @@ export default {
     </button>
 
     <h2>Scegli una squadra!</h2>
+    <h4>Ogni squadra deve avere almeno un giocatore</h4>
     <div class="teams-container">
       <!-- Squadra Gialla -->
       <div class="team yellow-team">
@@ -112,7 +107,7 @@ export default {
         <ul>
           <li v-for="player in this.yellowTeam">{{ player }}</li>
         </ul>
-        <button @click="joinYellowTeam" :disabled="this.buttonDisabled">Entra</button>
+        <button @click="joinYellowTeam" >Entra</button>
       </div>
 
       <!-- Squadra Blu -->
@@ -121,7 +116,7 @@ export default {
         <ul>
           <li v-for="player in this.blueTeam">{{ player }}</li>
         </ul>
-        <button @click="joinBlueTeam" :disabled="this.buttonDisabled">Entra</button>
+        <button @click="joinBlueTeam" >Entra</button>
       </div>
     </div>
 
@@ -135,6 +130,9 @@ export default {
           <option value="hard">Difficile</option>
         </select>
       </label>
+      <div v-if="showError" class="error-popup">
+        <p>{{ errorMessage }}</p>
+      </div>
       <button class="start-button" @click="emitStartGame" :disabled="!this.canStart">
         Inizia la Partita
       </button>
@@ -143,6 +141,15 @@ export default {
   </div>
 </template>
 <style scoped>
+.error-popup {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  padding: 10px 20px;
+  z-index: 1000;
+  font-size: 16px;
+}
 .game-lobby {
   display: flex;
   flex-direction: column;
