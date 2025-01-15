@@ -149,6 +149,15 @@ export default {
         }
       }
     },
+    onEliminatedPlayer(username,color) {
+      this.$nextTick(() => {
+        if (color === "yellow") {
+          this.$refs.teamContainerYellow.setEliminated(username);
+        } else  {
+          this.$refs.teamContainerBlue.setEliminated(username);
+        }
+      });
+    },
     goToHome() {
       this.$router.push("/home");
     },
@@ -201,6 +210,7 @@ export default {
     socket.on("afterUpdating", (result) => {
       const {data, color, username} = result;
       console.log("data " + data)
+      console.log("elininated" + data.eliminated);
       // aggiorna vite
       if (data.gameOver) {
         this.$nextTick(() => {
@@ -217,6 +227,7 @@ export default {
           this.changeCelColor(data.cellData.row, data.cellData.col, color+"-selected")
         } else {
           // perso
+          this.onEliminatedPlayer(data.eliminated, color);
           this.initializeGridWithSolution(data.solution);
 
         }
@@ -246,11 +257,7 @@ export default {
 
           }
         } else if (data.message.startsWith("Sbagliato")) {
-          this.$nextTick(() => {
-            if (this.$refs.teamContainer) {
-              this.$refs.teamContainer.setEliminated(username);
-            }
-          });
+          this.onEliminatedPlayer(username);
           this.setReadOnlyForEliminated(username);
           console.log("Last CEll " + data.cellData)
 
@@ -316,7 +323,7 @@ export default {
           <Timer ref="timer"></Timer>
         </div>
         <div class="game-layout">
-        <TeamContainer  ref="teamContainer" :team-name="'Gialla'" :players="this.yellowTeam"
+        <TeamContainer  ref="teamContainerYellow" :team-name="'Gialla'" :players="this.yellowTeam"
         :points = "this.yellowPoint"></TeamContainer>
 
         <div class="sudoku-container">
@@ -330,7 +337,7 @@ export default {
 
         </div>
 
-        <TeamContainer ref="teamContainer" :team-name="'Blu'" :players="this.blueTeam"
+        <TeamContainer ref="teamContainerBlue" :team-name="'Blu'" :players="this.blueTeam"
         :points = "this.bluePoint"></TeamContainer>
 
         </div>

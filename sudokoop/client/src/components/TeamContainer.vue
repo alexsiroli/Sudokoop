@@ -10,6 +10,7 @@ export default {
 
   methods: {
     setEliminated(username) {
+      console.log("Setting eliminated " + username)
       this.eliminated.push(username)
     }
   }
