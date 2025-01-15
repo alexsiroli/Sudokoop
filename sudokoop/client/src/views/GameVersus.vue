@@ -24,6 +24,8 @@ export default {
       isMaster: false,
       lastCell: null,
       team: "",
+      yellowPoint: 0,
+      bluePoint: 0,
     };
   },
   computed: {
@@ -33,7 +35,7 @@ export default {
       //console.log("puzzle : " + this.puzzle);
       if (this.gameOver) {
         //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-        socket.emit('createNewGame',
+        socket.emit('createVersusGame',
           {
             lobbyCode: sessionStorage.getItem('lobbyCode'),
             difficulty: this.difficulty
@@ -53,9 +55,7 @@ export default {
       });
       this.firstInitialization = false;
     },
-    colorTeam() {
 
-    },
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -186,7 +186,7 @@ export default {
       this.initializeGrid(puzzle)
     })
     socket.on("afterUpdating", (result) => {
-      const {data, color} = result;
+      const {data, color, username} = result;
       console.log("data " + data)
       // aggiorna vite
       if (data.gameOver) {
@@ -200,6 +200,8 @@ export default {
         this.gameOver = true;
         this.gameOverMessage = data.message;
         this.initializeGridWithSolution(data.solution);
+
+
         /*if (this.vite === 0) {
           console.log("inizializza con solizone ")
 
@@ -212,7 +214,8 @@ export default {
       } else {
         const {row, col} = data.cellData;
         if (data.message.startsWith("Giusto")) {
-
+          this.yellowPoint = data.yellowPoint;
+          this.bluePoint = data.bluePoint;
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
             if (this.lastCell != null) {
               console.log("lastCell is null")
@@ -224,7 +227,9 @@ export default {
 
           }
         } else if (data.message.startsWith("Sbagliato")) {
+          this.$refs.teamContainer.setEliminated(username);
           console.log("Last CEll " + data.cellData)
+
           if (this.lastCell != null) {
             this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
           }
@@ -287,7 +292,8 @@ export default {
           <Timer ref="timer"></Timer>
         </div>
         <div class="game-layout">
-        <TeamContainer :team-name="'Gialla'" :players="this.yellowTeam"></TeamContainer>
+        <TeamContainer  ref="teamContainer" :team-name="'Gialla'" :players="this.yellowTeam"
+        :points = "this.yellowPoint"></TeamContainer>
 
         <div class="sudoku-container">
           <sudoku-grid ref="grid"
@@ -300,7 +306,8 @@ export default {
 
         </div>
 
-        <TeamContainer :team-name="'Blu'" :players="this.blueTeam"></TeamContainer>
+        <TeamContainer ref="teamContainer" :team-name="'Blu'" :players="this.blueTeam"
+        :points = "this.bluePoint"></TeamContainer>
 
         </div>
         <LobbyUser></LobbyUser>

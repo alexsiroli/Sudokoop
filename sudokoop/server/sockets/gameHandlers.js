@@ -18,8 +18,8 @@ module.exports = function registerGameHandlers(socket, io) {
             {
                 sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
                 difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
-                yellowTeam: gameController.getGameOfLobby(lobbyCode).yellowTeam,
-                blueTeam: gameController.getGameOfLobby(lobbyCode).blueTeam,
+                yellowTeam: gameController.getGameOfLobby(lobbyCode).yellow.team,
+                blueTeam: gameController.getGameOfLobby(lobbyCode).blue.team,
             });
     });
 
@@ -87,7 +87,8 @@ module.exports = function registerGameHandlers(socket, io) {
         console.log("result after update " + result);
         io.to(lobbyCode).emit("afterUpdating",
             { data: result,
-            color: color});
+            color: color,
+            username: username});
     });
 
     // Aggiornamento cella

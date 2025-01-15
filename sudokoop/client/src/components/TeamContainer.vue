@@ -1,7 +1,18 @@
 <script>
 
 export default {
-  props: ['teamName', 'players']
+  props: ['teamName', 'players', 'points'],
+  data() {
+    return {
+        eliminated: [],
+    }
+  },
+
+  methods: {
+    setEliminated(username) {
+      this.eliminated.push(username)
+    }
+  }
 }
 </script>
 
@@ -9,8 +20,9 @@ export default {
   <div :class="['team-container', `${teamName}-team`]">
   <h3>Squadra {{this.teamName}}</h3>
   <ul>
-    <li v-for="player in this.players" :key="player">{{ player }}</li>
+    <li v-for="player in this.players">{{ player }} <a v-if="eliminated.includes(player)"> - Eliminato</a></li>
   </ul>
+    <h6>Points: {{this.points}}</h6>
   </div>
 </template>
 
@@ -40,7 +52,9 @@ export default {
   padding: 0;
   margin-top: 10px;
 }
-
+h6 {
+  color: black;
+}
 .team-container li {
   color: black;
 }

@@ -3,26 +3,43 @@ const Game = require("./Game");
 class VersusGame extends Game {
     constructor(difficult, yellowTeam, blueTeam) {
         super(difficult);
-        this.yellowTeam = yellowTeam;
-        this.blueTeam = blueTeam;
+        this.yellow =
+            {team: yellowTeam,
+            points: 0};
+        this.blue =  {
+            team: blueTeam,
+            points: 0
+        }
     }
 
+    findTeam(username) {
+        return this.yellow.team.includes(username) ? this.yellow : this.blue;
+    }
 
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num, username) {
         const result = super.insertNumber(row, col, num);
+        const team = this.findTeam(username)
+        if (result === "Giusto!") {
+            team.points ++;
+            return result;
+        }
+        if (result === "Hai vinto!!!") {
+            // sudoku finito: vince la squadra con i punti piu alti
+            if (this.yellow.points > this.blue.points) {
+                return 'Giallo vince!';
+            }
+            else {
+                return 'Blu vince!';
+            }
+        }
         if (result === 'Sbagliato! Riprova.') {
-            this.yellowTeam = this.yellowTeam.filter(player => player !== username);
+            team.team = team.team.filter(player => player !== username);
 
-            // Rimuovi il giocatore dalla squadra blu, se presente
-            this.blueTeam = this.blueTeam.filter(player => player !== username);
-
-            console.log("blueTeam", this.blueTeam);
-            console.log("yellowTeam", this.yellowTeam);
-            if (this.yellowTeam.length === 0) {
+            if (this.yellow.team.length === 0) {
                 return 'Blu vince!'; // Gioco terminato
             }
-            if (this.blueTeam.length === 0) {
+            if (this.blue.team.length === 0) {
                 return 'Giallo vince!';
             }
         }

@@ -121,6 +121,8 @@ const gameController = {
                 vite: game.vite,
                 message: 'Hai vinto!',
                 gameOver: true,
+                yellowPoint: game.yellow.points,
+                bluePoint: game.blue.points,
             });
         }
 
@@ -131,6 +133,8 @@ const gameController = {
                 vite: game.vite,
                 message: result,
                 gameOver: true,
+                yellowPoint: game.yellow.points,
+                bluePoint: game.blue.points,
             });
         }
         if (result === 'Blu vince!' || result === 'Giallo vince!') {
@@ -139,6 +143,8 @@ const gameController = {
                 gameOver: true,
                 message: result,
                 solution: game.sudoku.solution,
+                yellowPoint: game.yellow.points,
+                bluePoint: game.blue.points,
             })
         }
         return ({
@@ -147,6 +153,8 @@ const gameController = {
             vite: game.vite,
             message: result,
             gameOver: false,
+            yellowPoint: game.yellow.points,
+            bluePoint: game.blue.points,
         });
     },
 
