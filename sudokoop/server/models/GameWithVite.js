@@ -14,6 +14,7 @@ class GameWithVite extends Game {
     if (result === 'Sbagliato! Riprova.') {
       this.vite--; // Riduci le vite
       if (this.vite === 0) {
+        this.gameOver = true;
         return 'Hai perso! Vite terminate.'; // Gioco terminato
       }
     }

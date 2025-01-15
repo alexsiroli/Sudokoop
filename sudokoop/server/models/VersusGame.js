@@ -25,7 +25,8 @@ class VersusGame extends Game {
             team.points ++;
             return result;
         }
-        if (result === "Hai vinto!!!") {
+        if (result === "Hai vinto!") {
+            team.points ++;
             this.eliminated = "";
             // sudoku finito: vince la squadra con i punti piu alti
             if (this.yellow.points > this.blue.points) {
@@ -41,9 +42,11 @@ class VersusGame extends Game {
             console.log("Blue " + this.blue.team);
             this.eliminated = username;
             if (this.yellow.team.length === 0) {
+                this.gameOver = true;
                 return 'Blu vince!'; // Gioco terminato
             }
             if (this.blue.team.length === 0) {
+                this.gameOver = true;
                 return 'Giallo vince!';
             }
         }

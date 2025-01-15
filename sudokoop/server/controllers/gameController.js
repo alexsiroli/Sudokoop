@@ -135,54 +135,20 @@ const gameController = {
         // recupero il gioco e chiamo l insert
         const game = gameController.getGameOfLobby(lobbyCode);
         const result = game.insertNumber(cellData.row, cellData.col, cellData.value, username);
-
-        if (result === undefined) {
-
-            return ({
-                puzzle: game.sudoku.puzzle,
-                solution: game.sudoku.solution,
-                cellData: cellData,
-                vite: game.vite,
-                message: 'Hai vinto!',
-                gameOver: true,
-                yellowPoint: game.yellow.points,
-                bluePoint: game.blue.points,
-                eliminated: game.eliminated,
-            });
-        }
-
-        if (result === 'Hai perso! Vite terminate.') {
-            return ({
-                puzzle: game.sudoku.puzzle,
-                solution: game.sudoku.solution,
-                vite: game.vite,
-                message: result,
-                gameOver: true,
-
-            });
-        }
-        if (result === 'Blu vince!' || result === 'Giallo vince!') {
-            return ({
-                puzzle: game.sudoku.puzzle,
-                gameOver: true,
-                message: result,
-                solution: game.sudoku.solution,
-                yellowPoint: game.yellow.points,
-                bluePoint: game.blue.points,
-                eliminated: game.eliminated,
-            })
-        }
-        // caso sbagliato, riprova
-        return ({
+        const response = {
             puzzle: game.sudoku.puzzle,
+            solution: game.sudoku.solution,
             cellData: cellData,
             vite: game.vite,
             message: result,
-            gameOver: false,
-            yellowPoint: game.yellow.points,
-            bluePoint: game.blue.points,
-            eliminated: game.eliminated,
-        });
+            gameOver: game.gameOver,
+        };
+        if (game instanceof VersusGame) {
+            response.yellowPoint = game.yellow.points;
+            response.bluePoint = game.blue.points;
+            response.eliminated = game.eliminated;
+        }
+        return response;
     },
 
     // Endpoint per aggiornare vittorie o sconfitte

@@ -203,8 +203,12 @@ export default {
           console.log("inizializza con solizone ")
           this.initializeGridWithSolution(data.solution);
         } else {
-          // vinto: imposti l'ultimo inserimento a verde
-          this.changeCelColor(data.cellData.row, data.cellData.col, 'green')
+          const {row, col} = data.cellData;
+          const index = row * 9 + col;
+          // vinto: imposti l'ultimo inserimento a verde e imposta il valore
+          this.sudokuGrid[row][col].value = data.solution[index];
+          this.sudokuGrid[row][col].readOnly = true;
+          this.changeCelColor(row, col, 'green')
         }
       } else {
         const {row, col} = data.cellData;

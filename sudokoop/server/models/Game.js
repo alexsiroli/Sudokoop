@@ -4,6 +4,7 @@ class Game {
     constructor(difficult) {
         this.sudoku = sudokuGen.getSudoku(difficult);
         this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
+        this.gameOver = false;
     }
 
     insertNumberWithoutCheck(row, col, num) {
@@ -25,11 +26,11 @@ class Game {
             // Aggiorna la stringa puzzle per mostrare il numero inserito
             this.sudoku.puzzle =
                 this.sudoku.puzzle.substring(0, index) + num + this.sudoku.puzzle.substring(index + 1);
-
             this.emptyPlace--;
             if (this.emptyPlace === 0) {
                 console.log("Hai vinto!!");
-                return;
+                this.gameOver = true;
+                return 'Hai vinto!';
             }
 
             return 'Giusto!';
