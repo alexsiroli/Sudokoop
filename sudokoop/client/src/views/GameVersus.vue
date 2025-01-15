@@ -32,6 +32,7 @@ export default {
   },
   methods: {
     startNewGame() {
+      console.log("Start new game yellowTEan " + this.yellowTeam );
       //console.log("puzzle : " + this.puzzle);
       if (this.gameOver) {
         //faccio richiesta per nuovo gioco e torno indietro (sono il master)
@@ -127,8 +128,8 @@ export default {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
 
-          if (this.sudokuGrid[i][j].color === 'white' || (!this.sudokuGrid[i][j].color.startsWith('blue')
-            && !this.sudokuGrid[i][j].color.startsWith('yellow'))) {
+          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'filled'
+            && !this.sudokuGrid[i][j].color.endsWith('-selected'))) {
             this.sudokuGrid[i][j].value = solution[index];
             this.changeCelColor(i, j, 'red')
           }
@@ -170,7 +171,7 @@ export default {
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     })
-    socket.on("restartTheGame", () => {
+    socket.on("versusGameCanStart", () => {
 
       this.restartNewGame();
     })
@@ -188,7 +189,7 @@ export default {
 
     socket.on("cellDeselect", (data) => {
       const {rowIndex, colIndex} = data;
-      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly) {
+      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].color.endsWith("-selected")) {
         this.changeCelColor(rowIndex, colIndex, 'white');
       }
 
@@ -211,8 +212,14 @@ export default {
         this.final = true;
         this.gameOver = true;
         this.gameOverMessage = data.message;
-        this.initializeGridWithSolution(data.solution);
+        // non è stato eliminato nessuno, coloro ultima cella
+        if (data.eliminated === "") {
+          this.changeCelColor(data.cellData.row, data.cellData.col, color+"-selected")
+        } else {
+          // perso
+          this.initializeGridWithSolution(data.solution);
 
+        }
 
         /*if (this.vite === 0) {
           console.log("inizializza con solizone ")
@@ -239,7 +246,11 @@ export default {
 
           }
         } else if (data.message.startsWith("Sbagliato")) {
-          this.$refs.teamContainer.setEliminated(username);
+          this.$nextTick(() => {
+            if (this.$refs.teamContainer) {
+              this.$refs.teamContainer.setEliminated(username);
+            }
+          });
           this.setReadOnlyForEliminated(username);
           console.log("Last CEll " + data.cellData)
 
