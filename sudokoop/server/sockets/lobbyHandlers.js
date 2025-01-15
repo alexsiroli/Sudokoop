@@ -17,6 +17,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   });
 
   socket.on("backToLobby", lobbyCode => {
+    gameController.emptyTeam(lobbyCode);
     io.to(lobbyCode).emit("backToLobby");
     // reinvio anche i giocatori
     const lobby = lobbyController.findLobby(lobbyCode);
