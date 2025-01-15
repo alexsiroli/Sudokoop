@@ -63,6 +63,14 @@ const gameController = {
         lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
     },
 
+    emptyTeam: (lobbyCode) => {
+        if (lobbyTeams[lobbyCode]) {
+            lobbyTeams[lobbyCode] = {
+                yellowTeam: [],
+                blueTeam: [],
+            };
+        }
+    },
     addPlayerToTeam: (lobbyCode, color, username) => {
         if (!lobbyTeams[lobbyCode]) {
             lobbyTeams[lobbyCode] = {
@@ -122,6 +130,7 @@ const gameController = {
                 gameOver: true,
                 yellowPoint: game.yellow.points,
                 bluePoint: game.blue.points,
+                eliminated: game.eliminated,
             });
         }
 
@@ -132,8 +141,7 @@ const gameController = {
                 vite: game.vite,
                 message: result,
                 gameOver: true,
-                yellowPoint: game.yellow.points,
-                bluePoint: game.blue.points,
+
             });
         }
         if (result === 'Blu vince!' || result === 'Giallo vince!') {
@@ -144,8 +152,10 @@ const gameController = {
                 solution: game.sudoku.solution,
                 yellowPoint: game.yellow.points,
                 bluePoint: game.blue.points,
+                eliminated: game.eliminated,
             })
         }
+        // caso sbagliato, riprova
         return ({
             puzzle: game.sudoku.puzzle,
             cellData: cellData,
@@ -154,6 +164,7 @@ const gameController = {
             gameOver: false,
             yellowPoint: game.yellow.points,
             bluePoint: game.blue.points,
+            eliminated: game.eliminated,
         });
     },
 
