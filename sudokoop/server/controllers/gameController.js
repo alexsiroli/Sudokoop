@@ -1,4 +1,3 @@
-// server/src/controllers/gameController.js
 const Game = require('../models/GameWithVite');
 const VersusGame = require('../models/VersusGame');
 
