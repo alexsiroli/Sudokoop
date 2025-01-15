@@ -8,8 +8,8 @@ stages:
 cache:
   key: "${CI_COMMIT_REF_SLUG}"
   paths:
-    - server/node_modules
-    - client/node_modules
+    - sudokoop/server/node_modules
+    - sudokoop/client/node_modules
 
 variables:
   NODE_ENV: test
