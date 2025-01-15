@@ -69,7 +69,7 @@ export default {
           //console.log("previous", previous);
           row.push({
             value: isReadOnly ? char : "",
-            readOnly: isReadOnly,
+            readOnly: this.firstInitialization ? isReadOnly : this.sudokuGrid[i][j].readOnly,
             color: this.firstInitialization && isReadOnly ? 'filled' : previousCol, // Colore iniziale per celle fisse
           });
         }
@@ -127,12 +127,24 @@ export default {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
 
-          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'blue-selected'
-            && this.sudokuGrid[i][j].color !== 'yellow-selected' && !this.sudokuGrid[i][j].readOnly)) {
+          if (this.sudokuGrid[i][j].color === 'white' || (!this.sudokuGrid[i][j].color.startsWith('blue')
+            && !this.sudokuGrid[i][j].color.startsWith('yellow'))) {
             this.sudokuGrid[i][j].value = solution[index];
             this.changeCelColor(i, j, 'red')
           }
           this.sudokuGrid[i][j].readOnly = true;
+        }
+      }
+    },
+
+    setReadOnlyForEliminated(username) {
+      console.log("Setting readOnlyForEliminated user");
+      if (sessionStorage.getItem('username') === username) {
+        console.log(" I am eliminated");
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+              this.sudokuGrid[i][j].readOnly = true;
+          }
         }
       }
     },
@@ -228,6 +240,7 @@ export default {
           }
         } else if (data.message.startsWith("Sbagliato")) {
           this.$refs.teamContainer.setEliminated(username);
+          this.setReadOnlyForEliminated(username);
           console.log("Last CEll " + data.cellData)
 
           if (this.lastCell != null) {

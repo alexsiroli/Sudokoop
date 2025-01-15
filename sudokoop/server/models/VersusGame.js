@@ -35,7 +35,8 @@ class VersusGame extends Game {
         }
         if (result === 'Sbagliato! Riprova.') {
             team.team = team.team.filter(player => player !== username);
-
+            console.log("YEllow" + this.yellow.team);
+            console.log("Blue " + this.blue.team);
             if (this.yellow.team.length === 0) {
                 return 'Blu vince!'; // Gioco terminato
             }
