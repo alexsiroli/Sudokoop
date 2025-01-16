@@ -183,8 +183,11 @@ export default {
       console.log("players"  + players);
       this.players = players;
       players.forEach(player => {
-        if (player.isMaster && player.username === sessionStorage.getItem("username")) {
-          this.isMaster = true;
+        if (player.isMaster) {
+          this.masterUser = player.username;
+          if (player.username === sessionStorage.getItem("username")) {
+            this.isMaster = true;
+          }
         }
       })
     })
@@ -316,7 +319,13 @@ export default {
   justify-content: center;
   margin-top: 10px;
 }
-
+.exit {
+  color: white;
+  background-color: red;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+}
 .game-layout {
   display: flex;
   justify-content: space-between;

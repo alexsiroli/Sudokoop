@@ -124,7 +124,7 @@ export default {
 
     <LobbyUsers></LobbyUsers>
     <!-- Pulsante Start -->
-    <div class="controls" v-if="this.iAmMaster">
+    <div class="controls" v-if="this.isMaster">
       <label>Difficoltà:
         <select v-model="selectedDifficulty">
           <option value="easy">Facile</option>
