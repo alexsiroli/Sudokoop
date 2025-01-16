@@ -23,7 +23,7 @@ export default {
   <div>
     <h3>Nome della Lobby: {{ lobbyName }}</h3>
     <ul >
-      <li v-for="player in this.players" >{{ player.username }}</li>
+      <li v-for="player in this.players" >{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
     </ul>
   </div>
 </template>

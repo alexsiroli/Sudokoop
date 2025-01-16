@@ -274,9 +274,9 @@ export default {
       <div class="game-content">
         <div class="lives-container" v-if="!gameOver">
           <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
-          <Timer ref="timer"></Timer>
-        </div>
 
+        </div>
+        <Timer ref="timer"></Timer>
         <div class="sudoku-container">
           <sudoku-grid  ref="grid"
                        :grid="sudokuGrid"

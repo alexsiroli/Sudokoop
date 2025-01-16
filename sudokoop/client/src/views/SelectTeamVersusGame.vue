@@ -56,6 +56,11 @@ export default {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
     socket.on("playersOfLobby", (players) => {
       console.log(players);
+      players.forEach((player) => {
+        if (player.isMaster && player.username === sessionStorage.getItem("username")) {
+          this.isMaster = true;
+        }
+      })
       this.numPlayers = players.length;
     });
     socket.on("backToLobby", () => {
@@ -67,16 +72,6 @@ export default {
     })
     socket.on("versusGameCanStart", () => {
       this.$router.push({name: 'VersusGame'});
-    })
-    socket.emit("isUserTheMaster",
-      {
-        username: sessionStorage.getItem('username'),
-        code: sessionStorage.getItem("lobbyCode")
-      });
-
-    socket.on("youAreTheMaster", () => {
-      this.isMaster = true;
-      console.log("i am the master")
     })
 
     socket.on("onJoinTeam", (res) => {
@@ -105,7 +100,7 @@ export default {
       <div class="team yellow-team">
         <h3>Squadra Gialla</h3>
         <ul>
-          <li v-for="player in this.yellowTeam">{{ player }}</li>
+          <li v-for="player in this.yellowTeam">{{ player }} <span v-if="this.isMaster"> (Master)</span></li>
         </ul>
         <button @click="joinYellowTeam" >Entra</button>
       </div>
@@ -114,7 +109,7 @@ export default {
       <div class="team blue-team">
         <h3>Squadra Blu</h3>
         <ul>
-          <li v-for="player in this.blueTeam">{{ player }}</li>
+          <li v-for="player in this.blueTeam">{{ player }} <span v-if="this.isMaster"> (Master)</span></li>
         </ul>
         <button @click="joinBlueTeam" >Entra</button>
       </div>

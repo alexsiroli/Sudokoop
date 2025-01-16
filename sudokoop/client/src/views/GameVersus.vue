@@ -26,6 +26,7 @@ export default {
       team: "",
       yellowPoint: 0,
       bluePoint: 0,
+      masterUser: "",
     };
   },
   computed: {
@@ -186,6 +187,7 @@ export default {
     })
     socket.on("youAreTheMaster", () => {
       this.isMaster = true;
+      this.masterUser = sessionStorage.getItem("username");
       console.log("i am the master")
     })
     // reagisco al focus di un utente
@@ -221,9 +223,10 @@ export default {
         // avviso sudokugrid
         this.final = true;
         this.gameOver = true;
-        this.gameOverMessage = data.message;
+
         // non è stato eliminato nessuno, coloro ultima cella
         if (data.eliminated === "") {
+          this.gameOverMessage = "Squadra " + data.message;
           this.yellowPoint = data.yellowPoint;
           this.bluePoint = data.bluePoint;
           const {row, col} = data.cellData;
@@ -233,6 +236,7 @@ export default {
           this.sudokuGrid[row][col].readOnly = true;
           this.changeCelColor(row, col, color+"-selected")
         } else {
+          this.gameOverMessage = data.message;
           // perso
           this.onEliminatedPlayer(data.eliminated, color);
           this.initializeGridWithSolution(data.solution);
@@ -327,11 +331,12 @@ export default {
 
       <div class="game-content">
         <div class="lives-container" v-if="!gameOver">
-          <Timer ref="timer"></Timer>
+
         </div>
+        <Timer ref="timer"></Timer>
         <div class="game-layout">
         <TeamContainer  ref="teamContainerYellow" :team-name="'Gialla'" :players="this.yellowTeam"
-        :points = "this.yellowPoint"></TeamContainer>
+                        :points = "this.yellowPoint" :master="this.masterUser" ></TeamContainer>
 
         <div class="sudoku-container">
           <sudoku-grid ref="grid"
@@ -345,7 +350,7 @@ export default {
         </div>
 
         <TeamContainer ref="teamContainerBlue" :team-name="'Blu'" :players="this.blueTeam"
-        :points = "this.bluePoint"></TeamContainer>
+        :points = "this.bluePoint"  :master="this.masterUser" ></TeamContainer>
 
         </div>
         <LobbyUser></LobbyUser>
