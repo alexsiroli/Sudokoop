@@ -56,15 +56,18 @@ class LobbyController {
             case "yellow":
                 if (this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
                     this.lobbyTeams[lobbyCode].blueTeam = this.lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
-
                 }
-                this.lobbyTeams[lobbyCode].yellowTeam.push(username)
+                if (!this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
+                    this.lobbyTeams[lobbyCode].yellowTeam.push(username)
+                }
                 break;
             case "blue":
                 if (this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
                     this.lobbyTeams[lobbyCode].yellowTeam = this.lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
                 }
-                this.lobbyTeams[lobbyCode].blueTeam.push(username)
+                if (!this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
+                    this.lobbyTeams[lobbyCode].blueTeam.push(username)
+                }
                 break;
         }
         return {
@@ -88,6 +91,7 @@ class LobbyController {
         lobby.players = lobby.players.filter(p => p.username !== username);
         // Se la lobby ora è vuota, rimuoviamo la lobby
         if (lobby.players.length === 0) {
+            GameController.removeGame(code);
             this.removeLobby(code);
         } else {
             // Se manca il master, assegna a uno a caso

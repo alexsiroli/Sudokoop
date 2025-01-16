@@ -11,18 +11,21 @@ export default {
       blueTeam: [],
       buttonDisabled: false,
       numPlayers: 0,
-      isMaster: false,
+      master: "",
       selectedDifficulty: "easy",
       showError: false,
       errorMessage: "",
+      isMaster: false,
     };
   },
   computed: {
     canStart() {
       return (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers;
-    }
+    },
+
   },
   methods: {
+
     joinYellowTeam() {
       socket.emit("joinTeam", {
         color: "yellow",
@@ -52,13 +55,17 @@ export default {
       });
     },
   },
+
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
-    socket.on("playersOfLobby", (players) => {
+    socket.on("players" , (players) => {
       console.log(players);
       players.forEach((player) => {
-        if (player.isMaster && player.username === sessionStorage.getItem("username")) {
-          this.isMaster = true;
+        if (player.isMaster) {
+          this.master = player.username;
+          if (player.username === sessionStorage.getItem("username")) {
+            this.isMaster = true;
+          }
         }
       })
       this.numPlayers = players.length;
@@ -100,7 +107,7 @@ export default {
       <div class="team yellow-team">
         <h3>Squadra Gialla</h3>
         <ul>
-          <li v-for="player in this.yellowTeam">{{ player }} <span v-if="this.isMaster"> (Master)</span></li>
+          <li v-for="player in this.yellowTeam">{{ player }} <span v-if="player === this.master"> (Master)</span></li>
         </ul>
         <button @click="joinYellowTeam" >Entra</button>
       </div>
@@ -109,7 +116,7 @@ export default {
       <div class="team blue-team">
         <h3>Squadra Blu</h3>
         <ul>
-          <li v-for="player in this.blueTeam">{{ player }} <span v-if="this.isMaster"> (Master)</span></li>
+          <li v-for="player in this.blueTeam">{{ player }} <span v-if="player === this.master"> (Master)</span></li>
         </ul>
         <button @click="joinBlueTeam" >Entra</button>
       </div>
@@ -117,7 +124,7 @@ export default {
 
     <LobbyUsers></LobbyUsers>
     <!-- Pulsante Start -->
-    <div class="controls" v-if="this.isMaster">
+    <div class="controls" v-if="this.iAmMaster">
       <label>Difficoltà:
         <select v-model="selectedDifficulty">
           <option value="easy">Facile</option>

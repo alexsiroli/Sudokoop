@@ -107,6 +107,9 @@ const gameController = {
         return response;
     },
 
+    removeGame: (lobbyCode) => {
+        lobbyGame[lobbyCode] = null;
+    },
     // Endpoint per aggiornare vittorie o sconfitte
     updateStats: async (req, res) => {
         const { username, result } = req.body;
