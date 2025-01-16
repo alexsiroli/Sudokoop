@@ -7,7 +7,6 @@ const User = require('../models/User'); // Import del modello User
 // Mappa in memoria per associare gameId alle istanze di Game
 const activeGames = {};
 const lobbyGame = {};
-const lobbyTeams = {}
 const gameController = {
 
     // Salva il tempo su DB
@@ -63,46 +62,6 @@ const gameController = {
         lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
     },
 
-    emptyTeam: (lobbyCode) => {
-        if (lobbyTeams[lobbyCode]) {
-            lobbyTeams[lobbyCode] = {
-                yellowTeam: [],
-                blueTeam: [],
-            };
-        }
-    },
-
-    addPlayerToTeam: (lobbyCode, color, username) => {
-        if (!lobbyTeams[lobbyCode]) {
-            lobbyTeams[lobbyCode] = {
-                yellowTeam: [],
-                blueTeam: [],
-            };
-        }
-        switch (color) {
-            case "yellow":
-                if (lobbyTeams[lobbyCode].blueTeam.includes(username)) {
-                    lobbyTeams[lobbyCode].blueTeam = lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
-
-                }
-                lobbyTeams[lobbyCode].yellowTeam.push(username)
-                break;
-            case "blue":
-                if (lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
-                    lobbyTeams[lobbyCode].yellowTeam = lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
-                }
-                lobbyTeams[lobbyCode].blueTeam.push(username)
-                break;
-        }
-        return {
-            yellowTeam: lobbyTeams[lobbyCode].yellowTeam,
-            blueTeam: lobbyTeams[lobbyCode].blueTeam,
-        }
-    },
-
-    versusGameCanStart: (lobbyCode) => {
-        return lobbyTeams[lobbyCode].yellowTeam.length > 0 && lobbyTeams[lobbyCode].blueTeam.length > 0;
-    },
 
     getGameOfLobby: (lobbyCode) => {
 
@@ -115,12 +74,9 @@ const gameController = {
         //console.log("vite " + lobbyGame[lobbyCode].vite);
         return lobbyGame[lobbyCode];
     },
-    createVersusGame: (lobbyCode, difficulty) => {
-        console.log("creo un nuovo gioco con squadre ");
-        console.log("yellow " + lobbyTeams[lobbyCode].yellowTeam)
-        console.log("blue " + lobbyTeams[lobbyCode].blueTeam)
-        lobbyGame[lobbyCode] = new VersusGame(difficulty,
-            lobbyTeams[lobbyCode].yellowTeam, lobbyTeams[lobbyCode].blueTeam);
+
+    createVersusGame: (lobbyCode, game) => {
+        lobbyGame[lobbyCode] = game
     },
 
     newMultiPlayerGame: (difficulty)  => {

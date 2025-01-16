@@ -23,6 +23,7 @@ export default {
       firstInitialization: true,
       isMaster: false,
       lastCell: null,
+      players: [],
     };
   },
   computed: {
@@ -135,6 +136,12 @@ export default {
       }
     },
     goToHome() {
+      // esci dalla lobby: comunichi al server
+      socket.emit("leaveLobby",
+        {
+          code: sessionStorage.getItem("lobbyCode"),
+          username: sessionStorage.getItem("username"),
+        });
       this.$router.push("/home");
     },
     backToLobby() {
@@ -146,11 +153,16 @@ export default {
 
     this.startNewGame();
 
-    socket.emit("isUserTheMaster",
-      {
-        username: sessionStorage.getItem('username'),
-        code: sessionStorage.getItem("lobbyCode")
-      });
+    socket.emit('getPlayersOfLobby', sessionStorage.getItem("lobbyCode"))
+    socket.on('players', players => {
+      console.log("players"  + players);
+      this.players = players;
+      players.forEach(player => {
+        if (player.isMaster && player.username === sessionStorage.getItem("username")) {
+          this.isMaster = true;
+        }
+      })
+    })
 
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
@@ -159,10 +171,7 @@ export default {
 
       this.restartNewGame();
     })
-    socket.on("youAreTheMaster", () => {
-      this.isMaster = true;
-      console.log("i am the master")
-    })
+
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       console.log("cellFocus!!!");
@@ -251,7 +260,13 @@ export default {
   font-size: 1.1em;
   margin-top: 10px;
 }
-
+.exit {
+  color: white;
+  background-color: red;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+}
 .buttons-row {
   display: flex;
   gap: 20px;
@@ -262,7 +277,7 @@ export default {
 <template>
   <div class="centered-container">
     <div class="rounded-box game-container">
-      <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
+
       <h1 class="title">Gioco Multiplayer</h1>
       <h3>Difficoltà: {{ this.difficulty }}</h3>
 
@@ -288,7 +303,10 @@ export default {
 
         </div>
 
-        <LobbyUser></LobbyUser>
+        <LobbyUser :players="this.players"></LobbyUser>
+        <button v-if="!this.gameOver" @click="goToHome" class="exit">
+          Abbandona la partita
+        </button>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
         <div v-if="gameOver && isMaster" class="game-over-container" style="margin-top: 20px;">
           <div class="buttons-row">

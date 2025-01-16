@@ -2,19 +2,15 @@
 import socket from "../plugins/socket";
 
 export default {
+  props: ['players'],
   data() {
     return{
       lobbyName: "",
-      players: ""
+
     }
   },
   mounted() {
     this.lobbyName = sessionStorage.getItem("lobbyCode");
-    socket.emit('getPlayersOfLobby', sessionStorage.getItem("lobbyCode"))
-    socket.on('playersOfLobby', players => {
-      console.log("players"  + players);
-      this.players = players;
-    })
   }
 }
 </script>

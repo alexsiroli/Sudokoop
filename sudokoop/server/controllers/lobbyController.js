@@ -1,6 +1,9 @@
+const VersusGame = require("../models/VersusGame");
+const GameController = require("./gameController");
 class LobbyController {
     constructor() {
         this.lobbies = [];
+        this.lobbyTeams = [];
     }
 
     generateLobbyCode() {
@@ -31,6 +34,52 @@ class LobbyController {
         // Aggiunge come non-master
         lobby.players.push({ username, isMaster: false });
         return { success: true };
+    }
+
+    emptyTeam (lobbyCode) {
+        if (this.lobbyTeams[lobbyCode]) {
+            this.lobbyTeams[lobbyCode] = {
+                yellowTeam: [],
+                blueTeam: [],
+            };
+        }
+    }
+
+    addPlayerToTeam (lobbyCode, color, username) {
+        if (!this.lobbyTeams[lobbyCode]) {
+            this.lobbyTeams[lobbyCode] = {
+                yellowTeam: [],
+                blueTeam: [],
+            };
+        }
+        switch (color) {
+            case "yellow":
+                if (this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
+                    this.lobbyTeams[lobbyCode].blueTeam = this.lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
+
+                }
+                this.lobbyTeams[lobbyCode].yellowTeam.push(username)
+                break;
+            case "blue":
+                if (this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
+                    this.lobbyTeams[lobbyCode].yellowTeam = this.lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
+                }
+                this.lobbyTeams[lobbyCode].blueTeam.push(username)
+                break;
+        }
+        return {
+            yellowTeam: this.lobbyTeams[lobbyCode].yellowTeam,
+            blueTeam: this.lobbyTeams[lobbyCode].blueTeam,
+        }
+    }
+
+    versusGameCanStart (lobbyCode) {
+        return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
+    }
+
+    createNewVersusGame (lobbyCode, difficulty) {
+        GameController.createVersusGame(lobbyCode, new VersusGame(difficulty,
+            this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
     }
 
     removePlayer(code, username) {

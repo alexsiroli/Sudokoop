@@ -17,7 +17,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   });
 
   socket.on("backToLobby", lobbyCode => {
-    gameController.emptyTeam(lobbyCode);
+    lobbyController.emptyTeam(lobbyCode);
     io.to(lobbyCode).emit("backToLobby");
     // reinvio anche i giocatori
     const lobby = lobbyController.findLobby(lobbyCode);
@@ -53,6 +53,13 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     console.log("[DELME] SERVER: user joined => code:", code, " user:", username);
   });
 
+  socket.on("joinTeam", (data) => {
+    const { color, username, lobbyCode } = data;
+    const res = lobbyController.addPlayerToTeam(lobbyCode, color, username);
+    console.log(res);
+    io.to(lobbyCode).emit("onJoinTeam", res);
+  });
+
   // Gestione chat di lobby
   socket.on("lobbyMessage", (data) => {
     // data: { lobbyCode, author, text }
@@ -83,7 +90,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   socket.on('getPlayersOfLobby', (lobbyCode) => {
     console.log("[DELME] SERVER: getPlayersOfLobby => code:", lobbyCode);
     const players = lobbyController.getPlayersOfLobby(lobbyCode);
-    io.to(lobbyCode).emit("playersOfLobby", players);
+    io.to(lobbyCode).emit("players", players);
   });
 
   // Avvio partita multiplayer
@@ -97,6 +104,17 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     }
   })
 
+  socket.on("createVersusGame", (data) => {
+    const {lobbyCode, difficulty} = data;
+    if (lobbyController.versusGameCanStart(lobbyCode)) {
+      lobbyController.createNewVersusGame(lobbyCode, difficulty);
+      console.log("versusgame can start")
+      io.to(lobbyCode).emit("versusGameCanStart")
+    } else {
+      io.to(lobbyCode).emit("notValidTeams")
+    }
+
+  });
   socket.on("checkForStartMultiGame", (data) => {
     const { lobbyCode, mode, username, difficulty } = data;
     const isMaster = lobbyController.isMaster(lobbyCode, username);
