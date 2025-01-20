@@ -23,12 +23,7 @@ module.exports = function registerGameHandlers(socket, io) {
             });
     });
 
-    socket.on("createNewGame", (data) => {
-        console.log("creating new game")
-        const {lobbyCode, difficulty} = data;
-        gameController.createNewGame(lobbyCode, difficulty);
-        io.to(lobbyCode).emit("restartTheGame")
-    });
+
 
 
 

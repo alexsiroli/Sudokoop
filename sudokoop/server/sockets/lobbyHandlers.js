@@ -55,7 +55,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
   socket.on("joinTeam", (data) => {
     const { color, username, lobbyCode } = data;
-    const res = lobbyController.addPlayerToTeam(lobbyCode, color, username);
+    const res = lobbyController.addPlayerToTeam(lobbyCode, color, lobbyController.getPlayerFromUsername(lobbyCode, username));
     console.log(res);
     io.to(lobbyCode).emit("onJoinTeam", res);
   });
@@ -80,13 +80,13 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
     lobbyController.removePlayer(code, username);
     socket.leave(code);
-    // se versus game, rimuovo dai team
-
     const updatedLobby = lobbyController.findLobby(code);
+
     if (updatedLobby) {
+      io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
       io.to(code).emit("players", updatedLobby.players);
     }
-    if (lobbyController.isVersusGame(code)) {
+    if (updatedLobby && lobbyController.isVersusGame(code)) {
       lobbyController.removePlayerFromTeam(code, username);
       const teams =  lobbyController.getTeams(code);
       console.log(teams)
@@ -94,6 +94,11 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     }
   });
 
+
+  socket.on('getPlayersOfGame', (lobbyCode) => {
+    const players = gameController.getPlayersOfGame(lobbyCode)
+    io.to(lobbyCode).emit("playersOfGame", players);
+  })
   // Recupero giocatori di una lobby specifica
   socket.on('getPlayersOfLobby', (lobbyCode) => {
     console.log("[DELME] SERVER: getPlayersOfLobby => code:", lobbyCode);
@@ -121,8 +126,16 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     } else {
       io.to(lobbyCode).emit("notValidTeams")
     }
-
   });
+
+  socket.on("createMultiGame", (data) => {
+    console.log("creating new game")
+    const {lobbyCode, difficulty} = data;
+
+    gameController.createMultiGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
+    io.to(lobbyCode).emit("restartTheGame")
+  });
+
   socket.on("checkForStartMultiGame", (data) => {
     const { lobbyCode, mode, username, difficulty } = data;
     const isMaster = lobbyController.isMaster(lobbyCode, username);
@@ -142,7 +155,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
     // il gioco puo partire: viene creato
 
-    gameController.createNewGame(lobbyCode, difficulty);
+    gameController.createMultiGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
 
     io.to(lobbyCode).emit("gameCanStart", mode);
   });

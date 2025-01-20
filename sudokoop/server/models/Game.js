@@ -1,10 +1,19 @@
 const sudokuGen = require('sudoku-gen');
 
 class Game {
-    constructor(difficult) {
+    constructor(difficult, players) {
         this.sudoku = sudokuGen.getSudoku(difficult);
         this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
         this.gameOver = false;
+        console.log("costruttore di game " + players)
+        this.players = players;
+    }
+
+    removePlayer(username) {
+        this.players = this.players.filter(p => p.username !== username);
+    }
+    getPlayers() {
+        return this.players;
     }
 
     insertNumberWithoutCheck(row, col, num) {

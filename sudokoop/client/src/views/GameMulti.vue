@@ -37,7 +37,7 @@ export default {
       //console.log("puzzle : " + this.puzzle);
       if (this.gameOver) {
         //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-        socket.emit('createNewGame',
+        socket.emit('createMultiGame',
           {
             lobbyCode: sessionStorage.getItem('lobbyCode'),
             difficulty: this.difficulty
@@ -135,14 +135,14 @@ export default {
         }
       }
     },
-    goToHome() {
+    leaveGame() {
       // esci dalla lobby: comunichi al server
       socket.emit("leaveLobby",
         {
           code: sessionStorage.getItem("lobbyCode"),
           username: sessionStorage.getItem("username"),
         });
-      this.$router.push("/home");
+      this.$router.push({name: 'Lobby'});
     },
     backToLobby() {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
@@ -153,8 +153,8 @@ export default {
 
     this.startNewGame();
 
-    socket.emit('getPlayersOfLobby', sessionStorage.getItem("lobbyCode"))
-    socket.on('players', players => {
+    socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
+    socket.on('playersOfGame', players => {
       console.log("players"  + players);
       this.players = players;
       players.forEach(player => {
@@ -304,7 +304,7 @@ export default {
         </div>
 
         <LobbyUser :players="this.players"></LobbyUser>
-        <button v-if="!this.gameOver" @click="goToHome" class="exit">
+        <button v-if="!this.gameOver" @click="leaveGame" class="exit">
           Abbandona la partita
         </button>
         <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->

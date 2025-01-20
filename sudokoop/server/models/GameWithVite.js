@@ -2,8 +2,8 @@ const Game = require("./Game");
 
 class GameWithVite extends Game {
 
-  constructor(difficult) {
-    super(difficult);
+  constructor(difficult, players) {
+    super(difficult, players);
     this.vite = 3;  // Imposta le vite iniziali a 3
   }
 

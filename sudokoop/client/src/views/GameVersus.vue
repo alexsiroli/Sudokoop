@@ -50,7 +50,7 @@ export default {
       this.firstInitialization = true;
       this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
-      this.team = this.yellowTeam.includes(sessionStorage.getItem('username')) ? 'yellow' : 'blue';
+      this.team = this.yellowTeam.username.includes(sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.$nextTick(() => {
         if (this.$refs.timer) {
           this.$refs.timer.startTimer();
@@ -178,8 +178,8 @@ export default {
     console.log("bluTeam " + this.blueTeam)
     this.startNewGame();
 
-    socket.emit('getPlayersOfLobby', sessionStorage.getItem("lobbyCode"))
-    socket.on('players', players => {
+    socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
+    socket.on('playersOfGame', players => {
       console.log("players"  + players);
       this.players = players;
       players.forEach(player => {

@@ -2,7 +2,7 @@ const Game = require("./Game");
 
 class VersusGame extends Game {
     constructor(difficult, yellowTeam, blueTeam) {
-        super(difficult);
+        super(difficult, yellowTeam + blueTeam);
         this.yellow =
             {team: yellowTeam,
             points: 0};
@@ -13,14 +13,17 @@ class VersusGame extends Game {
         this.eliminated = "";
     }
 
+    getPlayers() {
+        return this.yellow.team.concat(this.blue.team);
+    }
     findTeam(username) {
-        return this.yellow.team.includes(username) ? this.yellow : this.blue;
+        return this.yellow.team.username.includes(username) ? this.yellow : this.blue;
     }
 
-    removePlayerFromTeam(username) {
+    removePlayer(username) {
         const team = this.findTeam(username);
         console.log("rimuovo da VERSUS game ")
-        team.team = team.team.filter(player => player !== username);
+        team.team = team.team.filter(player => player.username !== username);
         console.log("Yellow " + this.yellow.team)
         console.log("Blue " + this.blue.team)
     }
@@ -44,7 +47,7 @@ class VersusGame extends Game {
             }
         }
         if (result === 'Sbagliato! Riprova.') {
-            team.team = team.team.filter(player => player !== username);
+            team.team = team.team.filter(player => player.username !== username);
             console.log("YEllow" + this.yellow.team);
             console.log("Blue " + this.blue.team);
             this.eliminated = username;

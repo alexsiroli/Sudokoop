@@ -58,14 +58,20 @@ const gameController = {
         });
     },
 
-    createNewGame: (lobbyCode, difficulty) => {
-        lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
+    createMultiGame: (lobbyCode, difficulty, players) => {
+        lobbyGame[lobbyCode] = new Game(difficulty, players);
     },
 
-    removePlayerFromVersus: (lobbyCode, username) => {
-      lobbyGame[lobbyCode].removePlayerFromTeam(username);
-    },
 
+    removePlayerFromGame: (lobbyCode, username) => {
+        const game = lobbyGame[lobbyCode];
+        if (game) {
+            game.removePlayer(username);
+        }
+    },
+    getPlayersOfGame: (lobbyCode) => {
+      return lobbyGame[lobbyCode].getPlayers();
+    },
     getGameOfLobby: (lobbyCode) => {
 
         if (!lobbyGame[lobbyCode]) {
@@ -82,9 +88,6 @@ const gameController = {
         lobbyGame[lobbyCode] = game
     },
 
-    newMultiPlayerGame: (difficulty)  => {
-        return new Game(difficulty);
-    },
     insertNumberWithoutCheck: (cellData, lobbyCode) => {
         const game = gameController.getGameOfLobby(lobbyCode);
         return game.insertNumberWithoutCheck(cellData.row, cellData.col, cellData.value);

@@ -80,11 +80,13 @@ export default {
     socket.on("versusGameCanStart", () => {
       this.$router.push({name: 'VersusGame'});
     })
-
+//TODO: cambiare logica del master con i nuovi player e gestire i team container
     socket.on("onJoinTeam", (res) => {
       console.log("onJoinTeam", res);
-      this.blueTeam = res.blueTeam;
-      this.yellowTeam = res.yellowTeam;
+      this.blueTeam = res.blueTeam.map(player => player.username);
+      console.log("blu team " + this.blueTeam)
+      this.yellowTeam = res.yellowTeam.map(player => player.username);
+      console.log("yellow tea " + this.yellowTeam)
     })
 
   },
