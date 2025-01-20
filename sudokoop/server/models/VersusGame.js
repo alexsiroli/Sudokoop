@@ -17,6 +17,13 @@ class VersusGame extends Game {
         return this.yellow.team.includes(username) ? this.yellow : this.blue;
     }
 
+    removePlayerFromTeam(username) {
+        const team = this.findTeam(username);
+        console.log("rimuovo da VERSUS game ")
+        team.team = team.team.filter(player => player !== username);
+        console.log("Yellow " + this.yellow.team)
+        console.log("Blue " + this.blue.team)
+    }
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num, username) {
         const result = super.insertNumber(row, col, num);

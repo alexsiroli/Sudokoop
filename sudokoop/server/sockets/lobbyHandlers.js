@@ -79,11 +79,19 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     console.log("[DELME] SERVER: leaveLobby => code:", code, " user:", username);
 
     lobbyController.removePlayer(code, username);
+    socket.leave(code);
+    // se versus game, rimuovo dai team
+
     const updatedLobby = lobbyController.findLobby(code);
     if (updatedLobby) {
       io.to(code).emit("players", updatedLobby.players);
     }
-    socket.leave(code);
+    if (lobbyController.isVersusGame(code)) {
+      lobbyController.removePlayerFromTeam(code, username);
+      const teams =  lobbyController.getTeams(code);
+      console.log(teams)
+      io.to(code).emit("teams", teams);
+    }
   });
 
   // Recupero giocatori di una lobby specifica

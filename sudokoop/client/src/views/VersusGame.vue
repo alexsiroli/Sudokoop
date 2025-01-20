@@ -30,6 +30,14 @@ export default {
         this.yellowTeam = yellowTeam;
         this.blueTeam = blueTeam;
       })
+      socket.on("teams", (data) => {
+        console.log("sono in versus game ho ricevuto i team")
+        const {yellowTeam, blueTeam } = data;
+        this.yellowTeam = yellowTeam;
+        this.blueTeam = blueTeam;
+        console.log ("yellow " + yellowTeam)
+        console.log("blu " + blueTeam)
+      })
     }
   },
   mounted() {

@@ -62,6 +62,9 @@ const gameController = {
         lobbyGame[lobbyCode] = gameController.newMultiPlayerGame(difficulty);
     },
 
+    removePlayerFromVersus: (lobbyCode, username) => {
+      lobbyGame[lobbyCode].removePlayerFromTeam(username);
+    },
 
     getGameOfLobby: (lobbyCode) => {
 

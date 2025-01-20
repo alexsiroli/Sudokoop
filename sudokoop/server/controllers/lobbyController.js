@@ -45,6 +45,30 @@ class LobbyController {
         }
     }
 
+    removeFromBlueIfPresent(lobbyCode, username ){
+        if (this.lobbyTeams[lobbyCode] && this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
+
+            this.lobbyTeams[lobbyCode].blueTeam = this.lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
+            console.log("rimuovo dA blu " + this.lobbyTeams[lobbyCode].blueTeam )
+            return true;
+        }
+        return false;
+    }
+    removeFromYellowIfPresent(lobbyCode, username) {
+        if (this.lobbyTeams[lobbyCode] && this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
+            this.lobbyTeams[lobbyCode].yellowTeam = this.lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
+            console.log("rimuovo da giallo " + this.lobbyTeams[lobbyCode].yellowTeam)
+            return true;
+        }
+        return false;
+    }
+    removePlayerFromTeam(lobbyCode, username) {
+        if ( this.removeFromBlueIfPresent(lobbyCode, username) || this.removeFromYellowIfPresent(lobbyCode, username)) {
+            console.log("rimuovo il player dal gameController ");
+            GameController.removePlayerFromVersus(lobbyCode, username);
+        }
+        console.log("Teams dopo i remove " + this.getTeams(lobbyCode));
+    }
     addPlayerToTeam (lobbyCode, color, username) {
         if (!this.lobbyTeams[lobbyCode]) {
             this.lobbyTeams[lobbyCode] = {
@@ -54,28 +78,27 @@ class LobbyController {
         }
         switch (color) {
             case "yellow":
-                if (this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
-                    this.lobbyTeams[lobbyCode].blueTeam = this.lobbyTeams[lobbyCode].blueTeam.filter(user => user !== username);
-                }
+                this.removeFromBlueIfPresent(lobbyCode, username)
                 if (!this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
                     this.lobbyTeams[lobbyCode].yellowTeam.push(username)
                 }
                 break;
             case "blue":
-                if (this.lobbyTeams[lobbyCode].yellowTeam.includes(username)) {
-                    this.lobbyTeams[lobbyCode].yellowTeam = this.lobbyTeams[lobbyCode].yellowTeam.filter(user => user !== username);
-                }
+                this.removeFromYellowIfPresent(lobbyCode, username)
                 if (!this.lobbyTeams[lobbyCode].blueTeam.includes(username)) {
                     this.lobbyTeams[lobbyCode].blueTeam.push(username)
                 }
                 break;
         }
+        return this.getTeams(lobbyCode);
+    }
+
+    getTeams(lobbyCode) {
         return {
             yellowTeam: this.lobbyTeams[lobbyCode].yellowTeam,
             blueTeam: this.lobbyTeams[lobbyCode].blueTeam,
         }
     }
-
     versusGameCanStart (lobbyCode) {
         return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
     }
@@ -85,6 +108,9 @@ class LobbyController {
             this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
     }
 
+    isVersusGame(lobbyCode) {
+        return GameController.getGameOfLobby(lobbyCode) instanceof VersusGame;
+    }
     removePlayer(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return;
