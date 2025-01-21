@@ -5,6 +5,9 @@ class CoopGame {
         this.game = new GameWithVite(difficult, players);
         this.players = players;
     }
+    insertNumberWithoutCheck(row, col, num) {
+        this.game.insertNumberWithoutCheck(row, col, num);
+    }
     insertNumber(row, col, num) {
         return this.game.insertNumber(row, col, num);
     }

@@ -21,7 +21,7 @@ it('Game class initializes correctly', () => {
 it('Insert number correctly', () => {
     const coopGame = initializeGame();
     const resultCorrect = coopGame.insertNumber(0, 2, 3);
-    expect(resultCorrect).toBe('Giusto!');
+    expect(resultCorrect.message).toBe('Giusto!');
 });
 
 it('removePlayer', () => {

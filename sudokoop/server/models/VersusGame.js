@@ -9,7 +9,6 @@ class VersusGame {
         this.blue = {
             team: blueTeam, points: 0
         }
-        this.eliminated = ""; //conserva il nome dell'ultimo giocatore eliminato
     }
 
     getTeams() {
@@ -41,34 +40,42 @@ class VersusGame {
             this.gameOver = true;
             return 'Gialla vince!';
         }
-        return false;
+        return "";
+    }
+
+    insertNumberWithoutCheck(row, col, num) {
+        this.game.insertNumberWithoutCheck(row, col, num);
     }
 
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num, username) {
         const result = this.game.insertNumber(row, col, num);
         const team = this.findTeam(username)
-        if (result === "Giusto!") {
+        let message = "";
+
+        if (result.message === "Giusto!") {
             team.points++;
-            return result;
         }
-        if (result === "Hai vinto!") {
+        else if (result.message === "Hai vinto!") {
             team.points++;
-            this.eliminated = "";
             // sudoku finito: vince la squadra con i punti piu alti
             if (this.yellow.points > this.blue.points) {
-                return 'Gialla vince!';
+                 message = 'Gialla vince!';
             } else if (this.yellow.points === this.blue.points) {
-                return 'Pareggio!';
+                message = 'Pareggio!';
             } else {
-                return 'Blu vince!';
+                message = 'Blu vince!';
             }
+            result.message = message;
         }
-        if (result === 'Sbagliato! Riprova.') {
+        else if (result.message === 'Sbagliato! Riprova.') {
             team.team = team.team.filter(player => player.username !== username);
-            this.eliminated = username;
-            return this.checkForFinish(result) === false ? result : this.checkForFinish(result);
+            result.message = this.checkForFinish(result) === "" ? result.message : this.checkForFinish(result);
         }
+        result.yellowPoint = this.yellow.points;
+        result.bluePoint = this.blue.points;
+        result.yellowTeam = this.yellow.team;
+        result.blueTeam = this.blue.team;
         return result; // Restituisci il risultato originale per gli altri casi
     }
 }
