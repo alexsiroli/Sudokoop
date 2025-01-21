@@ -13,11 +13,17 @@ class VersusGame extends Game {
         this.eliminated = "";
     }
 
+    getTeams() {
+        return {
+            yellowTeam: this.yellow.team,
+            blueTeam: this.blue.team
+        }
+    }
     getPlayers() {
         return this.yellow.team.concat(this.blue.team);
     }
     findTeam(username) {
-        return this.yellow.team.username.includes(username) ? this.yellow : this.blue;
+        return this.yellow.team.some(p => p.username === username) ? this.yellow : this.blue;
     }
 
     removePlayer(username) {

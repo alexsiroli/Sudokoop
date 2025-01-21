@@ -11,7 +11,6 @@ export default {
       blueTeam: [],
       buttonDisabled: false,
       numPlayers: 0,
-      master: "",
       selectedDifficulty: "easy",
       showError: false,
       errorMessage: "",
@@ -59,16 +58,12 @@ export default {
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
     socket.on("players" , (players) => {
-      console.log(players);
-      players.forEach((player) => {
-        if (player.isMaster) {
-          this.master = player.username;
-          if (player.username === sessionStorage.getItem("username")) {
-            this.isMaster = true;
-          }
+      this.numPlayers = players.length;
+      players.forEach(p => {
+        if (p.username === sessionStorage.getItem('username') && p.isMaster) {
+          this.isMaster = true;
         }
       })
-      this.numPlayers = players.length;
     });
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
@@ -80,12 +75,11 @@ export default {
     socket.on("versusGameCanStart", () => {
       this.$router.push({name: 'VersusGame'});
     })
-//TODO: cambiare logica del master con i nuovi player e gestire i team container
     socket.on("onJoinTeam", (res) => {
       console.log("onJoinTeam", res);
-      this.blueTeam = res.blueTeam.map(player => player.username);
+      this.blueTeam = res.blueTeam;
       console.log("blu team " + this.blueTeam)
-      this.yellowTeam = res.yellowTeam.map(player => player.username);
+      this.yellowTeam = res.yellowTeam;
       console.log("yellow tea " + this.yellowTeam)
     })
 
@@ -109,7 +103,7 @@ export default {
       <div class="team yellow-team">
         <h3>Squadra Gialla</h3>
         <ul>
-          <li v-for="player in this.yellowTeam">{{ player }} <span v-if="player === this.master"> (Master)</span></li>
+          <li v-for="player in this.yellowTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
         <button @click="joinYellowTeam" >Entra</button>
       </div>
@@ -118,7 +112,7 @@ export default {
       <div class="team blue-team">
         <h3>Squadra Blu</h3>
         <ul>
-          <li v-for="player in this.blueTeam">{{ player }} <span v-if="player === this.master"> (Master)</span></li>
+          <li v-for="player in this.blueTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
         <button @click="joinBlueTeam" >Entra</button>
       </div>
@@ -154,14 +148,7 @@ export default {
   z-index: 1000;
   font-size: 16px;
 }
-.game-lobby {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding: 20px;
-}
+
 
 h3 {
   color: black;

@@ -50,7 +50,7 @@ export default {
       this.firstInitialization = true;
       this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
-      this.team = this.yellowTeam.username.includes(sessionStorage.getItem('username')) ? 'yellow' : 'blue';
+      this.team = this.yellowTeam.some(t => t.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.$nextTick(() => {
         if (this.$refs.timer) {
           this.$refs.timer.startTimer();
@@ -364,7 +364,7 @@ export default {
         </div>
 
         <TeamContainer ref="teamContainerBlue" :team-name="'Blu'" :players="this.blueTeam"
-        :points = "this.bluePoint"  :master="this.masterUser" ></TeamContainer>
+        :points = "this.bluePoint" ></TeamContainer>
 
         </div>
         <LobbyUser :players="this.players"></LobbyUser>

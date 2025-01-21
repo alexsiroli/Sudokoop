@@ -92,14 +92,15 @@ class LobbyController {
                 }
                 break;
         }
-        return this.getTeams(lobbyCode);
-    }
-
-    getTeams(lobbyCode) {
         return {
             yellowTeam: this.lobbyTeams[lobbyCode].yellowTeam,
             blueTeam: this.lobbyTeams[lobbyCode].blueTeam,
         }
+
+    }
+
+    getTeams(lobbyCode) {
+       return gameController.getGameOfLobby(lobbyCode).getTeams();
     }
     versusGameCanStart (lobbyCode) {
         return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
