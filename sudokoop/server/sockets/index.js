@@ -1,10 +1,11 @@
 const LobbyController = require('../controllers/lobbyController');
+const GameController = require('../controllers/gameController');
 const registerLobbyHandlers = require('./lobbyHandlers');
 const registerGameHandlers = require('./gameHandlers');
 
 module.exports = (io) => {
     const lobbyController = new LobbyController();
-
+    const gameController = new GameController();
     io.on('connection', (socket) => {
         console.log('Nuovo client connesso:', socket.id);
 
@@ -16,7 +17,7 @@ module.exports = (io) => {
 
         // Registra i vari handler
         registerLobbyHandlers(socket, io, lobbyController);
-        registerGameHandlers(socket, io);
+        registerGameHandlers(socket, io, gameController);
 
         // Disconnessione
         socket.on('disconnect', () => {

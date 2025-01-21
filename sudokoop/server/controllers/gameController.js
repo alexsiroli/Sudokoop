@@ -1,129 +1,145 @@
-const Game = require('../models/GameWithVite');
+const GameWithVite = require('../models/GameWithVite');
 const VersusGame = require('../models/VersusGame');
-
 const Leaderboard = require('../models/Leaderboard');
-const User = require('../models/User'); // Import del modello User
+const User = require('../models/User');
+const CoopGame = require("../models/CoopGame"); // Import del modello User
 
-// Mappa in memoria per associare gameId alle istanze di Game
-const activeGames = {};
-const lobbyGame = {};
-const gameController = {
+class GameController {
+    constructor() {
+        // Stato interno
+        this.activeGames = {};
+        this.lobbyGame = [];
+        this.lobbyTeams = [];
+    }
+
+    // Genera un ID univoco per il gioco
+    generateGameId() {
+        return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    }
 
     // Salva il tempo su DB
-    saveTime: async (req, res) => {
+    async saveTime(req, res) {
         const { username, milliseconds, difficulty } = req.body;
         if (!username || !milliseconds) {
             return res.status(400).json({ error: "Dati insufficienti" });
         }
         try {
-            // Crea un nuovo record Leaderboard e salva
-            const record = new Leaderboard({
-                username,
-                milliseconds,
-                difficulty
-            });
+            const record = new Leaderboard({ username, milliseconds, difficulty });
             await record.save();
-
             return res.status(200).json({ message: "Tempo salvato su DB" });
         } catch (err) {
             console.error("Errore salvataggio tempo:", err);
             return res.status(500).json({ error: "Errore interno nel salvataggio" });
         }
-    },
+    }
 
     // Recupera la leaderboard dal DB
-    getLeaderboard: async (req, res) => {
+    async getLeaderboard(req, res) {
         try {
-            // Trova tutti i record, ordina per tempo crescente
             const records = await Leaderboard.find().sort({ milliseconds: 1 });
             res.status(200).json(records);
         } catch (err) {
             console.error("Errore recupero leaderboard:", err);
             res.status(500).json({ error: "Errore nel recupero della leaderboard" });
         }
-    },
+    }
 
-    // Endpoint per avviare una nuova partita
-    newSinglePlayerGame: (req, res) => {
+    // Avvia una nuova partita single-player
+    newSinglePlayerGame(req, res) {
         const difficulty = req.query.difficulty || 'easy';
-        const gameId = gameController.generateGameId();
-
-        const newGame = new Game(difficulty);
-        activeGames[gameId] = newGame;
+        const gameId = this.generateGameId();
+        const newGame = new GameWithVite(difficulty);
+        this.activeGames[gameId] = newGame;
 
         return res.status(200).json({
             gameId,
             puzzle: newGame.sudoku.puzzle,
             vite: newGame.vite,
         });
-    },
-
-    createMultiGame: (lobbyCode, difficulty, players) => {
-        lobbyGame[lobbyCode] = new Game(difficulty, players);
-    },
+    }
 
 
-    removePlayerFromGame: (lobbyCode, username) => {
-        const game = lobbyGame[lobbyCode];
+    // Aggiunge un giocatore a un team
+    addPlayerToTeam(lobbyCode, color, player) {
+        if (!this.lobbyTeams[lobbyCode]) {
+            this.lobbyTeams[lobbyCode] = new Teams(lobbyCode);
+        }
+        this.lobbyTeams[lobbyCode].addPlayer(player, color);
+    }
+
+
+    removePlayerFromTeam(lobbyCode, player) {
+        if (this.lobbyTeams[lobbyCode]) {
+            this.lobbyTeams[lobbyCode].removePlayer(player);
+        }
+    }
+
+    versusGameCanStart (lobbyCode) {
+        return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
+    }
+
+    // Crea una nuova partita multiplayer
+    createCoopGame(lobbyCode, difficulty, players) {
+        this.lobbyGame[lobbyCode] = new CoopGame(difficulty, players);
+    }
+
+    createVersusGame(lobbyCode, difficulty) {
+        this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode].yellowTeam,
+            this.lobbyTeams[lobbyCode].blueTeam);
+        // TODO: valutare se svuotare i teams
+    }
+
+    // Rimuove un giocatore da una partita
+    removePlayerFromGame(lobbyCode, username) {
+        const game = this.lobbyGame[lobbyCode];
         if (game) {
             game.removePlayer(username);
         }
-    },
-    getPlayersOfGame: (lobbyCode) => {
-      return lobbyGame[lobbyCode].getPlayers();
-    },
-    getGameOfLobby: (lobbyCode) => {
+    }
 
-        if (!lobbyGame[lobbyCode]) {
+    // Recupera i giocatori di una partita
+    /*getPlayersOfGame(lobbyCode) {
+        return this.lobbyGame[lobbyCode]?.getPlayers();
+    }
+
+     */
+
+    // Recupera il gioco associato a una lobby
+    getGameOfLobby(lobbyCode) {
+        const game = this.lobbyGame[lobbyCode];
+        if (!game) {
             console.log("Lobby not found for code: " + lobbyCode);
             return null;
         }
-        console.log("Game " + JSON.stringify(lobbyGame[lobbyCode]));
-        console.log("sudoku " + JSON.stringify(lobbyGame[lobbyCode].sudoku));
-        //console.log("vite " + lobbyGame[lobbyCode].vite);
-        return lobbyGame[lobbyCode];
-    },
+        return game;
+    }
 
-    createVersusGame: (lobbyCode, game) => {
-        lobbyGame[lobbyCode] = game
-    },
-
-    insertNumberWithoutCheck: (cellData, lobbyCode) => {
-        const game = gameController.getGameOfLobby(lobbyCode);
+    // Inserisce un numero senza controlli
+    insertNumberWithoutCheck(cellData, lobbyCode) {
+        const game = this.getGameOfLobby(lobbyCode);
         return game.insertNumberWithoutCheck(cellData.row, cellData.col, cellData.value);
-    },
+    }
 
-    insertNumberMulti: (cellData, lobbyCode, username) => {
-        // recupero il gioco e chiamo l insert
-        const game = gameController.getGameOfLobby(lobbyCode);
+    // Inserisce un numero in modalità multiplayer
+    insertNumberMulti(cellData, lobbyCode, username) {
+        const game = this.getGameOfLobby(lobbyCode);
         const result = game.insertNumber(cellData.row, cellData.col, cellData.value, username);
-        const response = {
-            puzzle: game.sudoku.puzzle,
-            solution: game.sudoku.solution,
-            cellData: cellData,
-            vite: game.vite,
-            message: result,
-            gameOver: game.gameOver,
-        };
-        if (game instanceof VersusGame) {
-            response.yellowPoint = game.yellow.points;
-            response.bluePoint = game.blue.points;
-            response.eliminated = game.eliminated;
-        }
-        return response;
-    },
+        result.cellData = cellData;
+        return result;
+    }
 
-    removeGame: (lobbyCode) => {
-        lobbyGame[lobbyCode] = null;
-    },
-    // Endpoint per aggiornare vittorie o sconfitte
-    updateStats: async (req, res) => {
+    // Rimuove un gioco
+    removeGame(lobbyCode) {
+        this.lobbyGame[lobbyCode] = null;
+    }
+
+    // Aggiorna le statistiche di un utente
+    async updateStats(req, res) {
         const { username, result } = req.body;
         if (!username || !result) {
             return res.status(400).json({ error: "Dati insufficienti" });
         }
         try {
-            // Se result è "win", incrementiamo wins, altrimenti losses
             const update = result === "win" ? { $inc: { wins: 1 } } : { $inc: { losses: 1 } };
             const user = await User.findOneAndUpdate({ userName: username }, update, { new: true });
             if (!user) {
@@ -134,12 +150,12 @@ const gameController = {
             console.error("Errore aggiornamento statistiche:", err);
             return res.status(500).json({ error: "Errore interno" });
         }
-    },
+    }
 
-    // Endpoint per inserire un numero in una cella
-    insertNumber: (req, res) => {
+    // Inserisce un numero in modalità single-player
+    insertNumber(req, res) {
         const { gameId, row, col, value } = req.body;
-        const currentGame = activeGames[gameId];
+        const currentGame = this.activeGames[gameId];
         if (!currentGame) {
             return res.status(404).json({ error: 'Partita non trovata' });
         }
@@ -147,7 +163,7 @@ const gameController = {
         const result = currentGame.insertNumber(row, col, value);
 
         if (result === undefined) {
-            delete activeGames[gameId];
+            delete this.activeGames[gameId];
             return res.status(200).json({
                 puzzle: currentGame.sudoku.puzzle,
                 solution: currentGame.sudoku.solution,
@@ -158,7 +174,7 @@ const gameController = {
         }
 
         if (result === 'Hai perso! Vite terminate.') {
-            delete activeGames[gameId];
+            delete this.activeGames[gameId];
             return res.status(200).json({
                 puzzle: currentGame.sudoku.puzzle,
                 solution: currentGame.sudoku.solution,
@@ -174,11 +190,35 @@ const gameController = {
             message: result,
             gameOver: false,
         });
-    },
+    }
+}
 
-    generateGameId: () => {
-        return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-    },
-};
+class Teams {
+    constructor(code) {
+        this.code = code;
+        this.yellowTeam = [];
+        this.blueTeam = [];
+    }
 
-module.exports = gameController;
+    removePlayer(player) {
+        const team = this.yellowTeam.includes(p => p.username === player.username) ? this.yellowTeam : this.blueTeam;
+        this.removeIfPresent(player, team);
+    }
+    removeIfPresent(player, team) {
+        if (team.includes(player)) {
+            const index = team.findIndex(user => user.username === player.username);
+            if (index !== -1) {
+                team.splice(index, 1);
+            }
+        }
+    }
+    addPlayer(player, color) {
+        const targetTeam = color === 'yellow' ? this.yellowTeam : this.blueTeam;
+        const otherTeam = color === 'yellow' ? this.blueTeam : this.yellowTeam;
+        this.removeIfPresent(player, otherTeam)
+        targetTeam.push(player);
+    }
+}
+
+
+module.exports = new GameController();

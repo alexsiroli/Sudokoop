@@ -132,7 +132,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     console.log("creating new game")
     const {lobbyCode, difficulty} = data;
 
-    gameController.createMultiGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
+    gameController.createCoopGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
     io.to(lobbyCode).emit("restartTheGame")
   });
 
@@ -155,7 +155,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
     // il gioco puo partire: viene creato
 
-    gameController.createMultiGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
+    gameController.createCoopGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
 
     io.to(lobbyCode).emit("gameCanStart", mode);
   });

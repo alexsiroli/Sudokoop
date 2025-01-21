@@ -1,10 +1,7 @@
-const VersusGame = require("../models/VersusGame");
-const GameController = require("./gameController");
-const gameController = require("./gameController");
 class LobbyController {
+
     constructor() {
         this.lobbies = [];
-        this.lobbyTeams = [];
     }
 
     generateLobbyCode() {
@@ -33,10 +30,12 @@ class LobbyController {
             return { success: true };
         }
         // Aggiunge come non-master
-        lobby.players.push({ username, isMaster: false });
+        lobby.players.push(new Player(username, false));
         return { success: true };
     }
 
+
+/*
     emptyTeam (lobbyCode) {
         if (this.lobbyTeams[lobbyCode]) {
             this.lobbyTeams[lobbyCode] = {
@@ -46,67 +45,17 @@ class LobbyController {
         }
     }
 
-    removeFromBlueIfPresent(lobbyCode, player ){
-        if (this.lobbyTeams[lobbyCode] && this.lobbyTeams[lobbyCode].blueTeam.includes(player)) {
 
-            this.lobbyTeams[lobbyCode].blueTeam = this.lobbyTeams[lobbyCode].blueTeam.filter(user => user.username !==
-            player.username);
-            console.log("rimuovo dA blu " + this.lobbyTeams[lobbyCode].blueTeam )
-            return true;
-        }
-        return false;
-    }
-    removeFromYellowIfPresent(lobbyCode, player) {
-        if (this.lobbyTeams[lobbyCode] && this.lobbyTeams[lobbyCode].yellowTeam.includes(player)) {
-            this.lobbyTeams[lobbyCode].yellowTeam = this.lobbyTeams[lobbyCode].yellowTeam.filter(user => user.username !==
-                player.username);
-            console.log("rimuovo da giallo " + this.lobbyTeams[lobbyCode].yellowTeam)
-            return true;
-        }
-        return false;
-    }
-    removePlayerFromTeam(lobbyCode, player) {
-        if ( this.removeFromBlueIfPresent(lobbyCode, player) || this.removeFromYellowIfPresent(lobbyCode, player)) {
-            console.log("rimuovo il player dal gameController ");
-        }
-        console.log("Teams dopo i remove " + this.getTeams(lobbyCode));
-    }
-    addPlayerToTeam (lobbyCode, color, player) {
-        if (!this.lobbyTeams[lobbyCode]) {
-            this.lobbyTeams[lobbyCode] = {
-                yellowTeam: [],
-                blueTeam: [],
-            };
-        }
-        switch (color) {
-            case "yellow":
-                this.removeFromBlueIfPresent(lobbyCode, player)
-                if (!this.lobbyTeams[lobbyCode].yellowTeam.includes(player)) {
-                    this.lobbyTeams[lobbyCode].yellowTeam.push(player)
-                }
-                break;
-            case "blue":
-                this.removeFromYellowIfPresent(lobbyCode, player)
-                if (!this.lobbyTeams[lobbyCode].blueTeam.includes(player)) {
-                    this.lobbyTeams[lobbyCode].blueTeam.push(player)
-                }
-                break;
-        }
-        return {
-            yellowTeam: this.lobbyTeams[lobbyCode].yellowTeam,
-            blueTeam: this.lobbyTeams[lobbyCode].blueTeam,
-        }
 
-    }
 
     getTeams(lobbyCode) {
        return gameController.getGameOfLobby(lobbyCode).getTeams();
     }
-    versusGameCanStart (lobbyCode) {
-        return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
-    }
 
-    createNewVersusGame (lobbyCode, difficulty) {
+ */
+
+
+/*    createNewVersusGame (lobbyCode, difficulty) {
         GameController.createVersusGame(lobbyCode, new VersusGame(difficulty,
             this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
     }
@@ -114,16 +63,19 @@ class LobbyController {
     isVersusGame(lobbyCode) {
         return GameController.getGameOfLobby(lobbyCode) instanceof VersusGame;
     }
-    removePlayer(code, username) {
+
+ */
+
+    removePlayerFromLobby(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return;
         lobby.players = lobby.players.filter(p => p.username !== username);
         // Se la lobby ora è vuota, rimuoviamo la lobby
         if (lobby.players.length === 0) {
-            GameController.removeGame(code);
+            //GameController.removeGame(code);
             this.removeLobby(code);
         } else {
-            gameController.removePlayerFromGame(code, username)
+            //gameController.removePlayerFromGame(code, username)
             // Se manca il master, assegna a uno a caso
             const masterStillPresent = lobby.players.some(p => p.isMaster);
             if (!masterStillPresent && lobby.players.length > 0) {
@@ -140,9 +92,12 @@ class LobbyController {
         return lobby.players;
     }
 
-    getPlayerFromUsername(code, username) {
+    /*getPlayerFromUsername(code, username) {
         return this.findLobby(code).players.find(p => p.username === username);
     }
+
+     */
+
     isMaster(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return false;
@@ -176,8 +131,14 @@ module.exports = LobbyController;
 class Lobby {
     constructor(code, masterUsername) {
         this.code = code;
-        this.players = [
-            { username: masterUsername, isMaster: true }
-        ];
+        this.players = [new Player(masterUsername, true)];
     }
 }
+
+class Player {
+    constructor(username, isMaster) {
+        this.username = username;
+        this.isMaster = isMaster;
+    }
+}
+

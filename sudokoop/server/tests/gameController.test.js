@@ -1,5 +1,5 @@
 const gameController = require('../controllers/gameController');
-const Game = require('../models/Game');
+const Game  = require('../models/Game');
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User');
 
