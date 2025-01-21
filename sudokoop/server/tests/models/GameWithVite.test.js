@@ -4,7 +4,7 @@ jest.mock('sudoku-gen', () => ({
         solution: '123456789'.repeat(9),
     })),
 }));
-const GameWithVite = require('../models/GameWithVite');
+const GameWithVite = require('../../models/GameWithVite');
 
 
 it('Game class initializes correctly', () => {
