@@ -5,6 +5,9 @@ class CoopGame {
         this.game = new GameWithVite(difficult, players);
         this.players = players;
     }
+    insertNumber(row, col, num) {
+        return this.game.insertNumber(row, col, num);
+    }
     removePlayer(username) {
         this.players = this.players.filter(player => player.username !== username);
     }

@@ -29,11 +29,24 @@ class VersusGame {
     removePlayer(username) {
         const team = this.findTeam(username);
         team.team = team.team.filter(player => player.username !== username);
+        return this.checkForFinish();
+    }
+
+    checkForFinish() {
+        if (this.yellow.team.length === 0) {
+            this.gameOver = true;
+            return 'Blu vince!'; // Gioco terminato
+        }
+        if (this.blue.team.length === 0) {
+            this.gameOver = true;
+            return 'Gialla vince!';
+        }
+        return false;
     }
 
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num, username) {
-        const result = super.insertNumber(row, col, num);
+        const result = this.game.insertNumber(row, col, num);
         const team = this.findTeam(username)
         if (result === "Giusto!") {
             team.points++;
@@ -45,6 +58,8 @@ class VersusGame {
             // sudoku finito: vince la squadra con i punti piu alti
             if (this.yellow.points > this.blue.points) {
                 return 'Gialla vince!';
+            } else if (this.yellow.points === this.blue.points) {
+                return 'Pareggio!';
             } else {
                 return 'Blu vince!';
             }
@@ -52,14 +67,7 @@ class VersusGame {
         if (result === 'Sbagliato! Riprova.') {
             team.team = team.team.filter(player => player.username !== username);
             this.eliminated = username;
-            if (this.yellow.team.length === 0) {
-                this.gameOver = true;
-                return 'Blu vince!'; // Gioco terminato
-            }
-            if (this.blue.team.length === 0) {
-                this.gameOver = true;
-                return 'Gialla vince!';
-            }
+            return this.checkForFinish(result) === false ? result : this.checkForFinish(result);
         }
         return result; // Restituisci il risultato originale per gli altri casi
     }
