@@ -23,7 +23,7 @@ module.exports = (io) => {
         socket.on('disconnect', () => {
             console.log('Client disconnesso:', socket.id);
             // Rimuoviamo il player dalle lobby, se presente
-            lobbyController.handleDisconnect(socket.username);
+            lobbyController.removePlayerFromLobby(socket.username);
         });
     });
 };

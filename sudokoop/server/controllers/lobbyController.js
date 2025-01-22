@@ -66,29 +66,12 @@ class LobbyController {
 
  */
 
-    removePlayerFromLobby(code, username) {
-        const lobby = this.findLobby(code);
-        if (!lobby) return;
-        lobby.players = lobby.players.filter(p => p.username !== username);
-        // Se la lobby ora è vuota, rimuoviamo la lobby
-        if (lobby.players.length === 0) {
-            //GameController.removeGame(code);
-            this.removeLobby(code);
-        } else {
-            //gameController.removePlayerFromGame(code, username)
-            // Se manca il master, assegna a uno a caso
-            const masterStillPresent = lobby.players.some(p => p.isMaster);
-            if (!masterStillPresent && lobby.players.length > 0) {
-                lobby.players[0].isMaster = true;
-            }
-        }
-    }
+
 
     getPlayersOfLobby(code) {
         const lobby = this.findLobby(code);
         if (!lobby) return [];
         // Invece di .map(...) restituisco l'intero array di obj
-        console.log("Lista di gioca" + lobby.players);
         return lobby.players;
     }
 
@@ -105,12 +88,12 @@ class LobbyController {
         return player ? player.isMaster : false;
     }
 
-    handleDisconnect(username) {
+    removePlayerFromLobby(username) {
         const lobby = this.lobbies.find((l) =>
           l.players.some((p) => p.username === username)
         );
         if (!lobby) return;
-        lobby.players = lobby.players.filter((p) => p.username !== username);
+        lobby.removePlayer(username);
         if (lobby.players.length === 0) {
             this.removeLobby(lobby.code);
             return;
@@ -132,6 +115,10 @@ class Lobby {
     constructor(code, masterUsername) {
         this.code = code;
         this.players = [new Player(masterUsername, true)];
+    }
+    removePlayer(username) {
+        this.players = this.players.filter(player => player.username !== username);
+
     }
 }
 
