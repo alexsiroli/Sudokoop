@@ -57,25 +57,28 @@ class GameController {
             vite: newGame.vite,
         });
     }
-
+    // chiamato nel momento in cui i giocatori scelgono modalità versus
+    // e devono dividersi in squadre
+    createTeamsClass(lobbyCode, allPlayers) {
+        this.lobbyTeams[lobbyCode] = new Teams(allPlayers)
+    }
 
     // Aggiunge un giocatore a un team
     addPlayerToTeam(lobbyCode, color, player) {
-        if (!this.lobbyTeams[lobbyCode]) {
-            this.lobbyTeams[lobbyCode] = new Teams(lobbyCode);
+        if (this.lobbyTeams[lobbyCode]) {
+            return this.lobbyTeams[lobbyCode].addPlayerToTeam(player, color);
         }
-        this.lobbyTeams[lobbyCode].addPlayer(player, color);
     }
 
 
     removePlayerFromTeam(lobbyCode, player) {
         if (this.lobbyTeams[lobbyCode]) {
-            this.lobbyTeams[lobbyCode].removePlayer(player);
+            return this.lobbyTeams[lobbyCode].removePlayerFromTeam(player);
         }
     }
 
     versusGameCanStart (lobbyCode) {
-        return this.lobbyTeams[lobbyCode].yellowTeam.length > 0 && this.lobbyTeams[lobbyCode].blueTeam.length > 0;
+        return this.lobbyTeams[lobbyCode].checkVersusGameCanStart();
     }
 
     // Crea una nuova partita multiplayer
@@ -87,6 +90,7 @@ class GameController {
         this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode].yellowTeam,
             this.lobbyTeams[lobbyCode].blueTeam);
         // TODO: valutare se svuotare i teams
+        this.lobbyTeams[lobbyCode] = null;
     }
 
     // Rimuove un giocatore da una partita
@@ -98,11 +102,11 @@ class GameController {
     }
 
     // Recupera i giocatori di una partita
-    /*getPlayersOfGame(lobbyCode) {
+    getPlayersOfGame(lobbyCode) {
         return this.lobbyGame[lobbyCode]?.getPlayers();
     }
 
-     */
+
 
     // Recupera il gioco associato a una lobby
     getGameOfLobby(lobbyCode) {
@@ -127,12 +131,12 @@ class GameController {
         result.cellData = cellData;
         return result;
     }
-
+/*
     // Rimuove un gioco
     removeGame(lobbyCode) {
         this.lobbyGame[lobbyCode] = null;
     }
-
+*/
     // Aggiorna le statistiche di un utente
     async updateStats(req, res) {
         const { username, result } = req.body;
@@ -194,16 +198,25 @@ class GameController {
 }
 
 class Teams {
-    constructor(code) {
-        this.code = code;
+    // inizializzo i team con tutti i player della lobby: in questo modo vedo
+    // se i giocatori aggiunti appartenevano effettivamente alla lobby e faccio
+    // controllo per iniziare un game (tutti i giocatori hanno scelto una squadra)
+    constructor(allPlayers) {
         this.yellowTeam = [];
         this.blueTeam = [];
+        this.allPlayers = allPlayers;
     }
 
-    removePlayer(player) {
-        const team = this.yellowTeam.includes(p => p.username === player.username) ? this.yellowTeam : this.blueTeam;
+    removePlayerFromTeam(player) {
+        const team = this.yellowTeam.some(p => p.username === player.username) ? this.yellowTeam : this.blueTeam;
         this.removeIfPresent(player, team);
+        this.removeFromAllPlayersList(player);
+        return {
+            yellowTeam: this.yellowTeam,
+            blueTeam: this.blueTeam
+        }
     }
+
     removeIfPresent(player, team) {
         if (team.includes(player)) {
             const index = team.findIndex(user => user.username === player.username);
@@ -212,13 +225,33 @@ class Teams {
             }
         }
     }
-    addPlayer(player, color) {
+
+    removeFromAllPlayersList(player) {
+        this.allPlayers = this.allPlayers.filter( p => p.username !== player.username);
+    }
+
+    checkVersusGameCanStart() {
+        if (this.allPlayers.length !== 0) {
+            return {res: false, message: "Tutti i giocatori devono scegliere una squadra"};
+        }
+        if (this.yellowTeam.length < 1 || this.blueTeam.length < 1) {
+            return {res: false, message: "Ogni squadra deve avere almeno un giocatore"}
+        }
+        return {res:true}
+    }
+
+    addPlayerToTeam(player, color) {
         const targetTeam = color === 'yellow' ? this.yellowTeam : this.blueTeam;
         const otherTeam = color === 'yellow' ? this.blueTeam : this.yellowTeam;
         this.removeIfPresent(player, otherTeam)
+        this.removeFromAllPlayersList(player);
         targetTeam.push(player);
+        return {
+            yellowTeam: this.yellowTeam,
+            blueTeam: this.blueTeam
+        }
     }
 }
 
 
-module.exports = new GameController();
+module.exports = GameController;

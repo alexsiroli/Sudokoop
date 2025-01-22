@@ -1,7 +1,8 @@
-const gameController = require('../controllers/gameController');
+const GameController = require('../controllers/gameController');
 const Game  = require('../models/Game');
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User');
+const LobbyController = require("../controllers/lobbyController");
 
 jest.mock('../models/Leaderboard');
 jest.mock('../models/User');
@@ -9,7 +10,11 @@ jest.mock('../models/Game');
 
 describe('Game Controller', () => {
     let req, res;
+    let lobbyController;
+    let gameController;
     beforeEach(() => {
+        lobbyController = new LobbyController();
+        gameController = new GameController();
         req = { body: {}, query: {} };
         res = {
             status: jest.fn().mockReturnThis(),
@@ -98,6 +103,118 @@ describe('Game Controller', () => {
             const id = gameController.generateGameId();
             expect(id).toMatch(/^game_\d+_\d+$/);
         });
+    });
+
+
+    describe('createTeamsClass and addPlayerToTeam', () => {
+        let lobby, players;
+
+        beforeEach(() => {
+            lobby = lobbyController.createLobby('masterUser');
+            lobbyController.joinLobby(lobby.code, 'player1');
+            players = lobbyController.getPlayersOfLobby(lobby.code);
+            gameController.createTeamsClass(lobby.code, players);
+        });
+
+        it("aggiunge un giocatore al team del colore specificato", () => {
+            let res = gameController.addPlayerToTeam(lobby.code, 'yellow',
+                players[0]);
+            expect(res.yellowTeam).toEqual([players[0]]);
+            expect(res.blueTeam).toEqual([]);
+            res = gameController.addPlayerToTeam(lobby.code, 'blue',
+                players[1])
+            expect(res.yellowTeam).toEqual([players[0]]);
+            expect(res.blueTeam).toEqual([players[1]]);
+        });
+
+        it("se un giocatore si unisce a un team mentre era in un altro, viene rimosso dal primo e aggiunto" +
+            "al secondo", () => {
+            let res = gameController.addPlayerToTeam(lobby.code, 'yellow',
+                players[0])
+            expect(res.yellowTeam).toEqual([players[0]]);
+            expect(res.blueTeam).toEqual([]);
+            res = gameController.addPlayerToTeam(lobby.code, 'blue',
+                players[0])
+            expect(res.yellowTeam).toEqual([]);
+            expect(res.blueTeam).toEqual([players[0]]);
+        });
+    });
+
+    describe('checkVersusGameCanStart', () => {
+        let lobby, players;
+
+        beforeEach(() => {
+            lobby = lobbyController.createLobby('masterUser');
+            lobbyController.joinLobby(lobby.code, 'player1');
+            lobbyController.joinLobby(lobby.code, 'player2');
+            players = lobbyController.getPlayersOfLobby(lobby.code);
+            gameController.createTeamsClass(lobby.code, players);
+        });
+
+        it("restituisce false (versus non può iniziare) se ogni giocatore non ha scelto una squadra", () => {
+            let res = gameController.addPlayerToTeam(lobby.code, 'yellow',
+                players[0])
+            expect(res.yellowTeam).toEqual([players[0]]);
+            expect(res.blueTeam).toEqual([]);
+            const check = gameController.versusGameCanStart(lobby.code);
+            expect(check.res).toBeFalsy();
+            expect(check.message).toBe("Tutti i giocatori devono scegliere una squadra");
+        });
+
+        it("restituisce false (versus non può iniziare) se ogni squadra non ha almeno un giocatore", () => {
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[0]);
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[1]);
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[2]);
+            const check = gameController.versusGameCanStart(lobby.code);
+            expect(check.res).toBeFalsy();
+            expect(check.message).toBe("Ogni squadra deve avere almeno un giocatore");
+        });
+        it("restituisce true (versus può iniziare) se ogni team ha almeno un giocatore e tutti" +
+            "sono in una squadra ", () => {
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[0]);
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[1]);
+            gameController.addPlayerToTeam(lobby.code, 'blue', players[2]);
+            gameController.addPlayerToTeam(lobby.code, 'blue', players[0]);
+            const check = gameController.versusGameCanStart(lobby.code);
+            expect(check.res).toBeTruthy();
+        });
+    });
+
+    describe("player left lobby during team selection", () => {
+        let lobby, players;
+
+        beforeEach(() => {
+            lobby = lobbyController.createLobby('masterUser');
+            lobbyController.joinLobby(lobby.code, 'player1');
+            lobbyController.joinLobby(lobby.code, 'player2');
+            players = lobbyController.getPlayersOfLobby(lobby.code);
+            gameController.createTeamsClass(lobby.code, players);
+        });
+
+        it("dopo essere uscito, il giocatore deve essere rimosso dal team", () => {
+            let res = gameController.addPlayerToTeam(lobby.code, 'yellow', players[0])
+            expect(res.yellowTeam).toEqual([players[0]]);
+            expect(res.blueTeam).toEqual([]);
+            res = gameController.removePlayerFromTeam(lobby.code, players[0]);
+            expect(res.yellowTeam).toEqual([]);
+            expect(res.blueTeam).toEqual([]);
+        });
+
+        it("dopo essere uscito, la lista di tutti i giocatori deve aggiornarsi per il corretto " +
+            "check dell'inizio della partita", () => {
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[0]);
+            gameController.addPlayerToTeam(lobby.code, 'yellow', players[1]);
+            gameController.addPlayerToTeam(lobby.code, 'blue', players[2]);
+            gameController.addPlayerToTeam(lobby.code, 'blue', players[0]);
+            let check = gameController.versusGameCanStart(lobby.code);
+            expect(check.res).toBeTruthy();
+            res = gameController.removePlayerFromTeam(lobby.code, players[0]);
+            expect(res.yellowTeam).toEqual([ players[1]]);
+            expect(res.blueTeam).toEqual([players[2]]);
+            check = gameController.versusGameCanStart(lobby.code);
+            expect(check.res).toBeTruthy();
+        });
+
     });
 
     describe('updateStats', () => {
