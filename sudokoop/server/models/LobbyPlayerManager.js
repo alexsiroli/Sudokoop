@@ -1,9 +1,6 @@
-const TeamManager = require("./TeamsManager");
-
 class LobbyPlayerManager {
     constructor() {
         this.lobbyPlayers = [];
-        this.teamPlayers = [];
     }
 
     addPlayerToLobby(lobbyCode, player) {
@@ -12,11 +9,7 @@ class LobbyPlayerManager {
         }
         this.lobbyPlayers[lobbyCode].push(player);
     }
-    createTeams(lobbyCode) {
-        if (this.lobbyPlayers[lobbyCode]) {
-            this.teamPlayers = new TeamManager(this.lobbyPlayers[lobbyCode]);
-        }
-    }
+
     removePlayer(lobbyCode, username) {
         // rimuovi dalla lobby
         this.lobbyPlayers[lobbyCode] = this.lobbyPlayers[lobbyCode].filter(player => player.username !== username);
@@ -34,7 +27,6 @@ class LobbyPlayerManager {
     getPlayersOfLobby(lobbyCode) {
         return this.lobbyPlayers[lobbyCode];
     }
-
 
     getMasterOfLobby(lobbyCode) {
         return this.lobbyPlayers[lobbyCode].find((p) => p.isMaster);

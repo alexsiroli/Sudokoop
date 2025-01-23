@@ -7,17 +7,22 @@ class CoopGame {
         this.lobbyCode = lobbyCode;
         this.coopPlayerManager = new CoopPlayerManager(lobbyCode);
     }
+
     insertNumberWithoutCheck(row, col, num) {
         this.game.insertNumberWithoutCheck(row, col, num);
     }
+
     insertNumber(row, col, num) {
         return this.game.insertNumber(row, col, num);
     }
-    removePlayer(username) {
-        this.coopPlayerManager.removePlayer(username);
+
+    removePlayer(player) {
+        this.coopPlayerManager.removePlayer(player);
     }
+
     getPlayers() {
         return this.coopPlayerManager.getPlayers();
     }
 }
+
 module.exports = CoopGame;

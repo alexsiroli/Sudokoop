@@ -7,13 +7,12 @@ class CoopPlayerManager {
         this.lobbyCode = lobbyCode;
     }
 
-    removePlayer(username) {
-        this.gamePlayers = this.gamePlayers.filter(player => player.username !== username);
+    removePlayer(player) {
+        this.gamePlayers = this.gamePlayers.filter(p => p.username !== player.username);
         //TODO: gestire il caso zero giocatori
-        this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
-        //assegna nuovo master se necessario
-
+        this.setMaster(playerManager.removePlayer(this.lobbyCode, player.username));
     }
+
     setMaster(master) {
         this.gamePlayers.find(p => p.username === master.username).isMaster = true;
     }
@@ -22,4 +21,5 @@ class CoopPlayerManager {
         return this.gamePlayers;
     }
 }
+
 module.exports = CoopPlayerManager;

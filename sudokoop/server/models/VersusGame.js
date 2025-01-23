@@ -1,13 +1,14 @@
 const Game = require("./Game");
 
 class VersusGame {
-    constructor(difficult, yellowTeam, blueTeam) {
+    constructor(difficult, teamPlayerManager) {
         this.game = new Game(difficult);
+        this.teamPlayerManager = teamPlayerManager;
         this.yellow = {
-            team: yellowTeam, points: 0
+            team: this.teamPlayerManager.getTeams().yellowTeam, points: 0
         };
         this.blue = {
-            team: blueTeam, points: 0
+            team: this.teamPlayerManager.getTeams().blueTeam, points: 0
         }
     }
 
@@ -25,9 +26,8 @@ class VersusGame {
         return this.yellow.team.some(p => p.username === username) ? this.yellow : this.blue;
     }
 
-    removePlayer(username) {
-        const team = this.findTeam(username);
-        team.team = team.team.filter(player => player.username !== username);
+    removePlayer(player) {
+        this.teamPlayerManager.removePlayerFromGame(player)
         return this.checkForFinish();
     }
 
@@ -55,20 +55,18 @@ class VersusGame {
 
         if (result.message === "Giusto!") {
             team.points++;
-        }
-        else if (result.message === "Hai vinto!") {
+        } else if (result.message === "Hai vinto!") {
             team.points++;
             // sudoku finito: vince la squadra con i punti piu alti
             if (this.yellow.points > this.blue.points) {
-                 message = 'Gialla vince!';
+                message = 'Gialla vince!';
             } else if (this.yellow.points === this.blue.points) {
                 message = 'Pareggio!';
             } else {
                 message = 'Blu vince!';
             }
             result.message = message;
-        }
-        else if (result.message === 'Sbagliato! Riprova.') {
+        } else if (result.message === 'Sbagliato! Riprova.') {
             team.team = team.team.filter(player => player.username !== username);
             result.message = this.checkForFinish(result) === "" ? result.message : this.checkForFinish(result);
         }

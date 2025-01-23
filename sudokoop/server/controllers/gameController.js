@@ -3,6 +3,7 @@ const VersusGame = require('../models/VersusGame');
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User');
 const CoopGame = require("../models/CoopGame"); // Import del modello User
+const TeamPlayerManager = require("../models/TeamPlayerManager");
 
 class GameController {
     constructor() {
@@ -19,28 +20,28 @@ class GameController {
 
     // Salva il tempo su DB
     async saveTime(req, res) {
-        const { username, milliseconds, difficulty } = req.body;
+        const {username, milliseconds, difficulty} = req.body;
         if (!username || !milliseconds) {
-            return res.status(400).json({ error: "Dati insufficienti" });
+            return res.status(400).json({error: "Dati insufficienti"});
         }
         try {
-            const record = new Leaderboard({ username, milliseconds, difficulty });
+            const record = new Leaderboard({username, milliseconds, difficulty});
             await record.save();
-            return res.status(200).json({ message: "Tempo salvato su DB" });
+            return res.status(200).json({message: "Tempo salvato su DB"});
         } catch (err) {
             console.error("Errore salvataggio tempo:", err);
-            return res.status(500).json({ error: "Errore interno nel salvataggio" });
+            return res.status(500).json({error: "Errore interno nel salvataggio"});
         }
     }
 
     // Recupera la leaderboard dal DB
     async getLeaderboard(req, res) {
         try {
-            const records = await Leaderboard.find().sort({ milliseconds: 1 });
+            const records = await Leaderboard.find().sort({milliseconds: 1});
             res.status(200).json(records);
         } catch (err) {
             console.error("Errore recupero leaderboard:", err);
-            res.status(500).json({ error: "Errore nel recupero della leaderboard" });
+            res.status(500).json({error: "Errore nel recupero della leaderboard"});
         }
     }
 
@@ -57,11 +58,11 @@ class GameController {
             vite: newGame.vite,
         });
     }
+
     // chiamato nel momento in cui i giocatori scelgono modalità versus
     // e devono dividersi in squadre
-    createTeamsClass(lobbyCode, allPlayers) {
-        PlayerManager
-        this.lobbyTeams[lobbyCode] = new Teams(allPlayers)
+    createTeamManager(lobbyCode) {
+        this.lobbyTeams[lobbyCode] = new TeamPlayerManager(lobbyCode);
     }
 
     // Aggiunge un giocatore a un team
@@ -71,14 +72,13 @@ class GameController {
         }
     }
 
-
     removePlayerFromTeam(lobbyCode, player) {
         if (this.lobbyTeams[lobbyCode]) {
             return this.lobbyTeams[lobbyCode].removePlayerFromTeam(player);
         }
     }
 
-    versusGameCanStart (lobbyCode) {
+    versusGameCanStart(lobbyCode) {
         return this.lobbyTeams[lobbyCode].checkVersusGameCanStart();
     }
 
@@ -88,15 +88,14 @@ class GameController {
     }
 
     createVersusGame(lobbyCode, difficulty) {
-        this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode].yellowTeam,
-            this.lobbyTeams[lobbyCode].blueTeam);
+        this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode]);
         // TODO: valutare se svuotare i teams
         this.lobbyTeams[lobbyCode] = null;
     }
 
     // Rimuove un giocatore da una partita
-    removePlayerFromGame(lobbyCode, username) {
-        this.lobbyGame[lobbyCode]?.removePlayer(username);
+    removePlayerFromGame(lobbyCode, player) {
+        this.lobbyGame[lobbyCode]?.removePlayer(player);
     }
 
     // Recupera i giocatori di una partita
@@ -104,6 +103,9 @@ class GameController {
         return this.lobbyGame[lobbyCode]?.getPlayers();
     }
 
+    getTeamsOfGame(lobbyCode) {
+        return this.lobbyGame[lobbyCode]?.getTeams();
+    }
 
 
     // Recupera il gioco associato a una lobby
@@ -129,37 +131,39 @@ class GameController {
         result.cellData = cellData;
         return result;
     }
-/*
-    // Rimuove un gioco
-    removeGame(lobbyCode) {
-        this.lobbyGame[lobbyCode] = null;
-    }
-*/
+
+    /*
+        // Rimuove un gioco
+        removeGame(lobbyCode) {
+            this.lobbyGame[lobbyCode] = null;
+        }
+    */
+
     // Aggiorna le statistiche di un utente
     async updateStats(req, res) {
-        const { username, result } = req.body;
+        const {username, result} = req.body;
         if (!username || !result) {
-            return res.status(400).json({ error: "Dati insufficienti" });
+            return res.status(400).json({error: "Dati insufficienti"});
         }
         try {
-            const update = result === "win" ? { $inc: { wins: 1 } } : { $inc: { losses: 1 } };
-            const user = await User.findOneAndUpdate({ userName: username }, update, { new: true });
+            const update = result === "win" ? {$inc: {wins: 1}} : {$inc: {losses: 1}};
+            const user = await User.findOneAndUpdate({userName: username}, update, {new: true});
             if (!user) {
-                return res.status(404).json({ error: "Utente non trovato" });
+                return res.status(404).json({error: "Utente non trovato"});
             }
-            return res.status(200).json({ message: "Statistiche aggiornate" });
+            return res.status(200).json({message: "Statistiche aggiornate"});
         } catch (err) {
             console.error("Errore aggiornamento statistiche:", err);
-            return res.status(500).json({ error: "Errore interno" });
+            return res.status(500).json({error: "Errore interno"});
         }
     }
 
     // Inserisce un numero in modalità single-player
     insertNumber(req, res) {
-        const { gameId, row, col, value } = req.body;
+        const {gameId, row, col, value} = req.body;
         const currentGame = this.activeGames[gameId];
         if (!currentGame) {
-            return res.status(404).json({ error: 'Partita non trovata' });
+            return res.status(404).json({error: 'Partita non trovata'});
         }
 
         const result = currentGame.insertNumber(row, col, value);
@@ -194,8 +198,6 @@ class GameController {
         });
     }
 }
-
-
 
 
 module.exports = GameController;
