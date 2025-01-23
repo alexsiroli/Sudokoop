@@ -1,11 +1,11 @@
 const GameWithVite = require("./GameWithVite");
-const playerManager = require("./PlayerManager");
+const CoopPlayerManager = require("./CoopPlayerManager");
 
 class CoopGame {
     constructor(difficult, lobbyCode) {
         this.game = new GameWithVite(difficult);
         this.lobbyCode = lobbyCode;
-        this.players = playerManager.getPlayersOfGame(lobbyCode);
+        this.coopPlayerManager = new CoopPlayerManager(lobbyCode);
     }
     insertNumberWithoutCheck(row, col, num) {
         this.game.insertNumberWithoutCheck(row, col, num);
@@ -14,11 +14,10 @@ class CoopGame {
         return this.game.insertNumber(row, col, num);
     }
     removePlayer(username) {
-        playerManager.removePlayer(this.lobbyCode, username);
-        this.players = playerManager.getPlayersOfGame(this.lobbyCode);
+        this.coopPlayerManager.removePlayer(username);
     }
     getPlayers() {
-        return this.players;
+        return this.coopPlayerManager.getPlayers();
     }
 }
 module.exports = CoopGame;

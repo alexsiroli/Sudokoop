@@ -1,4 +1,4 @@
-const playerManager = require("../models/PlayerManager");
+const playerManager = require("../models/LobbyPlayerManager");
 const Player = require("../models/Player");
 
 
