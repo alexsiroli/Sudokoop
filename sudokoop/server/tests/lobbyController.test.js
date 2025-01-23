@@ -20,7 +20,7 @@ describe('LobbyController', () => {
             const lobby = lobbyController.createLobby(masterUsername);
             expect(lobby).toBeDefined();
             expect(lobby.code).toHaveLength(6);
-            expect(lobby.players).toContainEqual({ username: masterUsername, isMaster: true });
+            expect(lobbyController.getPlayersOfLobby(lobby.code)).toContainEqual({ username: masterUsername, isMaster: true });
             expect(lobbyController.lobbies).toContain(lobby);
         });
     });
@@ -49,7 +49,7 @@ describe('LobbyController', () => {
             const lobby = lobbyController.createLobby('masterUser');
             const result = lobbyController.joinLobby(lobby.code, 'user1');
             expect(result).toEqual({ success: true });
-            expect(lobby.players).toContainEqual({ username: 'user1', isMaster: false });
+            expect(lobbyController.getPlayersOfLobby(lobby.code)).toContainEqual({ username: 'user1', isMaster: false });
         });
 
         it('non aggiunge duplicati se l\'utente è già presente', () => {
@@ -57,7 +57,7 @@ describe('LobbyController', () => {
             lobbyController.joinLobby(lobby.code, 'user1');
             const result = lobbyController.joinLobby(lobby.code, 'user1');
             expect(result).toEqual({ success: true });
-            const occurrences = lobby.players.filter(p => p.username === 'user1').length;
+            const occurrences = lobbyController.getPlayersOfLobby(lobby.code).filter(p => p.username === 'user1').length;
             expect(occurrences).toBe(1);
         });
 
@@ -76,16 +76,16 @@ describe('LobbyController', () => {
         it('rimuove un giocatore da una lobby', () => {
             const lobby = lobbyController.createLobby('masterUser');
             lobbyController.joinLobby(lobby.code, 'user1');
-            expect(lobby.players.length).toBe(2);
-            lobbyController.removePlayerFromLobby( 'user1');
-            expect(lobby.players.length).toBe(1);
-            expect(lobby.players[0].username).toBe('masterUser');
+            expect(lobbyController.getPlayersOfLobby(lobby.code).length).toBe(2);
+            lobbyController.removePlayerFromLobby( lobby.code,'user1');
+            expect(lobbyController.getPlayersOfLobby(lobby.code).length).toBe(1);
+            expect(lobbyController.getPlayersOfLobby(lobby.code)[0].username).toBe('masterUser');
         });
 
         it('rimuove la lobby se l\'ultimo giocatore lascia', () => {
             const lobby = lobbyController.createLobby('masterUser');
             expect(lobbyController.lobbies).toContain(lobby);
-            lobbyController.removePlayerFromLobby('masterUser');
+            lobbyController.removePlayerFromLobby(lobby.code,'masterUser');
             expect(lobbyController.findLobby(lobby.code)).toBeUndefined();
         });
 
@@ -94,9 +94,9 @@ describe('LobbyController', () => {
             lobbyController.joinLobby(lobby.code,'user1');
             lobbyController.joinLobby(lobby.code, 'user2');
             // Rimuovi il master
-            lobbyController.removePlayerFromLobby('masterUser');
+            lobbyController.removePlayerFromLobby(lobby.code,'masterUser');
             // Verifica che uno dei giocatori sia stato assegnato come master
-            const masterPresente = lobby.players.some(p => p.isMaster);
+            const masterPresente = lobbyController.getPlayersOfLobby(lobby.code).some(p => p.isMaster);
             expect(masterPresente).toBe(true);
         });
     });
@@ -137,13 +137,13 @@ describe('LobbyController', () => {
         it('rimuove il giocatore da una lobby', () => {
             const lobby = lobbyController.createLobby('masterUser');
             lobbyController.joinLobby(lobby.code, 'user1');
-            lobbyController.removePlayerFromLobby('user1');
-            expect(lobby.players.some(p => p.username === 'user1')).toBe(false);
+            lobbyController.removePlayerFromLobby(lobby.code,'user1');
+            expect(lobbyController.getPlayersOfLobby(lobby.code).some(p => p.username === 'user1')).toBe(false);
         });
 
         it('rimuove la lobby se l\'ultimo giocatore si disconnette', () => {
             const lobby = lobbyController.createLobby('masterUser');
-            lobbyController.removePlayerFromLobby('masterUser');
+            lobbyController.removePlayerFromLobby(lobby.code,'masterUser');
             expect(lobbyController.findLobby(lobby.code)).toBeUndefined();
         });
 
@@ -151,8 +151,8 @@ describe('LobbyController', () => {
             const lobby = lobbyController.createLobby('masterUser');
             lobbyController.joinLobby(lobby.code, 'user1');
             lobbyController.joinLobby(lobby.code, 'user2');
-            lobbyController.removePlayerFromLobby('masterUser');
-            const masterPresente = lobby.players.some(p => p.isMaster);
+            lobbyController.removePlayerFromLobby(lobby.code,'masterUser');
+            const masterPresente = lobbyController.getPlayersOfLobby(lobby.code).some(p => p.isMaster);
             expect(masterPresente).toBe(true);
         });
     });

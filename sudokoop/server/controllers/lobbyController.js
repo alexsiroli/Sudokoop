@@ -1,3 +1,12 @@
+const playerManager = require("../models/PlayerManager");
+
+class Player {
+    constructor(username, isMaster) {
+        this.username = username;
+        this.isMaster = isMaster;
+    }
+}
+
 class LobbyController {
 
     constructor() {
@@ -10,7 +19,8 @@ class LobbyController {
 
     createLobby(masterUsername) {
         const code = this.generateLobbyCode();
-        const newLobby = new Lobby(code, masterUsername);
+        const newLobby = new Lobby(code);
+        playerManager.addPlayerToLobby(code, new Player(masterUsername, true));
         this.lobbies.push(newLobby);
         return newLobby;
     }
@@ -22,15 +32,15 @@ class LobbyController {
     joinLobby(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return { success: false, reason: "not-exist" };
-        if (lobby.players.length >= 10) {
+        if (playerManager.lobbyPlayers[code].length >= 10) {
             return { success: false, reason: "full" };
         }
         // Se già presente, nessun problema
-        if (lobby.players.find((p) => p.username === username)) {
+        if (playerManager.lobbyPlayers[code].find((p) => p.username === username)) {
             return { success: true };
         }
         // Aggiunge come non-master
-        lobby.players.push(new Player(username, false));
+        playerManager.addPlayerToLobby(code, new Player(username, false))
         return { success: true };
     }
 
@@ -72,7 +82,7 @@ class LobbyController {
         const lobby = this.findLobby(code);
         if (!lobby) return [];
         // Invece di .map(...) restituisco l'intero array di obj
-        return lobby.players;
+        return playerManager.getPlayersOfLobby(code);
     }
 
     /*getPlayerFromUsername(code, username) {
@@ -84,23 +94,16 @@ class LobbyController {
     isMaster(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return false;
-        const player = lobby.players.find((p) => p.username === username);
-        return player ? player.isMaster : false;
+
+        return playerManager.getMasterOfLobby(code).username === username;
     }
 
-    removePlayerFromLobby(username) {
-        const lobby = this.lobbies.find((l) =>
-          l.players.some((p) => p.username === username)
-        );
+    removePlayerFromLobby(code, username) {
+        const lobby = this.findLobby(code);
         if (!lobby) return;
-        lobby.removePlayer(username);
-        if (lobby.players.length === 0) {
+        playerManager.removePlayer(code, username);
+        if (playerManager.getPlayersOfLobby(code).length === 0) {
             this.removeLobby(lobby.code);
-            return;
-        }
-        const masterStillPresent = lobby.players.some((p) => p.isMaster);
-        if (!masterStillPresent && lobby.players.length > 0) {
-            lobby.players[0].isMaster = true;
         }
     }
 
@@ -112,20 +115,9 @@ class LobbyController {
 module.exports = LobbyController;
 
 class Lobby {
-    constructor(code, masterUsername) {
+    constructor(code) {
         this.code = code;
-        this.players = [new Player(masterUsername, true)];
-    }
-    removePlayer(username) {
-        this.players = this.players.filter(player => player.username !== username);
-
     }
 }
 
-class Player {
-    constructor(username, isMaster) {
-        this.username = username;
-        this.isMaster = isMaster;
-    }
-}
 
