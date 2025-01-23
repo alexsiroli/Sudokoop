@@ -1,11 +1,7 @@
 const playerManager = require("../models/PlayerManager");
+const Player = require("../models/Player");
 
-class Player {
-    constructor(username, isMaster) {
-        this.username = username;
-        this.isMaster = isMaster;
-    }
-}
+
 
 class LobbyController {
 

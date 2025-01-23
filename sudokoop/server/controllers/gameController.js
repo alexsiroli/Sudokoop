@@ -82,8 +82,8 @@ class GameController {
     }
 
     // Crea una nuova partita multiplayer
-    createCoopGame(lobbyCode, difficulty, players) {
-        this.lobbyGame[lobbyCode] = new CoopGame(difficulty, players);
+    createCoopGame(lobbyCode, difficulty) {
+        this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
     }
 
     createVersusGame(lobbyCode, difficulty) {

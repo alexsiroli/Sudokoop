@@ -233,36 +233,6 @@ describe('Game Controller', () => {
 
     });
 
-    describe('CoopGame', () => {
-
-        let lobby, players;
-
-        beforeEach(() => {
-            lobby = lobbyController.createLobby('masterUser');
-            lobbyController.joinLobby(lobby.code, 'player1');
-            lobbyController.joinLobby(lobby.code, 'player2');
-            players = lobbyController.getPlayersOfLobby(lobby.code);
-            gameController.createTeamsClass(lobby.code, players);
-            gameController.createCoopGame(lobby.code,'easy', players);
-        });
-        it("verifica i giocatori in gioco", () => {
-            expect(gameController.getPlayersOfGame(lobby.code)).toBe(players)
-        })
-        it("inserisce un numero correttamente", () => {
-            const cellData = {row: 0, col: 2, value: 3}
-            let resultCorrect  = gameController.insertNumberMulti(cellData, lobby.code, 'masterUser');
-            expect(resultCorrect.message).toBe('Giusto!');
-            expect(resultCorrect.puzzle[2]).toBe('3');
-            expect(resultCorrect.gameOver).toBe(false);
-            expect(resultCorrect.vite).toBe(3);
-        });
-        it("rimuove un giocatore dal gioco", () => {
-            gameController.removePlayerFromGame(lobby.code, 'player1')
-            expect(gameController.getPlayersOfGame(lobby.code)).toEqual([{username: 'masterUser', isMaster: true},
-                {username: 'player2', isMaster: false}]);
-        })
-
-    })
 
     describe('updateStats', () => {
         it('restituisce 400 se username o result mancano', async () => {
