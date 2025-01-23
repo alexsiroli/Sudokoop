@@ -14,7 +14,7 @@ class Game {
 
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num) {
-        let message = "";
+        let message;
         const index = row * 9 + col; // Calcola l'indice corrispondente nella stringa puzzle
         // Verifica se il numero inserito è corretto
         if (this.sudoku.solution[index] === num.toString()) {
@@ -31,7 +31,6 @@ class Game {
         } else {
             message = 'Sbagliato! Riprova.';
         }
-
         return {
             puzzle: this.sudoku.puzzle,
             solution: this.sudoku.solution,

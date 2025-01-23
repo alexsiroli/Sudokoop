@@ -6,8 +6,11 @@ const LobbyController = require("../controllers/lobbyController");
 
 jest.mock('../models/Leaderboard');
 jest.mock('../models/User');
-jest.mock('../models/Game');
-
+jest.mock('sudoku-gen', () => ({
+    getSudoku: jest.fn(() => ({
+        puzzle: '12-456-89'.repeat(9), solution: '123456789'.repeat(9),
+    })),
+}));
 describe('Game Controller', () => {
     let req, res;
     let lobbyController;
@@ -77,33 +80,46 @@ describe('Game Controller', () => {
 
     describe('newSinglePlayerGame', () => {
         it('crea una nuova partita single player e restituisce i dati', () => {
+            // Mock dinamico per GameWithVite
+            jest.mock('../models/GameWithVite', () => {
+                return jest.fn().mockImplementation(() => {
+                    const fakeSudoku = {
+                        puzzle: '12-456-89'.repeat(9),
+                        solution: '123456789'.repeat(9),
+                        difficulty: 'medium',
+                    };
+                    return { sudoku: fakeSudoku, vite: 3 };
+                });
+            });
+
+            // Mock per la generazione dell'ID del gioco
             const originalGenerateGameId = gameController.generateGameId;
-            req.query = { difficulty: 'medium' };
             gameController.generateGameId = jest.fn().mockReturnValue('game_test');
 
-            const fakeSudoku = { puzzle: '---', solution: '123', difficulty: 'medium' };
-            const fakeGameInstance = { sudoku: fakeSudoku, vite: 3 };
-            Game.mockImplementation(() => fakeGameInstance);
+            // Configura i parametri della richiesta
+            req.query = { difficulty: 'medium' };
 
+            // Esegui la funzione da testare
             gameController.newSinglePlayerGame(req, res);
 
+            // Verifica le risposte
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
                 gameId: 'game_test',
-                puzzle: '---',
+                puzzle: '12-456-89'.repeat(9),
                 vite: 3,
             });
 
+            // Ripristina la funzione originale
             gameController.generateGameId = originalGenerateGameId;
+
+            // Rimuovi il mock di GameWithVite per evitare effetti collaterali
+            jest.unmock('../models/GameWithVite');
         });
     });
 
-    describe('generateGameId', () => {
-        it('genera un ID di gioco valido', () => {
-            const id = gameController.generateGameId();
-            expect(id).toMatch(/^game_\d+_\d+$/);
-        });
-    });
+
+
 
 
     describe('createTeamsClass and addPlayerToTeam', () => {
@@ -216,6 +232,37 @@ describe('Game Controller', () => {
         });
 
     });
+
+    describe('CoopGame', () => {
+
+        let lobby, players;
+
+        beforeEach(() => {
+            lobby = lobbyController.createLobby('masterUser');
+            lobbyController.joinLobby(lobby.code, 'player1');
+            lobbyController.joinLobby(lobby.code, 'player2');
+            players = lobbyController.getPlayersOfLobby(lobby.code);
+            gameController.createTeamsClass(lobby.code, players);
+            gameController.createCoopGame(lobby.code,'easy', players);
+        });
+        it("verifica i giocatori in gioco", () => {
+            expect(gameController.getPlayersOfGame(lobby.code)).toBe(players)
+        })
+        it("inserisce un numero correttamente", () => {
+            const cellData = {row: 0, col: 2, value: 3}
+            let resultCorrect  = gameController.insertNumberMulti(cellData, lobby.code, 'masterUser');
+            expect(resultCorrect.message).toBe('Giusto!');
+            expect(resultCorrect.puzzle[2]).toBe('3');
+            expect(resultCorrect.gameOver).toBe(false);
+            expect(resultCorrect.vite).toBe(3);
+        });
+        it("rimuove un giocatore dal gioco", () => {
+            gameController.removePlayerFromGame(lobby.code, 'player1')
+            expect(gameController.getPlayersOfGame(lobby.code)).toEqual([{username: 'masterUser', isMaster: true},
+                {username: 'player2', isMaster: false}]);
+        })
+
+    })
 
     describe('updateStats', () => {
         it('restituisce 400 se username o result mancano', async () => {

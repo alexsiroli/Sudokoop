@@ -2,7 +2,7 @@ const GameWithVite = require("./GameWithVite");
 
 class CoopGame {
     constructor(difficult, players) {
-        this.game = new GameWithVite(difficult, players);
+        this.game = new GameWithVite(difficult);
         this.players = players;
     }
     insertNumberWithoutCheck(row, col, num) {
