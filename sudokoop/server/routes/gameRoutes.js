@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const gameController = require('../controllers/gameController');
-
+const GameController = require('../controllers/gameController');
+const gameController = new GameController();
 // Rotte single player
 router.get('/new', gameController.newSinglePlayerGame);
 router.post('/insert', gameController.insertNumber);

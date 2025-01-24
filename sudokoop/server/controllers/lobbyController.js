@@ -2,7 +2,6 @@ const playerManager = require("../models/LobbyPlayerManager");
 const Player = require("../models/Player");
 
 
-
 class LobbyController {
 
     constructor() {
@@ -27,51 +26,50 @@ class LobbyController {
 
     joinLobby(code, username) {
         const lobby = this.findLobby(code);
-        if (!lobby) return { success: false, reason: "not-exist" };
+        if (!lobby) return {success: false, reason: "not-exist"};
         if (playerManager.lobbyPlayers[code].length >= 10) {
-            return { success: false, reason: "full" };
+            return {success: false, reason: "full"};
         }
         // Se già presente, nessun problema
         if (playerManager.lobbyPlayers[code].find((p) => p.username === username)) {
-            return { success: true };
+            return {success: true};
         }
         // Aggiunge come non-master
         playerManager.addPlayerToLobby(code, new Player(username, false))
-        return { success: true };
+        return {success: true};
     }
 
 
-/*
-    emptyTeam (lobbyCode) {
-        if (this.lobbyTeams[lobbyCode]) {
-            this.lobbyTeams[lobbyCode] = {
-                yellowTeam: [],
-                blueTeam: [],
-            };
+    /*
+        emptyTeam (lobbyCode) {
+            if (this.lobbyTeams[lobbyCode]) {
+                this.lobbyTeams[lobbyCode] = {
+                    yellowTeam: [],
+                    blueTeam: [],
+                };
+            }
         }
-    }
 
 
 
 
-    getTeams(lobbyCode) {
-       return gameController.getGameOfLobby(lobbyCode).getTeams();
-    }
+        getTeams(lobbyCode) {
+           return gameController.getGameOfLobby(lobbyCode).getTeams();
+        }
 
- */
+     */
 
 
-/*    createNewVersusGame (lobbyCode, difficulty) {
-        GameController.createVersusGame(lobbyCode, new VersusGame(difficulty,
-            this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
-    }
+    /*    createNewVersusGame (lobbyCode, difficulty) {
+            GameController.createVersusGame(lobbyCode, new VersusGame(difficulty,
+                this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
+        }
 
-    isVersusGame(lobbyCode) {
-        return GameController.getGameOfLobby(lobbyCode) instanceof VersusGame;
-    }
+        isVersusGame(lobbyCode) {
+            return GameController.getGameOfLobby(lobbyCode) instanceof VersusGame;
+        }
 
- */
-
+     */
 
 
     getPlayersOfLobby(code) {

@@ -4,4 +4,5 @@ class Player {
         this.isMaster = isMaster;
     }
 }
+
 module.exports = Player;

@@ -1,6 +1,6 @@
 const Game = require('../models/GameWithVite');
-const gameController = require('../controllers/gameController');
-module.exports = function registerGameHandlers(socket, io) {
+
+module.exports = function registerGameHandlers(socket, io, gameController) {
     // Oggetto per tenere traccia delle partite single player
     const games = {};
     // mi salvo i giocatori delle due squadre
@@ -11,6 +11,16 @@ module.exports = function registerGameHandlers(socket, io) {
                 sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
                 difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
             });
+    });
+
+
+    socket.on("checkMultiGameStart", (data) => {
+        const {lobbyCode, mode} = data;
+        if (mode === 'coop') {
+            io.to(lobbyCode).emit("gameCanStart", gameController.coopGameCanStart(lobbyCode));
+        } else {
+            io.to(lobbyCode).emit("gameCanStart", gameController.versusGameCanStart(lobbyCode));
+        }
     });
 
     socket.on("getVersusGame", (lobbyCode) => {

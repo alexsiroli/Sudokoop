@@ -1,3 +1,111 @@
+<script>
+import socket from "../plugins/socket.js";
+import ChatBox from "../components/ChatBox.vue";
+
+export default {
+  name: "Lobby",
+  components: {ChatBox},
+  data() {
+    return {
+      inLobby: false,
+      currentLobbyCode: "",
+      players: [], // array di oggetti { username, isMaster }
+      isMaster: false,
+      selectedMode: "coop",
+      selectedDifficulty: "easy",
+      lobbyCodeError: "",
+      lobbyCode: "",
+      errorOnStart: "",
+    };
+  },
+  methods: {
+    createLobby() {
+      socket.emit("createLobby", sessionStorage.getItem('username'));
+    },
+
+    joinLobby() {
+      socket.emit("joinLobby", {
+        username: sessionStorage.getItem('username'),
+        code: this.lobbyCode
+      });
+    },
+
+    startMultiGame() {
+      socket.emit("checkMultiGameStart", {
+        lobbyCode: this.currentLobbyCode,
+        mode: this.selectedMode,
+      });
+    },
+
+    leaveLobbyAndGoHome() {
+      const username = sessionStorage.getItem('username');
+      const lobbyCode = this.currentLobbyCode;
+      // Se l'utente è attualmente in lobby, invia l'evento di abbandono al server
+      if (this.inLobby && lobbyCode && username) {
+        socket.emit("leaveLobby", {code: lobbyCode, username: username});
+      }
+      sessionStorage.removeItem("lobbyCode");
+      this.$router.push({name: 'Home'});
+    },
+
+    copyLobbyCode() {
+      navigator.clipboard.writeText(this.currentLobbyCode)
+        .then(() => console.log("Codice lobby copiato!"))
+        .catch(err => console.error("Errore nella copia:", err));
+    }
+  },
+
+  mounted() {
+    socket.on("onLobbyCreated", (code) => {
+      sessionStorage.setItem("lobbyCode", code);
+      this.currentLobbyCode = code;
+      this.inLobby = true;
+      this.isMaster = true;
+    });
+
+    socket.on("joinLobby", (res) => {
+      if (res === "Ok") {
+        sessionStorage.setItem("lobbyCode", this.lobbyCode);
+        this.currentLobbyCode = this.lobbyCode;
+        this.inLobby = true;
+        this.errorOnStart = "";
+      } else if (res === "Not exists") {
+        this.lobbyCodeError = "Questa lobby non esiste!";
+      } else if (res === "Full") {
+        this.lobbyCodeError = "Lobby piena (max 10)!";
+      }
+    });
+
+    socket.on("players", (playersArr) => {
+      this.players = playersArr;
+      this.inLobby = true;
+      this.currentLobbyCode = sessionStorage.getItem("lobbyCode");
+      this.isMaster = playersArr.some(p =>
+        p.username === sessionStorage.getItem('username') && p.isMaster);
+    });
+
+    socket.on('gameCanStart', (data) => {
+      if (data.res) {
+        if (this.selectedMode === "coop") {
+          this.$router.push({name: 'CoopGame'});
+        } else {
+          this.$router.push({name: 'SelectTeamVersusGame'});
+        }
+      } else {
+        this.errorOnStart = data.message;
+      }
+    })
+
+  },
+  beforeUnmount() {
+    socket.off("onLobbyCreated");
+    socket.off("joinLobby");
+    socket.off("players");
+    socket.off("gameCanStart");
+
+  }
+};
+</script>
 <template>
   <div class="centered-container">
     <div class="rounded-box">
@@ -33,7 +141,7 @@
 
         <!-- ChatBox visibile solo se inLobby è true -->
         <div style="margin-top: 20px;" v-if="inLobby">
-          <chat-box :lobbyCode="currentLobbyCode" />
+          <chat-box :lobbyCode="currentLobbyCode"/>
         </div>
 
         <!-- Sezione Master spostata sotto la ChatBox -->
@@ -57,143 +165,14 @@
           </div>
           <button
             @click="startMultiGame"
-            class="button">Avvia Partita</button>
+            class="button">Avvia Partita
+          </button>
           <p class="text-danger">{{ errorOnStart }}</p>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script>
-import socket from "../plugins/socket.js";
-import ChatBox from "../components/ChatBox.vue";
-
-export default {
-  name: "Lobby",
-  components: { ChatBox },
-  data() {
-    return {
-      inLobby: false,
-      currentLobbyCode: "",
-      players: [], // array di oggetti { username, isMaster }
-      isMaster: false,
-      selectedMode: "coop",
-      selectedDifficulty: "easy",
-      lobbyCodeError: "",
-      lobbyCode: "",
-      errorOnStart: "",
-    };
-  },
-  methods: {
-    createLobby() {
-      const user = sessionStorage.getItem('username');
-      console.log("[DELME] Lobby.vue => createLobby => user:", user);
-      socket.emit("createLobby", user);
-    },
-    joinLobby() {
-      console.log("[DELME] Lobby.vue => joinLobby => code:", this.lobbyCode);
-      socket.emit("joinLobby", {
-        username: sessionStorage.getItem('username'),
-        code: this.lobbyCode
-      });
-    },
-    startMultiGame() {
-      console.log("[DELME] Lobby.vue => startMultiGame => code:", this.currentLobbyCode,
-        " mode:", this.selectedMode, " difficulty:", this.selectedDifficulty);
-      socket.emit("checkForStartMultiGame", {
-        lobbyCode: this.currentLobbyCode,
-        mode: this.selectedMode,
-        username: sessionStorage.getItem('username'),
-        difficulty: this.selectedDifficulty,
-      });
-    },
-    leaveLobbyAndGoHome() {
-        const username = sessionStorage.getItem('username');
-        const lobbyCode = this.currentLobbyCode;
-
-        console.log("Abbandono lobby e torno alla Home");
-
-        // Se l'utente è attualmente in lobby, invia l'evento di abbandono al server
-        if (this.inLobby && lobbyCode && username) {
-          socket.emit("leaveLobby", { code: lobbyCode, username });
-        }
-
-        // Pulizia dello stato locale relativo alla lobby
-        sessionStorage.removeItem("lobbyCode");
-        this.inLobby = false;
-        this.currentLobbyCode = "";
-        this.players = [];
-        this.isMaster = false;
-        this.lobbyCode = "";
-        this.lobbyCodeError = "";
-        this.errorOnStart = "";
-
-        this.$router.push({ name: 'Home' });
-    },
-    copyLobbyCode() {
-      navigator.clipboard.writeText(this.currentLobbyCode)
-        .then(() => console.log("Codice lobby copiato!"))
-        .catch(err => console.error("Errore nella copia:", err));
-    }
-  },
-  mounted() {
-    console.log("[DELME] Lobby.vue => mounted");
-    socket.on("onLobbyCreated", (code) => {
-      console.log("[DELME] onLobbyCreated => code:", code);
-      sessionStorage.setItem("lobbyCode", code);
-      this.currentLobbyCode = code;
-      this.inLobby = true;
-      this.isMaster = true;
-    });
-    socket.on("joinLobby", (res) => {
-      console.log("[DELME] joinLobby callback =>", res);
-      if (res === "Ok") {
-        sessionStorage.setItem("lobbyCode", this.lobbyCode);
-        this.currentLobbyCode = this.lobbyCode;
-        this.inLobby = true;
-        this.errorOnStart = "";
-      } else if (res === "Not exists") {
-        this.lobbyCodeError = "Questa lobby non esiste!";
-      } else if (res === "Full") {
-        this.lobbyCodeError = "Lobby piena (max 10)!";
-      }
-    });
-    socket.on("players", (playersArr) => {
-      console.log("[DELME] Lobby.vue => players =>", playersArr);
-      this.players = playersArr;
-      this.inLobby = true;
-      this.currentLobbyCode = sessionStorage.getItem("lobbyCode");
-      this.isMaster = playersArr.some(p =>
-        p.username === sessionStorage.getItem('username') && p.isMaster);
-    });
-    socket.on("gameCanStart", mode => {
-      console.log("[DELME] Lobby.vue => gameStarted => mode:", mode);
-      if (mode === "coop") {
-        this.$router.push({name: 'CoopGame'});
-      } else {
-        this.$router.push({name: 'SelectTeamVersusGame'});
-      }
-    });
-    socket.on("notEnoughPlayers", () => {
-      console.log("[DELME] Lobby.vue => notEnoughPlayers");
-      this.errorOnStart = "Non ci sono abbastanza giocatori per iniziare la partita";
-    });
-    socket.on("notMaster", () => {
-      console.log("[DELME] Lobby.vue => notMaster => alert user");
-      alert("Non sei il master, non puoi avviare la partita!");
-    });
-  },
-  beforeUnmount() {
-    socket.off("onLobbyCreated");
-    socket.off("joinLobby");
-    socket.off("players");
-    socket.off("gameStarted");
-    socket.off("notEnoughPlayers");
-    socket.off("notMaster");
-  }
-};
-</script>
 
 <style scoped>
 /* Stili per la sezione master */

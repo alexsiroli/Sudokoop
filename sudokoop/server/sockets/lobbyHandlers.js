@@ -1,38 +1,18 @@
-const gameController = require('../controllers/gameController');
-
 module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
   // Creazione lobby
   socket.on("createLobby", username => {
-    console.log("[DELME] SERVER: createLobby => user:", username);
-
     const newLobby = lobbyController.createLobby(username);
     socket.join(newLobby.code);
-
     socket.emit("onLobbyCreated", newLobby.code);
-
     // Aggiorna i players
-    io.to(newLobby.code).emit("players", newLobby.players);
-    console.log("[DELME] SERVER: Lobby creata => code:", newLobby.code);
-  });
-
-  socket.on("backToLobby", lobbyCode => {
-    lobbyController.emptyTeam(lobbyCode);
-    io.to(lobbyCode).emit("backToLobby");
-    // reinvio anche i giocatori
-    const lobby = lobbyController.findLobby(lobbyCode);
-    if (lobby) {
-      console.log("Invio i players")
-      io.to(lobbyCode).emit("players", lobby.players);
-    }
+    io.to(newLobby.code).emit("players", lobbyController.getPlayersOfLobby(newLobby.code));
   });
 
 
   // Join lobby
   socket.on("joinLobby", (data) => {
     const { username, code } = data;
-    console.log("[DELME] SERVER: joinLobby => user:", username, " code:", code);
-
     const result = lobbyController.joinLobby(code, username);
     if (!result.success) {
       if (result.reason === "not-exist") {
@@ -42,23 +22,12 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       }
       return;
     }
-
     socket.join(code);
     socket.emit("joinLobby", "Ok");
     // Re-invia la lista aggiornata (array di obj)
-    const lobby = lobbyController.findLobby(code);
-    if (lobby) {
-      io.to(code).emit("players", lobby.players);
-    }
-    console.log("[DELME] SERVER: user joined => code:", code, " user:", username);
+    io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));
   });
 
-  socket.on("joinTeam", (data) => {
-    const { color, username, lobbyCode } = data;
-    const res = lobbyController.addPlayerToTeam(lobbyCode, color, lobbyController.getPlayerFromUsername(lobbyCode, username));
-    console.log(res);
-    io.to(lobbyCode).emit("onJoinTeam", res);
-  });
 
   // Gestione chat di lobby
   socket.on("lobbyMessage", (data) => {
@@ -76,35 +45,52 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   // Abbandono della lobby: rimuove l'utente dalla lobby e lascia la room
   socket.on("leaveLobby", (data) => {
     const { code, username } = data;
-    console.log("[DELME] SERVER: leaveLobby => code:", code, " user:", username);
-
-    lobbyController.removePlayer(code, username);
+    lobbyController.removePlayerFromLobby(code, username);
     socket.leave(code);
     const updatedLobby = lobbyController.findLobby(code);
 
     if (updatedLobby) {
-      io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
-      io.to(code).emit("players", updatedLobby.players);
-    }
-    if (updatedLobby && lobbyController.isVersusGame(code)) {
-      lobbyController.removePlayerFromTeam(code, username);
-      const teams =  lobbyController.getTeams(code);
-      console.log(teams)
-      io.to(code).emit("teams", teams);
+      io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));
     }
   });
+
+  // Recupero giocatori di una lobby specifica
+  socket.on('getPlayersOfLobby', (lobbyCode) => {
+    const players = lobbyController.getPlayersOfLobby(lobbyCode);
+    io.to(lobbyCode).emit("players", players);
+  });
+
+
+
+
+  socket.on("backToLobby", lobbyCode => {
+    lobbyController.emptyTeam(lobbyCode);
+    io.to(lobbyCode).emit("backToLobby");
+    // reinvio anche i giocatori
+    const lobby = lobbyController.findLobby(lobbyCode);
+    if (lobby) {
+      console.log("Invio i players")
+      io.to(lobbyCode).emit("players", lobby.players);
+    }
+  });
+
+
+
+
+  socket.on("joinTeam", (data) => {
+    const { color, username, lobbyCode } = data;
+    const res = lobbyController.addPlayerToTeam(lobbyCode, color, lobbyController.getPlayerFromUsername(lobbyCode, username));
+    console.log(res);
+    io.to(lobbyCode).emit("onJoinTeam", res);
+  });
+
 
 
   socket.on('getPlayersOfGame', (lobbyCode) => {
     const players = gameController.getPlayersOfGame(lobbyCode)
     io.to(lobbyCode).emit("playersOfGame", players);
   })
-  // Recupero giocatori di una lobby specifica
-  socket.on('getPlayersOfLobby', (lobbyCode) => {
-    console.log("[DELME] SERVER: getPlayersOfLobby => code:", lobbyCode);
-    const players = lobbyController.getPlayersOfLobby(lobbyCode);
-    io.to(lobbyCode).emit("players", players);
-  });
+
 
   // Avvio partita multiplayer
   socket.on('isUserTheMaster', (data) => {
@@ -136,7 +122,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     io.to(lobbyCode).emit("restartTheGame")
   });
 
-  socket.on("checkForStartMultiGame", (data) => {
+  /*socket.on("checkForStartMultiGame", (data) => {
     const { lobbyCode, mode, username, difficulty } = data;
     const isMaster = lobbyController.isMaster(lobbyCode, username);
     if (!isMaster) {
@@ -159,4 +145,6 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
     io.to(lobbyCode).emit("gameCanStart", mode);
   });
+
+   */
 };

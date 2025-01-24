@@ -4,7 +4,7 @@ const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User');
 const CoopGame = require("../models/CoopGame"); // Import del modello User
 const TeamPlayerManager = require("../models/TeamPlayerManager");
-
+const lobbyPlayerManager = require("../models/LobbyPlayerManager");
 class GameController {
     constructor() {
         // Stato interno
@@ -76,6 +76,16 @@ class GameController {
         if (this.lobbyTeams[lobbyCode]) {
             return this.lobbyTeams[lobbyCode].removePlayerFromTeam(player);
         }
+    }
+
+
+
+    coopGameCanStart(lobbyCode) {
+        if (lobbyPlayerManager.getPlayersOfLobby(lobbyCode).length < 2) {
+            return {res: false, message: "Devono esserci almeno 2 giocatori per iniziare la partita"}
+        }
+        console.log("coop game can start")
+        return {res: true};
     }
 
     versusGameCanStart(lobbyCode) {

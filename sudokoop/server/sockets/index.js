@@ -1,5 +1,6 @@
 const LobbyController = require('../controllers/lobbyController');
 const GameController = require('../controllers/gameController');
+
 const registerLobbyHandlers = require('./lobbyHandlers');
 const registerGameHandlers = require('./gameHandlers');
 
