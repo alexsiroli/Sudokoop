@@ -7,6 +7,7 @@ class GameWithVite extends Game {
         this.vite = 3;
     }
 
+
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num) {
         const result = super.insertNumber(row, col, num);

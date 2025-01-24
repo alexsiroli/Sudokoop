@@ -94,18 +94,18 @@ class GameController {
 
     // Crea una nuova partita multiplayer
     createCoopGame(lobbyCode, difficulty) {
+        console.log("Creating coopGame")
         this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
     }
 
     createVersusGame(lobbyCode, difficulty) {
         this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode]);
-        // TODO: valutare se svuotare i teams
         this.lobbyTeams[lobbyCode] = null;
     }
 
     // Rimuove un giocatore da una partita
-    removePlayerFromGame(lobbyCode, player) {
-        this.lobbyGame[lobbyCode]?.removePlayer(player);
+    removePlayerFromGame(lobbyCode, username) {
+        this.lobbyGame[lobbyCode]?.removePlayer(username);
     }
 
     // Recupera i giocatori di una partita
@@ -117,6 +117,9 @@ class GameController {
         return this.lobbyGame[lobbyCode]?.getTeams();
     }
 
+    removeGame(lobbyCode) {
+        this.lobbyGame[lobbyCode] = null;
+    }
 
     // Recupera il gioco associato a una lobby
     getGameOfLobby(lobbyCode) {

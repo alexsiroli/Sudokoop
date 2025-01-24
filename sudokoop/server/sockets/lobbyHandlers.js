@@ -64,13 +64,11 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
 
   socket.on("backToLobby", lobbyCode => {
-    lobbyController.emptyTeam(lobbyCode);
     io.to(lobbyCode).emit("backToLobby");
     // reinvio anche i giocatori
     const lobby = lobbyController.findLobby(lobbyCode);
     if (lobby) {
-      console.log("Invio i players")
-      io.to(lobbyCode).emit("players", lobby.players);
+      io.to(lobbyCode).emit("players", lobbyController.getPlayersOfLobby(lobbyCode));
     }
   });
 
@@ -86,10 +84,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
 
 
-  socket.on('getPlayersOfGame', (lobbyCode) => {
-    const players = gameController.getPlayersOfGame(lobbyCode)
-    io.to(lobbyCode).emit("playersOfGame", players);
-  })
+
 
 
   // Avvio partita multiplayer
@@ -114,13 +109,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     }
   });
 
-  socket.on("createMultiGame", (data) => {
-    console.log("creating new game")
-    const {lobbyCode, difficulty} = data;
 
-    gameController.createCoopGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
-    io.to(lobbyCode).emit("restartTheGame")
-  });
 
   /*socket.on("checkForStartMultiGame", (data) => {
     const { lobbyCode, mode, username, difficulty } = data;

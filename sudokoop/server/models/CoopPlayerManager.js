@@ -3,14 +3,16 @@ const playerManager = require("./LobbyPlayerManager");
 
 class CoopPlayerManager {
     constructor(lobbyCode) {
+        console.log("costruttore coop player")
         this.gamePlayers = [...playerManager.getPlayersOfLobby(lobbyCode)];
+        console.log("players "+ this.gamePlayers);
         this.lobbyCode = lobbyCode;
     }
 
-    removePlayer(player) {
-        this.gamePlayers = this.gamePlayers.filter(p => p.username !== player.username);
+    removePlayer(username) {
+        this.gamePlayers = this.gamePlayers.filter(p => p.username !== username);
         //TODO: gestire il caso zero giocatori
-        this.setMaster(playerManager.removePlayer(this.lobbyCode, player.username));
+        this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
     }
 
     setMaster(master) {

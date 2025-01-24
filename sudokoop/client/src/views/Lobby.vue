@@ -87,6 +87,11 @@ export default {
     socket.on('gameCanStart', (data) => {
       if (data.res) {
         if (this.selectedMode === "coop") {
+          if (this.isMaster) {
+            socket.emit("createCoopGame", {
+              lobbyCode: this.currentLobbyCode,
+              difficulty: this.selectedDifficulty});
+          }
           this.$router.push({name: 'CoopGame'});
         } else {
           this.$router.push({name: 'SelectTeamVersusGame'});

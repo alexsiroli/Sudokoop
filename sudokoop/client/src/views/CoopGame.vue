@@ -1,11 +1,11 @@
 <script>
-import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
 import GameMulti from './GameMulti.vue';
 
 export default {
   name: 'CoopGame',
-  components: {SudokuGrid, GameMulti},
+  components: {GameMulti},
+
   data() {
     return {
       sudokuGrid: "",
@@ -14,19 +14,31 @@ export default {
       difficulty: "",
     };
   },
+
+  computed: {
+    hearts() {
+      return "❤️".repeat(this.vite);
+    },
+  },
+
   methods: {
+    changeVite(newVite) {
+      this.vite = newVite;
+    },
+
     restartNewGame() {
       this.isInitialized = false;
       this.getGameData();
     },
+
     getGameData() {
-      socket.emit('getGame', sessionStorage.getItem('lobbyCode'))
+      socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
       socket.on("game", (data) => {
         const {sudoku, vite, difficulty} = data;
         this.sudokuGrid = sudoku;
         this.vite = vite;
-        this.isInitialized = true;
         this.difficulty = difficulty;
+        this.isInitialized = true;
       })
     }
   },
@@ -40,6 +52,17 @@ export default {
 
 </style>
 <template>
-   <GameMulti v-if="this.isInitialized" :initialVite="vite" :puzzle="sudokuGrid" :difficulty="this.difficulty"
-   :restartNewGame = "restartNewGame"></GameMulti>
+
+  <div class="centered-container">
+
+    <div class="rounded-box game-container">
+      <h1 class="title">Gioco Multiplayer Coop</h1>
+      <h3>Difficoltà: {{ this.difficulty }}</h3>
+      <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
+
+      <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :changeVite="changeVite"
+                 :restartNewGame="restartNewGame"></GameMulti>
+    </div>
+  </div>
+
 </template>

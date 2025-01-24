@@ -7,6 +7,8 @@ class LobbyPlayerManager {
         if (!this.lobbyPlayers[lobbyCode]) {
             this.lobbyPlayers[lobbyCode] = [];
         }
+        console.log("vecchi player " +  this.lobbyPlayers[lobbyCode])
+        console.log("Aggiunto " + player.username + " a " + lobbyCode)
         this.lobbyPlayers[lobbyCode].push(player);
     }
 
@@ -25,6 +27,7 @@ class LobbyPlayerManager {
 
 
     getPlayersOfLobby(lobbyCode) {
+        console.log("i player nel lobby " + lobbyCode + "sono" + this.lobbyPlayers[lobbyCode])
         return this.lobbyPlayers[lobbyCode];
     }
 

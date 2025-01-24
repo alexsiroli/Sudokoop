@@ -4,14 +4,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     // Oggetto per tenere traccia delle partite single player
     const games = {};
     // mi salvo i giocatori delle due squadre
-    socket.on("getGame", (lobbyCode) => {
-        io.to(lobbyCode).emit("game",
-            {
-                vite: gameController.getGameOfLobby(lobbyCode).vite,
-                sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
-                difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
-            });
-    });
 
 
     socket.on("checkMultiGameStart", (data) => {
@@ -23,6 +15,30 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         }
     });
 
+    socket.on("createCoopGame", (data) => {
+        console.log("creating coop Game" + data.lobbyCode + data.difficulty);
+        gameController.createCoopGame(data.lobbyCode, data.difficulty);
+    });
+
+    socket.on("startCoopGame", (lobbyCode) => {
+        io.to(lobbyCode).emit("startCoopGame")
+    });
+
+    socket.on("getCoopGame", (lobbyCode) => {
+        io.to(lobbyCode).emit("game",
+            {
+                vite: gameController.getGameOfLobby(lobbyCode).getVite(),
+                sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
+                difficulty: gameController.getGameOfLobby(lobbyCode).getDifficulty(),
+            });
+    });
+
+    socket.on('getPlayersOfGame', (lobbyCode) => {
+        const players = gameController.getPlayersOfGame(lobbyCode)
+        io.to(lobbyCode).emit("playersOfGame", players);
+    });
+
+
     socket.on("getVersusGame", (lobbyCode) => {
         io.to(lobbyCode).emit("game",
             {
@@ -32,6 +48,16 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                 blueTeam: gameController.getGameOfLobby(lobbyCode).blue.team,
             });
     });
+
+    socket.on("backToLobby", (lobbyCode) => {
+        gameController.removeGame(lobbyCode);
+    })
+
+    socket.on("leaveGame", (data) => {
+        const {code, username} = data;
+        gameController.removePlayerFromGame(code, username);
+        io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
+    })
 
 
 
@@ -52,7 +78,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
 
-
     socket.on('cellFocus', (data) => {
         const {rowIndex, colIndex, lobbyCode, color} = data;
         io.to(lobbyCode).emit("cellFocus", {
@@ -67,14 +92,16 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         io.to(lobbyCode).emit("cellDeselect", {
             rowIndex: rowIndex,
             colIndex: colIndex,
-
         })
     })
+
     socket.on('cellUpdateMulti', (data) => {
         const {cellData, lobbyCode, color, username} = data;
         const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
+
         const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
         if (!result.gameOver) {
+            console.log("mando il parziale" + partialResult)
             io.to(lobbyCode).emit("insertedNumber", partialResult)
         }
         console.log("result after update " + result);

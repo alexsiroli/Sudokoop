@@ -6,12 +6,11 @@ class Game {
         this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
         this.gameOver = false;
     }
-
     insertNumberWithoutCheck(row, col, num) {
         const index = row * 9 + col;
+        console.log("inserting number without chek " + row + col + num)
         return this.sudoku.puzzle.substring(0, index) + num + this.sudoku.puzzle.substring(index + 1);
     }
-
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num) {
         let message;
