@@ -4,18 +4,17 @@ jest.mock('sudoku-gen', () => ({
     })),
 }));
 
-const GameController = require('../../controllers/gameController');
+const gameController = require('../../controllers/gameController');
 const LobbyController = require("../../controllers/lobbyController");
 
 
 describe("CoopGame", () => {
-    let lobby, gameController, lobbyController, players;
+    let lobby, lobbyController, players;
     beforeEach(() => {
         lobbyController = new LobbyController();
         lobby = lobbyController.createLobby('masterUser');
         lobbyController.joinLobby(lobby.code, 'player1');
         lobbyController.joinLobby(lobby.code, 'player2');
-        gameController = new GameController();
         gameController.createCoopGame(lobby.code, 'easy');
         players = lobbyController.getPlayersOfLobby(lobby.code);
     });

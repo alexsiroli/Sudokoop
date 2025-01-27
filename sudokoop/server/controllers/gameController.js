@@ -14,12 +14,12 @@ class GameController {
     }
 
     // Genera un ID univoco per il gioco
-    generateGameId() {
+    generateGameId= () => {
         return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     }
 
     // Salva il tempo su DB
-    async saveTime(req, res) {
+    saveTime = async (req, res) => {
         const {username, milliseconds, difficulty} = req.body;
         if (!username || !milliseconds) {
             return res.status(400).json({error: "Dati insufficienti"});
@@ -35,7 +35,7 @@ class GameController {
     }
 
     // Recupera la leaderboard dal DB
-    async getLeaderboard(req, res) {
+    getLeaderboard = async (req, res) => {
         try {
             const records = await Leaderboard.find().sort({milliseconds: 1});
             res.status(200).json(records);
@@ -46,7 +46,7 @@ class GameController {
     }
 
     // Avvia una nuova partita single-player
-    newSinglePlayerGame(req, res) {
+    newSinglePlayerGame = (req, res) => {
         const difficulty = req.query.difficulty || 'easy';
         const gameId = this.generateGameId();
         const newGame = new GameWithVite(difficulty);
@@ -145,16 +145,8 @@ class GameController {
         result.cellData = cellData;
         return result;
     }
-
-    /*
-        // Rimuove un gioco
-        removeGame(lobbyCode) {
-            this.lobbyGame[lobbyCode] = null;
-        }
-    */
-
     // Aggiorna le statistiche di un utente
-    async updateStats(req, res) {
+    updateStats = async (req, res) => {
         const {username, result} = req.body;
         if (!username || !result) {
             return res.status(400).json({error: "Dati insufficienti"});
@@ -173,7 +165,7 @@ class GameController {
     }
 
     // Inserisce un numero in modalità single-player
-    insertNumber(req, res) {
+    insertNumber = (req, res) => {
         const {gameId, row, col, value} = req.body;
         const currentGame = this.activeGames[gameId];
         if (!currentGame) {
@@ -182,36 +174,13 @@ class GameController {
 
         const result = currentGame.insertNumber(row, col, value);
 
-        if (result === undefined) {
+        if (result.message === 'Hai vinto!' || result.message === 'Hai perso! Vite terminate.') {
             delete this.activeGames[gameId];
-            return res.status(200).json({
-                puzzle: currentGame.sudoku.puzzle,
-                solution: currentGame.sudoku.solution,
-                vite: currentGame.vite,
-                message: 'Hai vinto!',
-                gameOver: true,
-            });
         }
 
-        if (result === 'Hai perso! Vite terminate.') {
-            delete this.activeGames[gameId];
-            return res.status(200).json({
-                puzzle: currentGame.sudoku.puzzle,
-                solution: currentGame.sudoku.solution,
-                vite: currentGame.vite,
-                message: result,
-                gameOver: true,
-            });
-        }
-
-        return res.status(200).json({
-            puzzle: currentGame.sudoku.puzzle,
-            vite: currentGame.vite,
-            message: result,
-            gameOver: false,
-        });
+        return res.status(200).json(result);
     }
 }
 
 
-module.exports = GameController;
+module.exports = new GameController();

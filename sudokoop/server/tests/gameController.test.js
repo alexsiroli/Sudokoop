@@ -1,4 +1,4 @@
-const GameController = require('../controllers/gameController');
+const gameController = require('../controllers/gameController');
 const Game = require('../models/Game');
 const Leaderboard = require('../models/Leaderboard');
 const User = require('../models/User');
@@ -8,9 +8,8 @@ jest.mock('../models/User');
 jest.mock('../models/Game');
 
 describe('Game Controller', () => {
-    let req, res, gameController;
+    let req, res;
     beforeEach(() => {
-        gameController = new GameController();
         req = { body: {}, query: {} };
         res = {
             status: jest.fn().mockReturnThis(),
