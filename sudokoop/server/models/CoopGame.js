@@ -3,14 +3,10 @@ const CoopPlayerManager = require("./CoopPlayerManager");
 
 class CoopGame {
     constructor(difficult, lobbyCode) {
-        console.log("Coop game constructor");
-        console.log("code " + lobbyCode)
-        console.log("difficult " + difficult)
         this.difficulty = difficult;
         this.game = new GameWithVite(difficult);
         this.lobbyCode = lobbyCode;
         this.coopPlayerManager = new CoopPlayerManager(lobbyCode);
-        console.log("Players " + this.coopPlayerManager.getPlayers());
     }
 
     getDifficulty() {

@@ -3,9 +3,7 @@ const playerManager = require("./LobbyPlayerManager");
 
 class CoopPlayerManager {
     constructor(lobbyCode) {
-        console.log("costruttore coop player")
         this.gamePlayers = [...playerManager.getPlayersOfLobby(lobbyCode)];
-        console.log("players "+ this.gamePlayers);
         this.lobbyCode = lobbyCode;
     }
 

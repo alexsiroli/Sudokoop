@@ -2,7 +2,6 @@ const sudokuGen = require('sudoku-gen');
 
 class Game {
     constructor(difficult) {
-        console.log("sono in game " + difficult)
         this.sudoku = sudokuGen.getSudoku(difficult);
         this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
         this.gameOver = false;
@@ -10,7 +9,6 @@ class Game {
     }
     insertNumberWithoutCheck(row, col, num) {
         const index = row * 9 + col;
-        console.log("inserting number without chek " + row + col + num)
         return this.sudoku.puzzle.substring(0, index) + num + this.sudoku.puzzle.substring(index + 1);
     }
     // Metodo per inserire un numero in una cella

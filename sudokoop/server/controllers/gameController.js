@@ -87,7 +87,6 @@ class GameController {
         if (mode === 'versus') {
             this.createTeamManager(lobbyCode);
         }
-        console.log("coop game can start")
         return {res: true};
     }
 
@@ -97,7 +96,6 @@ class GameController {
 
     // Crea una nuova partita multiplayer
     createCoopGame(lobbyCode, difficulty) {
-        console.log("GAME CONTROLLER Creating coopGame")
         this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
     }
 

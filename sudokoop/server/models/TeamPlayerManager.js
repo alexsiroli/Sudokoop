@@ -61,9 +61,7 @@ class TeamPlayerManager {
         {
             targetTeam.push(player);
         }
-        console.log("adding " + player.username  + " to "+ color)
-        console.log("yello w " + this.yellowTeam)
-        console.log("blue " + this.blueTeam)
+
         return {
             yellowTeam: this.yellowTeam,
             blueTeam: this.blueTeam
@@ -71,10 +69,7 @@ class TeamPlayerManager {
     }
 
     removeIfPresent(username, team) {
-        console.log(team)
-
         if (team.some(p => p.username === username)) {
-            console.log("include il plauer")
             const index = team.findIndex(user => user.username === username);
             if (index !== -1) {
                 team.splice(index, 1);

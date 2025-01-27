@@ -2,7 +2,6 @@ const Game = require("./Game");
 
 class VersusGame {
     constructor(difficult, teamPlayerManager) {
-        console.log("CREATING VERSIS GAME")
         this.difficulty = difficult;
         this.game = new Game(difficult);
         this.teamPlayerManager = teamPlayerManager;
