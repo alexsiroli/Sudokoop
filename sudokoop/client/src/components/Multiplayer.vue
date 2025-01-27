@@ -1,14 +1,16 @@
 <script>
-import axios from "../main.js";
-import SudokuGrid from "../components/SudokuGridMulti.vue";
+
+import SudokuGrid from "./SudokuGridMulti.vue";
 import socket from "../plugins/socket";
-import LobbyUser from "../components/LobbyUsers.vue";
-import Timer from "../components/Timer.vue";
+import LobbyUser from "./LobbyUsers.vue";
+import Timer from "./Timer.vue";
+import TeamContainer from "./TeamContainer.vue";
 
 export default {
-  props: ['puzzle', 'changeVite', 'restartNewGame'],
-  name: 'GameMulti',
-  components: {SudokuGrid, LobbyUser, Timer},
+  // COLOR vale giallo/blue nel caso versus, senno gray nel caso coop
+  props: ['puzzle', 'mode', 'restartNewGame', 'color', 'getGameData','changeVite', 'yellowTeam', 'blueTeam'],
+  name: 'Multiplayer',
+  components: {SudokuGrid, LobbyUser, Timer, TeamContainer},
   data() {
     return {
       message: "",
@@ -19,28 +21,25 @@ export default {
       isMaster: false,
       lastCell: null,
       players: [],
+      yellow: {team: this.yellowTeam, point: 0},
+      blue: {team: this.blueTeam, point: 0},
     };
   },
 
   methods: {
 
-
-    /*startNewGame() {
+    // chiamato la prima inizializzazione oppure quando ho perso e devo riiniziare
+    startNewGame() {
       //console.log("puzzle : " + this.puzzle);
       if (this.gameOver && this.isMaster) {
-        //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-        socket.emit('createCoopGame',
-          {
-            lobbyCode: sessionStorage.getItem('lobbyCode'),
-            difficulty: this.difficulty
-          });
-        socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
         this.restartNewGame();
       }
+      this.isInitialized = true;
       this.gameOver = false;
       this.firstInitialization = true;
       this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
+      //this.team = this.yellowTeam.some(t => t.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.$nextTick(() => {
         if (this.$refs.timer) {
           this.$refs.timer.startTimer();
@@ -49,8 +48,6 @@ export default {
       this.firstInitialization = false;
     },
 
-
-     */
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -64,7 +61,7 @@ export default {
           //console.log("previous", previous);
           row.push({
             value: isReadOnly ? char : "",
-            readOnly: isReadOnly,
+            readOnly: this.firstInitialization ? isReadOnly : this.sudokuGrid[i][j].readOnly,
             color: this.firstInitialization && isReadOnly ? 'filled' : previousCol, // Colore iniziale per celle fisse
           });
         }
@@ -79,7 +76,9 @@ export default {
       // dico al server che ho inserito
       socket.emit("cellUpdateMulti", {
         cellData: cellData,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
+      //color: this.team,
+        username: sessionStorage.getItem("username"),
       });
 
     },
@@ -89,7 +88,8 @@ export default {
       socket.emit("cellFocus", {
         rowIndex: rowIndex,
         colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
+        color: this.color,
       });
     },
 
@@ -97,7 +97,7 @@ export default {
       socket.emit("cellDeselect", {
         rowIndex: rowIndex,
         colIndex: colIndex,
-        lobbyCode: sessionStorage.getItem("lobbyCode")
+        lobbyCode: sessionStorage.getItem("lobbyCode"),
       });
 
     },
@@ -109,8 +109,6 @@ export default {
         }
       });
     },
-
-
     initializeGridWithSolution(solution) {
       //const previousGrid = this.sudokuGrid;
       //this.sudokuGrid = [];
@@ -119,8 +117,8 @@ export default {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
 
-          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'green'
-            && !this.sudokuGrid[i][j].readOnly)) {
+          if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'filled'
+            && !this.sudokuGrid[i][j].color.endsWith('-selected'))) {
             this.sudokuGrid[i][j].value = solution[index];
             this.changeCelColor(i, j, 'red')
           }
@@ -128,6 +126,20 @@ export default {
         }
       }
     },
+
+    setReadOnlyForEliminated(username) {
+      console.log("Setting readOnlyForEliminated user");
+      if (sessionStorage.getItem('username') === username) {
+        console.log(" I am eliminated");
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+            this.sudokuGrid[i][j].readOnly = true;
+          }
+        }
+      }
+    },
+
+
     leaveGame() {
       // esci dalla lobby: comunichi al server
       socket.emit("leaveGame",
@@ -140,41 +152,52 @@ export default {
     backToLobby() {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
     }
+
   },
 
   mounted() {
-    // configurazione griglia
     this.startNewGame();
-    // recupero giocatori
-    socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
-    socket.on('playersOfGame', players => {
-      this.players = players;
-      players.forEach(player => {
-        if (player.isMaster && player.username === sessionStorage.getItem("username")) {
-          this.isMaster = true;
-        }
-      })
-    })
 
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
+    socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
+    socket.on('playersOfGame', players => {
+      this.players = players;
+      players.forEach(player => {
+        if (player.isMaster) {
+          this.masterUser = player.username;
+          if (player.username === sessionStorage.getItem("username")) {
+            this.isMaster = true;
+          }
+        }
+      })
+    });
+
+    socket.on("teams", (data) => {
+      console.log("receiving teams " + data)
+      this.yellow.team = data.yellowTeam;
+      this.blue.team = data.blueTeam;
+    });
 
     socket.on("startGame", () => {
-      this.restartNewGame();
-    })
+      this.getGameData();
+      this.startNewGame();
+    });
 
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
       console.log("cellFocus!!!");
-      const {rowIndex, colIndex} = data;
-      this.changeCelColor(rowIndex, colIndex, 'gray');
-
+      const {rowIndex, colIndex, color} = data;
+      this.changeCelColor(rowIndex, colIndex, color);
     });
 
     socket.on("cellDeselect", (data) => {
+      console.log("DESELECTING cell")
       const {rowIndex, colIndex} = data;
-      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" && !this.sudokuGrid[rowIndex][colIndex].readOnly) {
+      console.log("color " + this.sudokuGrid[rowIndex][colIndex].color)
+      if (this.sudokuGrid[rowIndex][colIndex].color !== "red" &&
+        !this.sudokuGrid[rowIndex][colIndex].color.endsWith("-selected")) {
         this.changeCelColor(rowIndex, colIndex, 'white');
       }
 
@@ -185,9 +208,20 @@ export default {
     });
 
     socket.on("afterUpdating", (result) => {
-      const {data, color} = result;
-      // aggiorna vite
-      this.changeVite(data.vite);
+      const {data,  username} = result;
+      console.log("ADDED NUMBER")
+      // aggiorna vite se coop
+      if (this.mode === "coop") {
+        this.changeVite(data.vite);
+      } else {
+        this.yellow.team = data.yellowTeam;
+        this.yellow.point = data.yellowPoint;
+        this.blue.team = data.blueTeam;
+        this.blue.point = data.bluePoint;
+      }
+
+      let color = this.mode === 'coop' ? 'green' : data.color
+      // caso gameOver
       if (data.gameOver) {
         this.$nextTick(() => {
           if (this.$refs.timer) {
@@ -197,18 +231,24 @@ export default {
         // avviso sudokugrid
         this.gameOver = true;
         this.gameOverMessage = data.message;
-        // perso
-        if (data.vite === 0) {
-          console.log("inizializza con solizone ")
+
+        // condizione per verificare se la partita è finita con una sconfitta (lostCondition) o vittoria
+        // ho perso
+        if (!data.win) {
           this.initializeGridWithSolution(data.solution);
-        } else {
+
+          //this.onEliminatedPlayer(data.eliminated, data.color);
+        }
+        else {
           const {row, col} = data.cellData;
           const index = row * 9 + col;
           // vinto: imposti l'ultimo inserimento a verde e imposta il valore
           this.sudokuGrid[row][col].value = data.solution[index];
           this.sudokuGrid[row][col].readOnly = true;
-          this.changeCelColor(row, col, 'green')
+
+          this.changeCelColor(row, col, color+"-selected")
         }
+        // non ho finito vado avanti
       } else {
         const {row, col} = data.cellData;
         if (data.message.startsWith("Giusto")) {
@@ -219,18 +259,19 @@ export default {
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
             this.sudokuGrid[row][col].readOnly = true;
-            this.changeCelColor(row, col, 'green')
+            this.changeCelColor(row, col, color+"-selected")
             this.lastCell = null;
 
           }
         } else if (data.message.startsWith("Sbagliato")) {
-          console.log("Last CEll " + data.cellData)
-          if (this.lastCell != null) {
-            this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
+          if (this.mode !== 'coop') {
+            this.setReadOnlyForEliminated(username);
           }
-          this.lastCell = data.cellData;
-          this.changeCelColor(row, col, 'red')
-
+            if (this.lastCell != null) {
+              this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
+            }
+            this.lastCell = data.cellData;
+            this.changeCelColor(row, col, 'red')
         }
         this.initializeGrid(data.puzzle)
       }
@@ -238,41 +279,19 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.game-over-message {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.message-container {
-  font-size: 1.1em;
-  margin-top: 10px;
-}
-
-.exit {
-  color: white;
-  background-color: red;
-  justify-content: center;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 10px;
-}
-</style>
 <template>
   <!-- Se il gioco è finito e l'utente ha perso, mostra il messaggio sopra la griglia -->
   <div v-if="gameOver" class="game-over-container">
     <p class="game-over-message"> {{ this.gameOverMessage }}</p>
   </div>
   <Timer ref="timer"></Timer>
-  <div class="sudoku-container">
+  <div class="game-layout">
+
+    <TeamContainer v-if="this.mode==='versus'"  ref="teamContainerYellow" :team-name="'Gialla'" :team="this.yellow" ></TeamContainer>
+
+
+    <div class="sudoku-container">
+
     <sudoku-grid ref="grid"
                  :grid="sudokuGrid"
                  @cell-updated="handleCellUpdate"
@@ -282,6 +301,9 @@ export default {
 
   </div>
 
+    <TeamContainer v-if="this.mode==='versus'"  ref="teamContainerBlue" :team-name="'Blu'" :team="this.blue" ></TeamContainer>
+
+  </div>
   <LobbyUser :players="this.players"></LobbyUser>
   <button v-if="!this.gameOver" @click="leaveGame" class="exit">
     Abbandona la partita
@@ -298,3 +320,36 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+.game-over-message {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sudoku-container {
+  flex-grow: 1; /* Consenti alla griglia Sudoku di occupare lo spazio centrale */
+  margin: 0 20px; /* Margine laterale per distanziare dalle squadre */
+  text-align: center;
+}
+
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.exit {
+  color: white;
+  background-color: red;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+}
+.game-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+</style>

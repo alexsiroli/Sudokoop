@@ -1,6 +1,6 @@
 <script>
 import socket from '../plugins/socket.js';
-import GameMulti from './Multiplayer.vue';
+import GameMulti from '../components/Multiplayer.vue';
 
 export default {
   name: 'CoopGame',

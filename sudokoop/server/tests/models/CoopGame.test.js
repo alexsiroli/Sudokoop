@@ -4,7 +4,7 @@ jest.mock('sudoku-gen', () => ({
     })),
 }));
 
-const GameController = require('../../controllers/GameController');
+const GameController = require('../../controllers/gameController');
 const LobbyController = require("../../controllers/lobbyController");
 
 

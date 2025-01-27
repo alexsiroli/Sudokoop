@@ -5,7 +5,6 @@ import SinglePlayer from '../views/SinglePlayer.vue';
 import Lobby from '../views/Lobby.vue';
 import CoopGame from '../views/CoopGame.vue';
 import SelectTeamVersusGame from '../views/SelectTeamVersusGame.vue';
-import CreateLobby from "../views/CreateLobby.vue";
 import Login from "../views/Login.vue";
 import Register from '../views/Register.vue';
 import VersusGame from "../views/VersusGame.vue";
