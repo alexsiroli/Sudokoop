@@ -94,7 +94,7 @@ class GameController {
 
     // Crea una nuova partita multiplayer
     createCoopGame(lobbyCode, difficulty) {
-        console.log("Creating coopGame")
+        console.log("GAME CONTROLLER Creating coopGame")
         this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
     }
 

@@ -1,6 +1,6 @@
 <script>
 import socket from '../plugins/socket.js';
-import GameMulti from './GameMulti.vue';
+import GameMulti from './Multiplayer.vue';
 
 export default {
   name: 'CoopGame',
@@ -27,11 +27,22 @@ export default {
     },
 
     restartNewGame() {
+      console.log("Restarting new Game")
+      // Se sono il master, creo il gioco
+      //faccio richiesta per nuovo gioco e torno indietro (sono il master)
+      console.log("difficulty " + this.difficulty)
+      socket.emit('createCoopGame',
+        {
+          lobbyCode: sessionStorage.getItem('lobbyCode'),
+          difficulty: this.difficulty
+        });
+      socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
       this.isInitialized = false;
-      this.getGameData();
+     // this.getGameData();
     },
 
     getGameData() {
+      this.isInitialized = false;
       socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
       socket.on("game", (data) => {
         const {sudoku, vite, difficulty} = data;
@@ -60,8 +71,8 @@ export default {
       <h3>Difficoltà: {{ this.difficulty }}</h3>
       <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
 
-      <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :changeVite="changeVite"
-                 :restartNewGame="restartNewGame"></GameMulti>
+      <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :mode="'coop'" :changeVite="changeVite"
+                 :color="'gray'" :restartNewGame="restartNewGame" :getGameData ="getGameData"></GameMulti>
     </div>
   </div>
 

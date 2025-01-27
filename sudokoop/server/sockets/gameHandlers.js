@@ -16,12 +16,13 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("createCoopGame", (data) => {
-        console.log("creating coop Game" + data.lobbyCode + data.difficulty);
+        console.log("GAME HADLER creating coop Game" + data.lobbyCode + data.difficulty);
         gameController.createCoopGame(data.lobbyCode, data.difficulty);
     });
 
+
     socket.on("startCoopGame", (lobbyCode) => {
-        io.to(lobbyCode).emit("startCoopGame")
+        io.to(lobbyCode).emit("startGame")
     });
 
     socket.on("getCoopGame", (lobbyCode) => {
@@ -48,7 +49,18 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                 blueTeam: gameController.getGameOfLobby(lobbyCode).blue.team,
             });
     });
+/*
+    socket.on("getTeamByColor", (data) => {
+        const {color, lobbyCode} = data;
+        const game =  gameController.getGameOfLobby(lobbyCode);
+        io.to(lobbyCode).emit("teams", {
+            playerTeam: color === "Gialla" ? game.getTeams().yellowTeam : game.getTeams().blueTeam,
+            teamPoints: color === "Gialla" ? game.getTeamsPoint().yellowTeam : game.getTeamsPoint().blueTeam,
+        })
+    })
 
+
+ */
     socket.on("backToLobby", (lobbyCode) => {
         gameController.removeGame(lobbyCode);
     })
@@ -60,6 +72,21 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     })
 
 
+
+    socket.on('cellUpdateMulti', (data) => {
+        const {cellData, lobbyCode, username} = data;
+        const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
+        const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
+
+        if (!result.gameOver) {
+            console.log("mando il parziale" + partialResult)
+            io.to(lobbyCode).emit("insertedNumber", partialResult)
+        }
+        console.log("result after update " + result);
+        io.to(lobbyCode).emit("afterUpdating",
+            { data: result,
+                username: username});
+    });
 
 
 
@@ -95,21 +122,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         })
     })
 
-    socket.on('cellUpdateMulti', (data) => {
-        const {cellData, lobbyCode, color, username} = data;
-        const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
 
-        const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
-        if (!result.gameOver) {
-            console.log("mando il parziale" + partialResult)
-            io.to(lobbyCode).emit("insertedNumber", partialResult)
-        }
-        console.log("result after update " + result);
-        io.to(lobbyCode).emit("afterUpdating",
-            { data: result,
-            color: color,
-            username: username});
-    });
 
     // Aggiornamento cella
     socket.on('cellUpdate', (cellData) => {

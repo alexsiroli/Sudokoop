@@ -2,9 +2,11 @@ const sudokuGen = require('sudoku-gen');
 
 class Game {
     constructor(difficult) {
+        console.log("sono in game " + difficult)
         this.sudoku = sudokuGen.getSudoku(difficult);
         this.emptyPlace = this.sudoku.puzzle.match(/-/g).length;
         this.gameOver = false;
+        this.win = false;
     }
     insertNumberWithoutCheck(row, col, num) {
         const index = row * 9 + col;
@@ -23,6 +25,7 @@ class Game {
             this.emptyPlace--;
             if (this.emptyPlace === 0) {
                 this.gameOver = true;
+                this.win = true;
                 message = 'Hai vinto!';
             } else {
                 message = 'Giusto!';
@@ -31,6 +34,7 @@ class Game {
             message = 'Sbagliato! Riprova.';
         }
         return {
+            win: this.win,
             puzzle: this.sudoku.puzzle,
             solution: this.sudoku.solution,
             message: message,

@@ -12,13 +12,9 @@ export default {
   components: {SudokuGrid, LobbyUser, Timer, TeamContainer},
   data() {
     return {
-      gameId: null,
       message: "",
       gameOver: false,
       gameOverMessage: "",
-      coloredCell: null,
-      final: false,
-      userFilledCells: null,
       sudokuGrid: [],
       firstInitialization: true,
       isMaster: false,
@@ -30,8 +26,7 @@ export default {
       players: [],
     };
   },
-  computed: {
-  },
+
   methods: {
     startNewGame() {
       console.log("Start new game yellowTEan " + this.yellowTeam );
@@ -349,6 +344,7 @@ export default {
         </div>
         <Timer ref="timer"></Timer>
         <div class="game-layout">
+
         <TeamContainer  ref="teamContainerYellow" :team-name="'Gialla'" :players="this.yellowTeam"
                         :points = "this.yellowPoint" :master="this.masterUser" ></TeamContainer>
 
@@ -358,7 +354,6 @@ export default {
                        @cell-updated="handleCellUpdate"
                        :onFocus="handelCellFocus"
                        :onDeselect="handleCellDeselection"
-                       :coloredCell="coloredCell"
           />
 
         </div>

@@ -3,6 +3,7 @@ const Game = require("./Game");
 class GameWithVite extends Game {
 
     constructor(difficult) {
+        console.log("CREATING GAMEWITHVITE")
         super(difficult);
         this.vite = 3;
     }

@@ -5,6 +5,7 @@ class CoopGame {
     constructor(difficult, lobbyCode) {
         console.log("Coop game constructor");
         console.log("code " + lobbyCode)
+        console.log("difficult " + difficult)
         this.difficulty = difficult;
         this.game = new GameWithVite(difficult);
         this.lobbyCode = lobbyCode;

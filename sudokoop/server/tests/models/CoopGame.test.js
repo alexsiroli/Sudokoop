@@ -36,21 +36,21 @@ describe("CoopGame", () => {
     });
 
     it('If a player is removed from coopGame, he is also removed from lobby', () => {
-        gameController.removePlayerFromGame(lobby.code, players[2]);
+        gameController.removePlayerFromGame(lobby.code, 'player2');
         let newPlayers = [{username: 'masterUser', isMaster: true},
             {username: 'player1', isMaster: false}];
         expect(gameController.getPlayersOfGame(lobby.code)).toEqual(newPlayers);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual(newPlayers);
-        gameController.removePlayerFromGame(lobby.code, players[2]);
+        gameController.removePlayerFromGame(lobby.code, 'player2');
         expect(gameController.getPlayersOfGame(lobby.code)).toEqual(newPlayers);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual(newPlayers);
-        gameController.removePlayerFromGame(lobby.code, players[1]);
+        gameController.removePlayerFromGame(lobby.code, 'player1');
         expect(gameController.getPlayersOfGame(lobby.code)).toEqual([{username: 'masterUser', isMaster: true}]);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual([{username: 'masterUser', isMaster: true}]);
     });
 
     it('master changes if removed', () => {
-        gameController.removePlayerFromGame(lobby.code, players[0]);
+        gameController.removePlayerFromGame(lobby.code, 'masterUser');
         let newPlayers = [{username: 'player1', isMaster: true},
             {username: 'player2', isMaster: false}];
         expect(gameController.getPlayersOfGame(lobby.code)).toEqual(newPlayers);
@@ -66,5 +66,14 @@ describe("CoopGame", () => {
         expect(gameController.getPlayersOfGame(lobby.code)).toEqual(oldPlayers);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual(oldPlayers.concat(
             {username: 'player3', isMaster: false}));
+    });
+
+    it('created new coop game after ends of previous match', () => {
+        gameController.createCoopGame(lobby.code, 'easy');
+        const coopGame = gameController.getGameOfLobby(lobby.code);
+        expect(coopGame.game.sudoku.puzzle).toBe('12-456-89'.repeat(9));
+        expect(coopGame.game.emptyPlace).toBe(2 * 9);
+        expect(coopGame.game.gameOver).toBe(false);
+        expect(coopGame.game.vite).toBe(3);
     })
 });

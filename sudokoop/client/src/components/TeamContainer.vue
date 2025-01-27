@@ -1,19 +1,12 @@
 <script>
 
 export default {
-  props: ['teamName', 'players', 'points'],
+  props: ['teamName', 'team'],
   data() {
     return {
-        eliminated: [],
     }
   },
 
-  methods: {
-    setEliminated(username) {
-      console.log("Setting eliminated " + username)
-      this.eliminated.push(username)
-    }
-  }
 }
 </script>
 
@@ -21,10 +14,9 @@ export default {
   <div :class="['team-container', `${teamName}-team`]">
   <h3>Squadra {{this.teamName}}</h3>
   <ul>
-    <li v-for="player in this.players">{{ player.username }} <span v-if="player.isMaster"> (Master)</span>
-      <a v-if="eliminated.includes(player)"> - Eliminato</a></li>
+    <li v-for="player in this.team.team">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
   </ul>
-    <h6>Points: {{this.points}}</h6>
+    <h6>Points: {{this.team.points}}</h6>
   </div>
 </template>
 

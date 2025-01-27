@@ -33,6 +33,12 @@ class TeamPlayerManager {
         }
     }
 
+    setPlayerAsEliminated (username) {
+        const team = this.findTeam(username);
+        team.find(p => p.username === username).username = username + "-eliminated";
+
+    }
+
     // chiamato durante la fase di gioco (quando abbandoni)
     removePlayerFromGame(player) {
         this.removePlayerFromTeam(player)

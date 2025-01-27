@@ -24,9 +24,10 @@ export default {
 
   methods: {
 
-    startNewGame() {
+
+    /*startNewGame() {
       //console.log("puzzle : " + this.puzzle);
-      if (this.gameOver) {
+      if (this.gameOver && this.isMaster) {
         //faccio richiesta per nuovo gioco e torno indietro (sono il master)
         socket.emit('createCoopGame',
           {
@@ -48,6 +49,8 @@ export default {
       this.firstInitialization = false;
     },
 
+
+     */
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -89,6 +92,7 @@ export default {
         lobbyCode: sessionStorage.getItem("lobbyCode")
       });
     },
+
     handleCellDeselection(rowIndex, colIndex) {
       socket.emit("cellDeselect", {
         rowIndex: rowIndex,
@@ -105,6 +109,7 @@ export default {
         }
       });
     },
+
 
     initializeGridWithSolution(solution) {
       //const previousGrid = this.sudokuGrid;
@@ -153,8 +158,9 @@ export default {
 
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
-    })
-    socket.on("startCoopGame", () => {
+    });
+
+    socket.on("startGame", () => {
       this.restartNewGame();
     })
 

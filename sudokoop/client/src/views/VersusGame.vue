@@ -2,10 +2,11 @@
 import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
 import GameVersus from './GameVersus.vue';
+import GameMulti from './Multiplayer.vue';
 
 export default {
   name: 'VersusGame',
-  components: {SudokuGrid, GameVersus},
+  components: {GameMulti},
   data() {
     return {
       sudokuGrid: "",
@@ -17,6 +18,15 @@ export default {
   },
   methods: {
     restartNewGame() {
+
+      //faccio richiesta per nuovo gioco e torno indietro (sono il master)
+      socket.emit('createVersusGame',
+        {
+          lobbyCode: sessionStorage.getItem('lobbyCode'),
+          difficulty: this.difficulty
+        });
+      socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
+
       this.isInitialized = false;
       this.getGameData();
     },
@@ -30,14 +40,7 @@ export default {
         this.yellowTeam = yellowTeam;
         this.blueTeam = blueTeam;
       })
-      socket.on("teams", (data) => {
-        console.log("sono in versus game ho ricevuto i team")
-        const {yellowTeam, blueTeam } = data;
-        this.yellowTeam = yellowTeam;
-        this.blueTeam = blueTeam;
-        console.log ("yellow " + yellowTeam)
-        console.log("blu " + blueTeam)
-      })
+
     }
   },
   mounted() {
@@ -50,7 +53,7 @@ export default {
 
 </style>
 <template>
-  <GameVersus v-if="this.isInitialized" :puzzle="sudokuGrid" :difficulty="this.difficulty"
+  <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :difficulty="this.difficulty"
              :yellowTeam ="this.yellowTeam" :blueTeam="this.blueTeam"
-             :restartNewGame = "restartNewGame"></GameVersus>
+             :restartNewGame = "restartNewGame"></GameMulti>
 </template>
