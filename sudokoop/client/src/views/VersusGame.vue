@@ -1,7 +1,5 @@
 <script>
-import SudokuGrid from '../components/SudokuGrid.vue';
 import socket from '../plugins/socket.js';
-import GameVersus from './GameVersus.vue';
 import GameMulti from './Multiplayer.vue';
 
 export default {
@@ -14,6 +12,7 @@ export default {
       difficulty: "",
       yellowTeam: [],
       blueTeam: [],
+      color: "",
     };
   },
   methods: {
@@ -28,9 +27,10 @@ export default {
       socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
 
       this.isInitialized = false;
-      this.getGameData();
+      //this.getGameData();
     },
     getGameData() {
+      this.isInitialized = false;
       socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
       socket.on("game", (data) => {
         const {sudoku, difficulty, yellowTeam, blueTeam} = data;
@@ -39,7 +39,10 @@ export default {
         this.difficulty = difficulty;
         this.yellowTeam = yellowTeam;
         this.blueTeam = blueTeam;
-      })
+        this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
+      });
+
+
 
     }
   },
@@ -53,7 +56,14 @@ export default {
 
 </style>
 <template>
-  <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :difficulty="this.difficulty"
-             :yellowTeam ="this.yellowTeam" :blueTeam="this.blueTeam"
-             :restartNewGame = "restartNewGame"></GameMulti>
+  <div class="centered-container">
+
+    <div class="rounded-box game-container">
+      <h1 class="title">Gioco Multiplayer Versus</h1>
+      <h3>Difficoltà: {{ this.difficulty }}</h3>
+  <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid"
+             :mode="'versus'" :color="color" :yellowTeam ="this.yellowTeam" :blueTeam="this.blueTeam"
+             :getGameData ="getGameData" :restartNewGame = "restartNewGame"></GameMulti>
+    </div>
+  </div>
 </template>

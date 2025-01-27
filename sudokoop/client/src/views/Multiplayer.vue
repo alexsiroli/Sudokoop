@@ -174,6 +174,12 @@ export default {
       })
     });
 
+    socket.on("teams", (data) => {
+      console.log("receiving teams " + data)
+      this.yellow.team = data.yellowTeam;
+      this.blue.team = data.blueTeam;
+    });
+
     socket.on("startGame", () => {
       this.getGameData();
       this.startNewGame();
@@ -315,3 +321,35 @@ export default {
   </div>
 </template>
 
+<style>
+.game-over-message {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sudoku-container {
+  flex-grow: 1; /* Consenti alla griglia Sudoku di occupare lo spazio centrale */
+  margin: 0 20px; /* Margine laterale per distanziare dalle squadre */
+  text-align: center;
+}
+
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.exit {
+  color: white;
+  background-color: red;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+}
+.game-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+</style>

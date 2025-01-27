@@ -3,8 +3,10 @@ const Game = require("./Game");
 class VersusGame {
     constructor(difficult, teamPlayerManager) {
         console.log("CREATING VERSIS GAME")
+        this.difficulty = difficult;
         this.game = new Game(difficult);
         this.teamPlayerManager = teamPlayerManager;
+        this.gameOver = false;
         this.yellow = {
             team: this.teamPlayerManager.getTeams().yellowTeam, points: 0
         };
@@ -12,7 +14,13 @@ class VersusGame {
             team: this.teamPlayerManager.getTeams().blueTeam, points: 0
         }
     }
+    getSudoku() {
+        return this.game.sudoku.puzzle;
+    }
 
+    getDifficulty() {
+        return this.difficulty;
+    }
     getTeams() {
         return {
             yellowTeam: this.yellow.team, blueTeam: this.blue.team
@@ -34,17 +42,17 @@ class VersusGame {
         return this.yellow.team.some(p => p.username === username) ? this.yellow : this.blue;
     }
 
-    removePlayer(player) {
-        this.teamPlayerManager.removePlayerFromGame(player)
+    removePlayer(username) {
+        this.teamPlayerManager.removePlayerFromGame(username)
         return this.checkForFinish();
     }
 
     checkForFinish() {
-        if (this.yellow.team.length === 0) {
+        if (this.yellow.team.every(player => player.username.includes('-eliminated'))) {
             this.gameOver = true;
             return 'Squadra Blu vince!'; // Gioco terminato
         }
-        if (this.blue.team.length === 0) {
+        if (this.blue.team.every(player => player.username.includes('-eliminated'))) {
             this.gameOver = true;
             return 'Squadra Gialla vince!';
         }
@@ -52,7 +60,7 @@ class VersusGame {
     }
 
     insertNumberWithoutCheck(row, col, num) {
-        this.game.insertNumberWithoutCheck(row, col, num);
+        return this.game.insertNumberWithoutCheck(row, col, num);
     }
 
     // Metodo per inserire un numero in una cella
@@ -78,6 +86,7 @@ class VersusGame {
             // setto un giocatore come eliminato
             this.teamPlayerManager.setPlayerAsEliminated(username);
             result.message = this.checkForFinish(result) === "" ? result.message : this.checkForFinish(result);
+            result.gameOver = this.gameOver;
         }
         result.yellowPoint = this.yellow.points;
         result.bluePoint = this.blue.points;

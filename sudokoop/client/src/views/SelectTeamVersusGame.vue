@@ -10,71 +10,76 @@ export default {
       yellowTeam: [],
       blueTeam: [],
       buttonDisabled: false,
-      numPlayers: 0,
       selectedDifficulty: "easy",
       showError: false,
       errorMessage: "",
-      isMaster: false,
+      player: [],
     };
   },
   computed: {
-    canStart() {
-      return (this.yellowTeam.length + this.blueTeam.length) === this.numPlayers;
-    },
+
 
   },
   methods: {
 
     joinYellowTeam() {
       socket.emit("joinTeam", {
-        color: "yellow",
-        username: sessionStorage.getItem("username"),
         lobbyCode: sessionStorage.getItem("lobbyCode"),
+        color: "yellow",
+        player: this.player,
+
       });
       //this.buttonDisabled = true;
 
     },
     joinBlueTeam() {
       socket.emit("joinTeam", {
-        color: "blue",
-        username: sessionStorage.getItem("username"),
         lobbyCode: sessionStorage.getItem("lobbyCode"),
+        color: "blue",
+        player: this.player,
       });
       //this.buttonDisabled = true;
     },
     backToLobby() {
       socket.emit("backToLobby", sessionStorage.getItem("lobbyCode"));
     },
-    emitStartGame() {
-      // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
 
-      socket.emit('createVersusGame', {
-        lobbyCode: sessionStorage.getItem('lobbyCode'),
-        difficulty: this.selectedDifficulty,
-      });
+    checkVersusGameCanStart() {
+      // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
+      socket.emit("checkVersusGameCanStart",   sessionStorage.getItem('lobbyCode'));
+
     },
   },
 
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
     socket.on("players" , (players) => {
-      this.numPlayers = players.length;
       players.forEach(p => {
-        if (p.username === sessionStorage.getItem('username') && p.isMaster) {
-          this.isMaster = true;
+        if (p.username === sessionStorage.getItem('username')) {
+          this.player = p;
         }
       })
     });
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
-    socket.on("notValidTeams", () => {
-      this.showError = true;
-      this.errorMessage = "Ci deve essere almeno un giocatore per squadra"
+
+
+
+    socket.on('versusGameCanStart', (data) => {
+      if (data.res) {
+        if (this.player.isMaster) {
+          socket.emit('createVersusGame', {
+            lobbyCode: sessionStorage.getItem('lobbyCode'),
+            difficulty: this.selectedDifficulty,
+          });
+        }
+        this.$router.push({name: 'VersusGame'});
+      } else {
+        this.errorMessage = data.message;
+      }
     })
-    socket.on("versusGameCanStart", () => {
-      this.$router.push({name: 'VersusGame'});
-    })
+
     socket.on("onJoinTeam", (res) => {
       console.log("onJoinTeam", res);
       this.blueTeam = res.blueTeam;
@@ -120,7 +125,7 @@ export default {
 
     <LobbyUsers></LobbyUsers>
     <!-- Pulsante Start -->
-    <div class="controls" v-if="this.isMaster">
+    <div class="controls" v-if="this.player.isMaster">
       <label>Difficoltà:
         <select v-model="selectedDifficulty">
           <option value="easy">Facile</option>
@@ -128,10 +133,10 @@ export default {
           <option value="hard">Difficile</option>
         </select>
       </label>
-      <div v-if="showError" class="error-popup">
+      <div class="error-popup">
         <p>{{ errorMessage }}</p>
       </div>
-      <button class="start-button" @click="emitStartGame" :disabled="!this.canStart">
+      <button class="start-button" @click="checkVersusGameCanStart">
         Inizia la Partita
       </button>
     </div>
@@ -140,9 +145,7 @@ export default {
 </template>
 <style scoped>
 .error-popup {
-  background-color: #f8d7da;
   color: #721c24;
-  border: 1px solid #f5c6cb;
   border-radius: 5px;
   padding: 10px 20px;
   z-index: 1000;

@@ -18,7 +18,6 @@ const routes = [
   { path: '/lobby/:lobbyCode?', name: 'Lobby', component: Lobby },
   { path: '/coopgame', name: 'CoopGame', component: CoopGame },
   { path: '/selectTeam', name: 'SelectTeamVersusGame', component: SelectTeamVersusGame },
-  { path: '/createLobby', name: 'CreateLobby', component: CreateLobby },
   { path: '/register', name: 'Register', component: Register },
   { path: '/versusGame', name: 'VersusGame', component: VersusGame },
 

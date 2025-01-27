@@ -12,10 +12,10 @@ class TeamPlayerManager {
         this.allPlayers = [...playerManager.getPlayersOfLobby(lobbyCode)];
     }
 
-    removePlayerFromTeam(player) {
-        const team = this.yellowTeam.some(p => p.username === player.username) ? this.yellowTeam : this.blueTeam;
-        this.removeIfPresent(player, team);
-        this.removeFromAllPlayersList(player);
+    removePlayerFromTeam(username) {
+        const team = this.yellowTeam.some(p => p.username === username) ? this.yellowTeam : this.blueTeam;
+        this.removeIfPresent(username, team);
+        this.removeFromAllPlayersList(username);
         return {
             yellowTeam: this.yellowTeam,
             blueTeam: this.blueTeam
@@ -40,39 +40,50 @@ class TeamPlayerManager {
     }
 
     // chiamato durante la fase di gioco (quando abbandoni)
-    removePlayerFromGame(player) {
-        this.removePlayerFromTeam(player)
-        this.setMaster(playerManager.removePlayer(this.lobbyCode, player.username));
+    removePlayerFromGame(username) {
+        this.removePlayerFromTeam(username)
+        this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
     }
 
     setMaster(master) {
-        const team = this.findTeam(master.username);
-        team.find(p => p.username === master.username).isMaster = true;
+        if (master) {
+            const team = this.findTeam(master.username);
+            team.find(p => p.username === master.username).isMaster = true;
+        }
     }
 
     addPlayerToTeam(player, color) {
         const targetTeam = color === 'yellow' ? this.yellowTeam : this.blueTeam;
         const otherTeam = color === 'yellow' ? this.blueTeam : this.yellowTeam;
-        this.removeIfPresent(player, otherTeam)
-        this.removeFromAllPlayersList(player);
-        targetTeam.push(player);
+        this.removeIfPresent(player.username, otherTeam)
+        this.removeFromAllPlayersList(player.username);
+        if (!targetTeam.some(p => p.username === player.username))
+        {
+            targetTeam.push(player);
+        }
+        console.log("adding " + player.username  + " to "+ color)
+        console.log("yello w " + this.yellowTeam)
+        console.log("blue " + this.blueTeam)
         return {
             yellowTeam: this.yellowTeam,
             blueTeam: this.blueTeam
         }
     }
 
-    removeIfPresent(player, team) {
-        if (team.includes(player)) {
-            const index = team.findIndex(user => user.username === player.username);
+    removeIfPresent(username, team) {
+        console.log(team)
+
+        if (team.some(p => p.username === username)) {
+            console.log("include il plauer")
+            const index = team.findIndex(user => user.username === username);
             if (index !== -1) {
                 team.splice(index, 1);
             }
         }
     }
 
-    removeFromAllPlayersList(player) {
-        this.allPlayers = this.allPlayers.filter(p => p.username !== player.username);
+    removeFromAllPlayersList(username) {
+        this.allPlayers = this.allPlayers.filter(p => p.username !== username);
     }
 
     checkVersusGameCanStart() {
@@ -83,6 +94,11 @@ class TeamPlayerManager {
             return {res: false, message: "Ogni squadra deve avere almeno un giocatore"}
         }
         return {res: true}
+    }
+
+    restorePlayer() {
+        this.yellowTeam.forEach(p => p.username = p.username.replace('-eliminated', ''))
+        this.blueTeam.forEach(p => p.username = p.username.replace('-eliminated', ''))
     }
 
 }

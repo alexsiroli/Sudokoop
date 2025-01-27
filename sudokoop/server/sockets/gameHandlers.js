@@ -1,4 +1,5 @@
 const Game = require('../models/GameWithVite');
+const VersusGame = require("../models/VersusGame");
 
 module.exports = function registerGameHandlers(socket, io, gameController) {
     // Oggetto per tenere traccia delle partite single player
@@ -8,11 +9,11 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("checkMultiGameStart", (data) => {
         const {lobbyCode, mode} = data;
-        if (mode === 'coop') {
-            io.to(lobbyCode).emit("gameCanStart", gameController.coopGameCanStart(lobbyCode));
-        } else {
-            io.to(lobbyCode).emit("gameCanStart", gameController.versusGameCanStart(lobbyCode));
-        }
+        io.to(lobbyCode).emit("gameCanStart", {
+            res: gameController.multiPlayerGameCanStart(lobbyCode, mode),
+            mode: mode
+        });
+
     });
 
     socket.on("createCoopGame", (data) => {
@@ -39,15 +40,36 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         io.to(lobbyCode).emit("playersOfGame", players);
     });
 
+    socket.on("checkVersusGameCanStart", (lobbyCode) => {
+        io.to(lobbyCode).emit("versusGameCanStart", gameController.versusGameCanStart(lobbyCode));
+    });
+
+    socket.on("joinTeam", (data) => {
+        const {lobbyCode, color, player} = data;
+        console.log("joiningTEams" + color + "by " + player.username)
+        io.to(lobbyCode).emit("onJoinTeam", gameController.addPlayerToTeam(lobbyCode, color, player));
+    })
+
+
+
+    socket.on("createVersusGame", (data) => {
+        console.log("GAME HADLER creating coop Game" + data.lobbyCode + data.difficulty);
+        gameController.createVersusGame(data.lobbyCode, data.difficulty);
+    });
 
     socket.on("getVersusGame", (lobbyCode) => {
         io.to(lobbyCode).emit("game",
             {
-                sudoku: gameController.getGameOfLobby(lobbyCode).sudoku.puzzle,
-                difficulty: gameController.getGameOfLobby(lobbyCode).sudoku.difficulty,
-                yellowTeam: gameController.getGameOfLobby(lobbyCode).yellow.team,
-                blueTeam: gameController.getGameOfLobby(lobbyCode).blue.team,
+                sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
+                difficulty: gameController.getGameOfLobby(lobbyCode).getDifficulty(),
+                yellowTeam: gameController.getGameOfLobby(lobbyCode).getTeams().yellowTeam,
+                blueTeam: gameController.getGameOfLobby(lobbyCode).getTeams().blueTeam
             });
+    });
+
+
+    socket.on("startVersusGame", (lobbyCode) => {
+        io.to(lobbyCode).emit("startGame")
     });
 /*
     socket.on("getTeamByColor", (data) => {
@@ -67,8 +89,19 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("leaveGame", (data) => {
         const {code, username} = data;
+        // rimuovendolo dal gioco, lo rimuovo dalla lobby
         gameController.removePlayerFromGame(code, username);
         io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
+
+        // se era un versus game devo rimandare i team
+        if (gameController.getGameOfLobby(code) instanceof VersusGame) {
+            io.to(code).emit("teams",
+                {
+                    yellowTeam: gameController.getGameOfLobby(code).getTeams().yellowTeam,
+                    blueTeam: gameController.getGameOfLobby(code).getTeams().blueTeam
+                })
+        }
+
     })
 
 

@@ -30,6 +30,17 @@ describe("Selection of teams in Versus Game", () => {
         expect(res.blueTeam).toEqual([players[1]]);
     });
 
+    it("se un giocatore si unisce a un team in cui era già, non viene aggiunto nuovamente", () => {
+        let res = gameController.addPlayerToTeam(lobby.code, 'yellow',
+            players[0])
+        expect(res.yellowTeam).toEqual([players[0]]);
+        expect(res.blueTeam).toEqual([]);
+        res = gameController.addPlayerToTeam(lobby.code, 'yellow',
+            players[0])
+        expect(res.yellowTeam).toEqual([players[0]]);
+        expect(res.blueTeam).toEqual([]);
+    })
+
     it("se un giocatore si unisce a un team mentre era in un altro, viene rimosso dal primo e aggiunto" +
         "al secondo", () => {
         let res = gameController.addPlayerToTeam(lobby.code, 'yellow',
@@ -78,7 +89,7 @@ describe("player left lobby during team selection", () => {
         let res = gameController.addPlayerToTeam(lobby.code, 'yellow', players[0])
         expect(res.yellowTeam).toEqual([players[0]]);
         expect(res.blueTeam).toEqual([]);
-        res = gameController.removePlayerFromTeam(lobby.code, players[0]);
+        res = gameController.removePlayerFromTeam(lobby.code, 'masterUser');
         expect(res.yellowTeam).toEqual([]);
         expect(res.blueTeam).toEqual([]);
     });
@@ -91,7 +102,7 @@ describe("player left lobby during team selection", () => {
         gameController.addPlayerToTeam(lobby.code, 'blue', players[0]);
         let check = gameController.versusGameCanStart(lobby.code);
         expect(check.res).toBeTruthy();
-        res = gameController.removePlayerFromTeam(lobby.code, players[0]);
+        res = gameController.removePlayerFromTeam(lobby.code, 'masterUser');
         expect(res.yellowTeam).toEqual([players[1]]);
         expect(res.blueTeam).toEqual([players[2]]);
         check = gameController.versusGameCanStart(lobby.code);
@@ -148,15 +159,16 @@ describe("Logic of Versus Game", () => {
         expect(resultWrong.yellowPoint).toBe(0);
         expect(resultWrong.yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
         expect(resultWrong.bluePoint).toBe(0);
-        expect(resultWrong.blueTeam).toEqual([{username: 'masterUser', isMaster: true}]);
+        expect(resultWrong.blueTeam).toEqual([{username:'player2-eliminated', isMaster: false},
+            {username: 'masterUser', isMaster: true}]);
     });
 
     it('Lost', () => {
         let cellData = {row: 0, col: 2, value: 4}
         const resultWrong = gameController.insertNumberMulti(cellData, lobby.code, 'player1');
-        expect(resultWrong.message).toBe('Blu vince!');
+        expect(resultWrong.message).toBe('Squadra Blu vince!');
         expect(resultWrong.yellowPoint).toBe(0);
-        expect(resultWrong.yellowTeam).toEqual([]);
+        expect(resultWrong.yellowTeam).toEqual([{username: 'player1-eliminated', isMaster: false}]);
         expect(resultWrong.bluePoint).toBe(0);
         expect(resultWrong.blueTeam).toEqual([{username: 'player2', isMaster: false}, {
             username: 'masterUser', isMaster: true
@@ -192,7 +204,7 @@ describe("Logic of Versus Game", () => {
         // inserisco correttamente l ultimo numero: verifico che ho vinto con 3 vite
         cellData = {row: 8, col: 6, value: 7};
         resultCorrect = gameController.insertNumberMulti(cellData, lobby.code, 'player1');
-        expect(resultCorrect.message).toBe('Gialla vince!');
+        expect(resultCorrect.message).toBe('Squadra Gialla vince!');
         expect(resultCorrect.yellowPoint).toBe(10);
         expect(resultCorrect.yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
         expect(resultCorrect.bluePoint).toBe(8);
@@ -233,17 +245,40 @@ describe("Logic of Versus Game", () => {
     });
 
     it('Exit of player during a match. It should be deleted from teams and from lobby', () => {
-        gameController.removePlayerFromGame(lobby.code, players[2]);
+        gameController.removePlayerFromGame(lobby.code, 'player2');
         expect(gameController.getTeamsOfGame(lobby.code).yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
         expect(gameController.getTeamsOfGame(lobby.code).blueTeam).toEqual([{username: 'masterUser', isMaster: true}]);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual([{username: 'masterUser', isMaster: true},
             {username: 'player1', isMaster: false}]);
     });
     it('On master exit, someone becomes new master', () => {
-        gameController.removePlayerFromGame(lobby.code, players[0]);
+        gameController.removePlayerFromGame(lobby.code, 'masterUser');
         expect(gameController.getTeamsOfGame(lobby.code).yellowTeam).toEqual([{username: 'player1', isMaster: true}]);
         expect(gameController.getTeamsOfGame(lobby.code).blueTeam).toEqual([{username: 'player2', isMaster: false}]);
         expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual([{username: 'player1', isMaster: true},
             {username: 'player2', isMaster: false}]);
     });
+
+    it("after the end of a match, it should be possible to start another match", () => {
+        let cellData = {row: 0, col: 2, value: 4}
+        const resultWrong = gameController.insertNumberMulti(cellData, lobby.code, 'player1');
+        expect(resultWrong.message).toBe('Squadra Blu vince!');
+        expect(resultWrong.yellowPoint).toBe(0);
+        expect(resultWrong.yellowTeam).toEqual([{username: 'player1-eliminated', isMaster: false}]);
+        expect(resultWrong.bluePoint).toBe(0);
+        expect(resultWrong.blueTeam).toEqual([{username: 'player2', isMaster: false}, {
+            username: 'masterUser', isMaster: true
+        }]);
+        gameController.createVersusGame(lobby.code, 'easy');
+        const versusGame = gameController.getGameOfLobby(lobby.code);
+        expect(versusGame.game.sudoku.puzzle).toBe('12-456-89'.repeat(9));
+        expect(versusGame.game.emptyPlace).toBe(2 * 9);
+        expect(versusGame.game.gameOver).toBe(false);
+        expect(versusGame.yellow.team).toEqual([{username: 'player1', isMaster: false}]);
+        expect(versusGame.yellow.points).toBe(0);
+        expect(versusGame.blue.team).toEqual([{username: 'player2', isMaster: false}, {
+            username: 'masterUser', isMaster: true
+        }]);
+        expect(versusGame.blue.points).toBe(0);
+    } )
 });

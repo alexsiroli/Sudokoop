@@ -61,8 +61,6 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   });
 
 
-
-
   socket.on("backToLobby", lobbyCode => {
     io.to(lobbyCode).emit("backToLobby");
     // reinvio anche i giocatori
@@ -75,39 +73,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
 
 
-  socket.on("joinTeam", (data) => {
-    const { color, username, lobbyCode } = data;
-    const res = lobbyController.addPlayerToTeam(lobbyCode, color, lobbyController.getPlayerFromUsername(lobbyCode, username));
-    console.log(res);
-    io.to(lobbyCode).emit("onJoinTeam", res);
-  });
 
-
-
-
-
-
-  // Avvio partita multiplayer
-  socket.on('isUserTheMaster', (data) => {
-    const {username, code} = data;
-    if (lobbyController.isMaster(code, username)) {
-      console.log(username + "is the master")
-     ;
-      console.log("il mio socket id " + socket.id)
-      io.to(socket.id).emit("youAreTheMaster")
-    }
-  })
-
-  socket.on("createVersusGame", (data) => {
-    const {lobbyCode, difficulty} = data;
-    if (lobbyController.versusGameCanStart(lobbyCode)) {
-      lobbyController.createNewVersusGame(lobbyCode, difficulty);
-      console.log("versusgame can start")
-      io.to(lobbyCode).emit("versusGameCanStart")
-    } else {
-      io.to(lobbyCode).emit("notValidTeams")
-    }
-  });
 
 
 

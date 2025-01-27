@@ -85,8 +85,8 @@ export default {
     });
 
     socket.on('gameCanStart', (data) => {
-      if (data.res) {
-        if (this.selectedMode === "coop") {
+      if (data.res.res) {
+        if (data.mode === "coop") {
           if (this.isMaster) {
             socket.emit("createCoopGame", {
               lobbyCode: this.currentLobbyCode,

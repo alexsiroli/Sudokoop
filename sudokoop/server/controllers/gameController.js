@@ -72,17 +72,20 @@ class GameController {
         }
     }
 
-    removePlayerFromTeam(lobbyCode, player) {
+    removePlayerFromTeam(lobbyCode, username) {
         if (this.lobbyTeams[lobbyCode]) {
-            return this.lobbyTeams[lobbyCode].removePlayerFromTeam(player);
+            return this.lobbyTeams[lobbyCode].removePlayerFromTeam(username);
         }
     }
 
 
 
-    coopGameCanStart(lobbyCode) {
+    multiPlayerGameCanStart(lobbyCode, mode) {
         if (lobbyPlayerManager.getPlayersOfLobby(lobbyCode).length < 2) {
             return {res: false, message: "Devono esserci almeno 2 giocatori per iniziare la partita"}
+        }
+        if (mode === 'versus') {
+            this.createTeamManager(lobbyCode);
         }
         console.log("coop game can start")
         return {res: true};
@@ -99,8 +102,8 @@ class GameController {
     }
 
     createVersusGame(lobbyCode, difficulty) {
+        this.lobbyTeams[lobbyCode].restorePlayer()
         this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode]);
-        this.lobbyTeams[lobbyCode] = null;
     }
 
     // Rimuove un giocatore da una partita
