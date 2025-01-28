@@ -113,6 +113,14 @@ input {
   background-color: white;
 }
 
+.cell-border-right {
+  border-right: 2px solid var(--border-color);
+}
+
+.cell-border-bottom {
+  border-bottom: 2px solid var(--border-color);
+}
+
 .cell-readonly input {
   background-color: #eaeaea;
   font-weight: bold;

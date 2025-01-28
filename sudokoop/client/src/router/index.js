@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Game from '../views/Game.vue';
-import SinglePlayer from '../views/SinglePlayer.vue';
 import Lobby from '../views/Lobby.vue';
 import CoopGame from '../views/CoopGame.vue';
 import SelectTeamVersusGame from '../views/SelectTeamVersusGame.vue';
@@ -12,7 +11,6 @@ import VersusGame from "../views/VersusGame.vue";
 const routes = [
   { path: '/', name: 'Login', component: Login },
   { path: '/Home', name: 'Home', component: Home },
-  { path: '/singleplayer', name: 'SinglePlayer', component: SinglePlayer },
   { path: '/game', name: 'Game', component: Game },
   { path: '/lobby/:lobbyCode?', name: 'Lobby', component: Lobby },
   { path: '/coopgame', name: 'CoopGame', component: CoopGame },
