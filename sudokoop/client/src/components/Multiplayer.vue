@@ -1,5 +1,4 @@
 <script>
-
 import SudokuGrid from "./SudokuGridMulti.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "./LobbyUsers.vue";
@@ -7,8 +6,7 @@ import Timer from "./Timer.vue";
 import TeamContainer from "./TeamContainer.vue";
 
 export default {
-  // COLOR vale giallo/blue nel caso versus, senno gray nel caso coop
-  props: ['puzzle', 'mode', 'restartNewGame', 'color', 'getGameData','changeVite', 'yellowTeam', 'blueTeam'],
+  props: ['puzzle', 'mode', 'restartNewGame', 'color', 'getGameData', 'changeVite', 'yellowTeam', 'blueTeam'],
   name: 'Multiplayer',
   components: {SudokuGrid, LobbyUser, Timer, TeamContainer},
   data() {
@@ -27,7 +25,6 @@ export default {
   },
 
   methods: {
-
     // chiamato la prima inizializzazione oppure quando ho perso e devo riiniziare
     startNewGame() {
       if (this.gameOver && this.isMaster) {
@@ -38,7 +35,6 @@ export default {
       this.firstInitialization = true;
       this.sudokuGrid = [];
       this.initializeGrid(this.puzzle);
-      //this.team = this.yellowTeam.some(t => t.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.$nextTick(() => {
         if (this.$refs.timer) {
           this.$refs.timer.startTimer();
@@ -105,10 +101,8 @@ export default {
         }
       });
     },
-    initializeGridWithSolution(solution) {
-      //const previousGrid = this.sudokuGrid;
-      //this.sudokuGrid = [];
 
+    initializeGridWithSolution(solution) {
       for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
@@ -198,7 +192,7 @@ export default {
     });
 
     socket.on("afterUpdating", (result) => {
-      const {data,  username} = result;
+      const {data, username} = result;
       // aggiorna vite se coop
       if (this.mode === "coop") {
         this.changeVite(data.vite);
@@ -221,18 +215,16 @@ export default {
         this.gameOver = true;
         this.gameOverMessage = data.message;
 
-        // condizione per verificare se la partita è finita con una sconfitta (lostCondition) o vittoria
         // ho perso
         if (!data.win) {
           this.initializeGridWithSolution(data.solution);
-        }
-        else {
+        } else {
           const {row, col} = data.cellData;
           const index = row * 9 + col;
           // vinto: imposti l'ultimo inserimento a verde e imposta il valore
           this.sudokuGrid[row][col].value = data.solution[index];
           this.sudokuGrid[row][col].readOnly = true;
-          this.changeCelColor(row, col, color+"-selected")
+          this.changeCelColor(row, col, color + "-selected")
         }
         // non ho finito vado avanti
       } else {
@@ -244,7 +236,7 @@ export default {
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
             this.sudokuGrid[row][col].readOnly = true;
-            this.changeCelColor(row, col, color+"-selected")
+            this.changeCelColor(row, col, color + "-selected")
             this.lastCell = null;
 
           }
@@ -252,11 +244,11 @@ export default {
           if (this.mode !== 'coop') {
             this.setReadOnlyForEliminated(username);
           }
-            if (this.lastCell != null) {
-              this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
-            }
-            this.lastCell = data.cellData;
-            this.changeCelColor(row, col, 'red')
+          if (this.lastCell != null) {
+            this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
+          }
+          this.lastCell = data.cellData;
+          this.changeCelColor(row, col, 'red')
         }
         this.initializeGrid(data.puzzle)
       }
@@ -272,21 +264,23 @@ export default {
   <Timer ref="timer"></Timer>
   <div class="game-layout">
 
-    <TeamContainer v-if="this.mode==='versus'"  ref="teamContainerYellow" :team-name="'Gialla'" :team="this.yellow" ></TeamContainer>
+    <TeamContainer v-if="this.mode==='versus'" ref="teamContainerYellow" :team-name="'Gialla'"
+                   :team="this.yellow"></TeamContainer>
 
 
     <div class="sudoku-container">
 
-    <sudoku-grid ref="grid"
-                 :grid="sudokuGrid"
-                 @cell-updated="handleCellUpdate"
-                 :onFocus="handelCellFocus"
-                 :onDeselect="handleCellDeselection"
-    />
+      <sudoku-grid ref="grid"
+                   :grid="sudokuGrid"
+                   @cell-updated="handleCellUpdate"
+                   :onFocus="handelCellFocus"
+                   :onDeselect="handleCellDeselection"
+      />
 
-  </div>
+    </div>
 
-    <TeamContainer v-if="this.mode==='versus'"  ref="teamContainerBlue" :team-name="'Blu'" :team="this.blue" ></TeamContainer>
+    <TeamContainer v-if="this.mode==='versus'" ref="teamContainerBlue" :team-name="'Blu'"
+                   :team="this.blue"></TeamContainer>
 
   </div>
   <LobbyUser :players="this.players"></LobbyUser>
@@ -325,6 +319,7 @@ export default {
   justify-content: center;
   margin-top: 10px;
 }
+
 .exit {
   color: white;
   background-color: red;
@@ -332,6 +327,7 @@ export default {
   padding: 10px;
   border-radius: 10px;
 }
+
 .game-layout {
   display: flex;
   justify-content: space-between;

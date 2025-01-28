@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Timer from '@/components/Timer.vue';
 
 jest.useFakeTimers();
@@ -17,7 +17,7 @@ describe('Timer.vue', () => {
 
   it('computed property formattedTime restituisce tempo formattato correttamente', async () => {
     // Imposta manualmente timeSpent per testare il formato
-    await wrapper.setData({ timeSpent: 125000 }); // 125000 ms = 2 minuti e 5 secondi
+    await wrapper.setData({timeSpent: 125000}); // 125000 ms = 2 minuti e 5 secondi
     expect(wrapper.vm.formattedTime).toBe('02:05');
   });
 
@@ -49,7 +49,8 @@ describe('Timer.vue', () => {
 
   it('stopTimer cancella correttamente il timerInterval', () => {
     // Imposta un timerInterval fittizio
-    wrapper.vm.timerInterval = setInterval(() => {}, 1000);
+    wrapper.vm.timerInterval = setInterval(() => {
+    }, 1000);
     expect(wrapper.vm.timerInterval).not.toBeNull();
 
     // Arresta il timer

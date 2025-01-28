@@ -9,7 +9,6 @@ class CoopPlayerManager {
 
     removePlayer(username) {
         this.gamePlayers = this.gamePlayers.filter(p => p.username !== username);
-        //TODO: gestire il caso zero giocatori
         this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
     }
 

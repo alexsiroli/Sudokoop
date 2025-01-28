@@ -16,10 +16,7 @@ export default {
       player: [],
     };
   },
-  computed: {
-
-
-  },
+  computed: {},
   methods: {
 
     joinYellowTeam() {
@@ -46,14 +43,14 @@ export default {
 
     checkVersusGameCanStart() {
       // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
-      socket.emit("checkVersusGameCanStart",   sessionStorage.getItem('lobbyCode'));
+      socket.emit("checkVersusGameCanStart", sessionStorage.getItem('lobbyCode'));
 
     },
   },
 
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
-    socket.on("players" , (players) => {
+    socket.on("players", (players) => {
       players.forEach(p => {
         if (p.username === sessionStorage.getItem('username')) {
           this.player = p;
@@ -63,7 +60,6 @@ export default {
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
-
 
 
     socket.on('versusGameCanStart', (data) => {
@@ -107,7 +103,7 @@ export default {
         <ul>
           <li v-for="player in this.yellowTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
-        <button @click="joinYellowTeam" >Entra</button>
+        <button @click="joinYellowTeam">Entra</button>
       </div>
 
       <!-- Squadra Blu -->
@@ -116,7 +112,7 @@ export default {
         <ul>
           <li v-for="player in this.blueTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
-        <button @click="joinBlueTeam" >Entra</button>
+        <button @click="joinBlueTeam">Entra</button>
       </div>
     </div>
 
@@ -165,6 +161,7 @@ li {
   margin-bottom: 20px;
   padding-top: 20px;
 }
+
 .controls {
   display: flex;
   flex-direction: column; /* Dispone gli elementi in colonna */

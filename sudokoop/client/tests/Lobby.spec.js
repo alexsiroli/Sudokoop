@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Lobby from '@/views/Lobby.vue';
 import socket from '@/plugins/socket.js';
 
@@ -23,7 +23,7 @@ describe('Lobby.vue', () => {
     wrapper = mount(Lobby, {
       global: {
         mocks: {
-          $router: { push: routerPushMock }
+          $router: {push: routerPushMock}
         }
       }
     });
@@ -40,7 +40,7 @@ describe('Lobby.vue', () => {
   });
 
   it('chiama socket.emit con i parametri corretti quando joinLobby è invocato', () => {
-    wrapper.setData({ lobbyCode: 'LOBBY123' });
+    wrapper.setData({lobbyCode: 'LOBBY123'});
     wrapper.vm.joinLobby();
     expect(socket.emit).toHaveBeenCalledWith('joinLobby', {
       username: 'testuser',
@@ -63,8 +63,8 @@ describe('Lobby.vue', () => {
 
   it('esegue copyLobbyCode chiamando navigator.clipboard.writeText', async () => {
     const writeTextMock = jest.fn().mockResolvedValue();
-    global.navigator.clipboard = { writeText: writeTextMock };
-    wrapper.setData({ lobbyCode: 'COPYME' });
+    global.navigator.clipboard = {writeText: writeTextMock};
+    wrapper.setData({lobbyCode: 'COPYME'});
 
     await wrapper.vm.copyLobbyCode();
 
@@ -76,8 +76,8 @@ describe('Lobby.vue', () => {
     sessionStorage.setItem('lobbyCode', 'OLD_LOBBY');
     wrapper.vm.inLobby = true;
     wrapper.vm.lobbyCode = 'TESTLOBBY';
-    wrapper.vm.players = [{ username: 'testuser', isMaster: true }];
-    wrapper.vm.$router = { push: routerPushMock };
+    wrapper.vm.players = [{username: 'testuser', isMaster: true}];
+    wrapper.vm.$router = {push: routerPushMock};
 
     wrapper.vm.leaveLobbyAndGoHome();
 
@@ -93,6 +93,6 @@ describe('Lobby.vue', () => {
     expect(wrapper.vm.lobbyCode).toBe("");
     expect(wrapper.vm.lobbyCodeError).toBe("");
     expect(wrapper.vm.errorOnStart).toBe("");
-    expect(routerPushMock).toHaveBeenCalledWith({ name: 'Home' });
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Home'});
   });
 });

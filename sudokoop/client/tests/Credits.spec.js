@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Credits from '@/components/Credits.vue';
 
 describe('Credits.vue', () => {

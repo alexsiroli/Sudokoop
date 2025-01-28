@@ -3,8 +3,7 @@
 export default {
   props: ['teamName', 'team'],
   data() {
-    return {
-    }
+    return {}
   },
 
 }
@@ -12,11 +11,11 @@ export default {
 
 <template>
   <div :class="['team-container', `${teamName}-team`]">
-  <h3>Squadra {{this.teamName}}</h3>
-  <ul>
-    <li v-for="player in this.team.team">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
-  </ul>
-    <h6>Points: {{this.team.points}}</h6>
+    <h3>Squadra {{ this.teamName }}</h3>
+    <ul>
+      <li v-for="player in this.team.team">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
+    </ul>
+    <h6>Points: {{ this.team.points }}</h6>
   </div>
 </template>
 
@@ -36,6 +35,7 @@ export default {
 .Blu-team {
   background-color: #e6f2ff;
 }
+
 .team-container h3 {
   color: black;
 }
@@ -46,9 +46,11 @@ export default {
   padding: 0;
   margin-top: 10px;
 }
+
 h6 {
   color: black;
 }
+
 .team-container li {
   color: black;
 }

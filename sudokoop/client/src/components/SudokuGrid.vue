@@ -1,11 +1,10 @@
-
 <script>
 export default {
   name: 'SudokuGrid',
   props: {
-    grid: { type: Array, required: true },
-    coloredCell: { type: Object, default: null },
-    final: { type: Boolean, default: false }
+    grid: {type: Array, required: true},
+    coloredCell: {type: Object, default: null},
+    final: {type: Boolean, default: false}
   },
   data() {
     return {
@@ -24,7 +23,7 @@ export default {
         this.grid[rowIndex][colIndex].value = '';
         return;
       }
-      const cellData = { row: rowIndex, col: colIndex, value: parseInt(value, 10) };
+      const cellData = {row: rowIndex, col: colIndex, value: parseInt(value, 10)};
       this.$emit('cell-updated', cellData);
     },
     getCellClass(rowIndex, colIndex) {
@@ -112,14 +111,6 @@ input {
   box-sizing: border-box;
   border-radius: 0;
   background-color: white;
-}
-
-.cell-border-right {
-  border-right: 2px solid var(--border-color);
-}
-
-.cell-border-bottom {
-  border-bottom: 2px solid var(--border-color);
 }
 
 .cell-readonly input {

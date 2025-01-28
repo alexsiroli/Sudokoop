@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Register from '@/views/Register.vue';
 import axios from '@/main.js';
 import socket from '@/plugins/socket.js';
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 
 // Mock di axios e socket.io
 jest.mock('@/main.js', () => ({
@@ -15,7 +15,7 @@ jest.mock('@/plugins/socket.js', () => ({
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { name: 'Home', path: '/', component: { template: '<div>Home</div>' } }
+    {name: 'Home', path: '/', component: {template: '<div>Home</div>'}}
   ]
 });
 
@@ -38,7 +38,7 @@ describe('Register.vue', () => {
   it('mostra countdown se già loggato', async () => {
     sessionStorage.setItem('username', 'testuser');
     wrapper = mount(Register, {
-      global: { plugins: [router] }
+      global: {plugins: [router]}
     });
     await wrapper.vm.$nextTick();
     expect(wrapper.text()).toContain('Sei già loggato come testuser!');
@@ -49,7 +49,7 @@ describe('Register.vue', () => {
     sessionStorage.setItem('username', 'testuser');
 
     wrapper = mount(Register, {
-      global: { plugins: [router] }
+      global: {plugins: [router]}
     });
 
     const pushSpy = jest.spyOn(router, 'push');
@@ -57,14 +57,14 @@ describe('Register.vue', () => {
     jest.advanceTimersByTime(3000);
     await wrapper.vm.$nextTick();
 
-    expect(pushSpy).toHaveBeenCalledWith({ name: "Home" });
+    expect(pushSpy).toHaveBeenCalledWith({name: "Home"});
 
     jest.useRealTimers();
   });
 
   it('invoca axios.post e reindirizza su successo', async () => {
     wrapper = mount(Register, {
-      global: { plugins: [router] }
+      global: {plugins: [router]}
     });
 
     // Imposta i valori degli input
@@ -88,18 +88,18 @@ describe('Register.vue', () => {
     // Verifica l'emissione dello username tramite socket, l'aggiornamento di sessionStorage e il reindirizzamento
     expect(socket.emit).toHaveBeenCalledWith("username", 'newuser');
     expect(sessionStorage.getItem('username')).toBe('newuser');
-    expect(pushSpy).toHaveBeenCalledWith({ name: "Home" });
+    expect(pushSpy).toHaveBeenCalledWith({name: "Home"});
   });
 
   it('gestisce errore di registrazione', async () => {
     wrapper = mount(Register, {
-      global: { plugins: [router] }
+      global: {plugins: [router]}
     });
 
     await wrapper.find('input[type="text"]').setValue('newuser');
     await wrapper.find('input[type="password"]').setValue('password123');
 
-    axios.post.mockRejectedValueOnce({ response: { data: { error: "Errore registrazione" } } });
+    axios.post.mockRejectedValueOnce({response: {data: {error: "Errore registrazione"}}});
 
     await wrapper.find('form').trigger('submit.prevent');
     await wrapper.vm.$nextTick();  // Attende l'aggiornamento del DOM

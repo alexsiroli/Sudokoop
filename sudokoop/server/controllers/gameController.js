@@ -5,6 +5,7 @@ const User = require('../models/User');
 const CoopGame = require("../models/CoopGame"); // Import del modello User
 const TeamPlayerManager = require("../models/TeamPlayerManager");
 const lobbyPlayerManager = require("../models/LobbyPlayerManager");
+
 class GameController {
     constructor() {
         // Stato interno
@@ -14,7 +15,7 @@ class GameController {
     }
 
     // Genera un ID univoco per il gioco
-    generateGameId= () => {
+    generateGameId = () => {
         return `game_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     }
 
@@ -77,7 +78,6 @@ class GameController {
             return this.lobbyTeams[lobbyCode].removePlayerFromTeam(username);
         }
     }
-
 
 
     multiPlayerGameCanStart(lobbyCode, mode) {
@@ -144,6 +144,7 @@ class GameController {
         result.cellData = cellData;
         return result;
     }
+
     // Aggiorna le statistiche di un utente
     updateStats = async (req, res) => {
         const {username, result} = req.body;

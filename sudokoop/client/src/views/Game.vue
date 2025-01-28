@@ -30,7 +30,7 @@
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
           <!-- Se l'utente ha vinto, mostra anche il tempo impiegato -->
           <p v-if="gameOverMessage.startsWith('Hai vinto')">
-            {{ gameOverMessage }}<br />
+            {{ gameOverMessage }}<br/>
             Tempo impiegato: {{ formattedTime }}
           </p>
 
@@ -62,7 +62,7 @@ import Leaderboard from "../components/Leaderboard.vue";
 
 export default {
   name: "Game",
-  components: { SudokuGrid, Leaderboard },
+  components: {SudokuGrid, Leaderboard},
   data() {
     return {
       gameId: null,

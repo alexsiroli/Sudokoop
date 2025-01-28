@@ -1,13 +1,12 @@
-
 <script>
 export default {
   name: 'SudokuGrid',
   props: {
-    grid: { type: Array, required: true },
-    coloredCell: { type: Object, default: null },
-    final: { type: Boolean, default: false },
-    onFocus: { type: Function, required: false },
-    onDeselect: { type: Function, required: false },
+    grid: {type: Array, required: true},
+    coloredCell: {type: Object, default: null},
+    final: {type: Boolean, default: false},
+    onFocus: {type: Function, required: false},
+    onDeselect: {type: Function, required: false},
 
   },
   data() {
@@ -28,7 +27,7 @@ export default {
         this.grid[rowIndex][colIndex].value = '';
         return;
       }
-      const cellData = { row: rowIndex, col: colIndex, value: parseInt(value, 10) };
+      const cellData = {row: rowIndex, col: colIndex, value: parseInt(value, 10)};
       this.$emit('cell-updated', cellData);
     },
 
@@ -132,15 +131,6 @@ input {
   background-color: white;
 }
 
-.cell-border-right {
-  border-right: 2px solid var(--border-color);
-}
-
-.cell-border-bottom {
-  border-bottom: 2px solid var(--border-color);
-}
-
-
 /* Stili specifici per Single Player */
 .sp-green input {
   background-color: lightgreen;
@@ -156,7 +146,7 @@ input {
   font-weight: bold;
 }
 
-.cell-red input{
+.cell-red input {
   background-color: lightcoral;
   font-weight: bold;
 }
@@ -164,26 +154,30 @@ input {
 .cell-yellow input {
   background-color: blanchedalmond;
 }
+
 .cell-blue input {
   background-color: lightblue;
 }
+
 .cell-yellow-selected input {
   background-color: khaki;
   font-weight: bold;
 }
+
 .cell-blue-selected input {
   background-color: lightskyblue;
   font-weight: bold;
 }
-.cell-gray input{
+
+.cell-gray input {
   background-color: cadetblue;
 }
 
-.cell-white input{
+.cell-white input {
   background-color: white;
 }
 
-.cell-filled input{
+.cell-filled input {
   background-color: rgb(234, 234, 234);
   font-weight: bold;
 }

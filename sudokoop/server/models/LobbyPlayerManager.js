@@ -28,7 +28,7 @@ class LobbyPlayerManager {
 
 
     getPlayersOfLobby(lobbyCode) {
-       return this.lobbyPlayers[lobbyCode];
+        return this.lobbyPlayers[lobbyCode];
     }
 
     getMasterOfLobby(lobbyCode) {

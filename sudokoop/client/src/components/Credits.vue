@@ -6,18 +6,18 @@
       <!-- Testo informativo sul progetto -->
       <p>
         <strong>Sudokoop</strong> è un progetto universitario sviluppato per l’Università di Bologna.
-        <br /><br />
+        <br/><br/>
         <strong>Correlato ai corsi:</strong>
-          <br />
-          <em>Sistemi Distribuiti</em>
-          <br />
-          <em>Applicazioni e Servizi Web</em>.
+        <br/>
+        <em>Sistemi Distribuiti</em>
+        <br/>
+        <em>Applicazioni e Servizi Web</em>.
       </p>
       <p>
         <strong>Sviluppato da:</strong>
-        <br />
+        <br/>
         Alice Mastrilli (<em>alice.mastrilli@studio.unibo.it</em>)
-        <br />
+        <br/>
         Alex Siroli (<em>alex.siroli@studio.unibo.it</em>)
       </p>
 

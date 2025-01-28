@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import SinglePlayer from '@/views/SinglePlayer.vue';
 
 describe('SinglePlayer.vue', () => {
@@ -33,11 +33,11 @@ describe('SinglePlayer.vue', () => {
   it('naviga alla rotta "Game" con la difficoltà selezionata quando si clicca il bottone', async () => {
     const wrapper = factory();
     // Impostazione manuale della difficoltà
-    await wrapper.setData({ selectedDifficulty: 'medium' });
+    await wrapper.setData({selectedDifficulty: 'medium'});
 
     const button = wrapper.find('button');
     await button.trigger('click');
 
-    expect(routerPushMock).toHaveBeenCalledWith({ name: 'Game', query: { difficulty: 'medium' } });
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Game', query: {difficulty: 'medium'}});
   });
 });

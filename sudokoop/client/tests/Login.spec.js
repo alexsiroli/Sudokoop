@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Login from '@/views/Login.vue';
 import axios from '@/main.js';
 import socket from '@/plugins/socket.js';
@@ -43,9 +43,9 @@ describe('Login.vue', () => {
     sessionStorage.setItem('username', 'testuser');
 
     // Rimonta il componente per far scattare il mounted hook
-    const router = { push: jest.fn() };
+    const router = {push: jest.fn()};
     wrapper = mount(Login, {
-      global: { mocks: { $router: router } }
+      global: {mocks: {$router: router}}
     });
 
     // Attendi l'aggiornamento della vista
@@ -61,7 +61,7 @@ describe('Login.vue', () => {
     axios.post.mockResolvedValue({});
 
     // Imposta valori per username e password
-    await wrapper.setData({ username: 'user1', password: 'pass' });
+    await wrapper.setData({username: 'user1', password: 'pass'});
 
     // Simula la chiamata onSubmit
     await wrapper.vm.onSubmit();
@@ -72,15 +72,15 @@ describe('Login.vue', () => {
     });
     expect(socket.emit).toHaveBeenCalledWith('username', 'user1');
     expect(sessionStorage.getItem('username')).toBe('user1');
-    expect(routerPushMock).toHaveBeenCalledWith({ name: 'Home' });
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Home'});
   });
 
   it('gestisce errori di login', async () => {
     axios.post.mockRejectedValue({
-      response: { data: { error: 'Credenziali errate' } }
+      response: {data: {error: 'Credenziali errate'}}
     });
 
-    await wrapper.setData({ username: 'user1', password: 'wrongpass' });
+    await wrapper.setData({username: 'user1', password: 'wrongpass'});
     await wrapper.vm.onSubmit();
 
     expect(wrapper.vm.loginError).toBe('Credenziali errate');
@@ -88,16 +88,16 @@ describe('Login.vue', () => {
 
   it('naviga a Register quando goRegister è chiamato', () => {
     wrapper.vm.goRegister();
-    expect(routerPushMock).toHaveBeenCalledWith({ name: 'Register' });
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Register'});
   });
 
   it('decrementa il countdown e poi naviga a Home in startCountdown', async () => {
     jest.useFakeTimers();
-    const router = { push: jest.fn() };
+    const router = {push: jest.fn()};
 
     // Rimonta il componente con un nuovo router mock
     wrapper = mount(Login, {
-      global: { mocks: { $router: router } }
+      global: {mocks: {$router: router}}
     });
 
     wrapper.vm.countdown = 2;
@@ -107,7 +107,7 @@ describe('Login.vue', () => {
     expect(wrapper.vm.countdown).toBe(1);
 
     jest.advanceTimersByTime(1000);
-    expect(router.push).toHaveBeenCalledWith({ name: 'Home' });
+    expect(router.push).toHaveBeenCalledWith({name: 'Home'});
 
     jest.useRealTimers();
   });

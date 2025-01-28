@@ -33,7 +33,7 @@ class TeamPlayerManager {
         }
     }
 
-    setPlayerAsEliminated (username) {
+    setPlayerAsEliminated(username) {
         const team = this.findTeam(username);
         team.find(p => p.username === username).username = username + "-eliminated";
 
@@ -57,8 +57,7 @@ class TeamPlayerManager {
         const otherTeam = color === 'yellow' ? this.blueTeam : this.yellowTeam;
         this.removeIfPresent(player.username, otherTeam)
         this.removeFromAllPlayersList(player.username);
-        if (!targetTeam.some(p => p.username === player.username))
-        {
+        if (!targetTeam.some(p => p.username === player.username)) {
             targetTeam.push(player);
         }
 
@@ -95,7 +94,6 @@ class TeamPlayerManager {
         this.yellowTeam.forEach(p => p.username = p.username.replace('-eliminated', ''))
         this.blueTeam.forEach(p => p.username = p.username.replace('-eliminated', ''))
     }
-
 }
 
 module.exports = TeamPlayerManager;

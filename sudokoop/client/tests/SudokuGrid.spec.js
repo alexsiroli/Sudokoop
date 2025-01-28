@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import SudokuGrid from '@/components/SudokuGrid.vue';
 
 describe('SudokuGrid.vue', () => {
@@ -22,7 +22,7 @@ describe('SudokuGrid.vue', () => {
 
   beforeEach(() => {
     wrapper = mount(SudokuGrid, {
-      props: { grid: createGrid(), coloredCell: null, final: false },
+      props: {grid: createGrid(), coloredCell: null, final: false},
     });
   });
 
@@ -39,7 +39,7 @@ describe('SudokuGrid.vue', () => {
 
     expect(wrapper.emitted('cell-updated')).toBeTruthy();
     const emitted = wrapper.emitted('cell-updated')[0][0];
-    expect(emitted).toEqual({ row: rowIndex, col: colIndex, value: 5 });
+    expect(emitted).toEqual({row: rowIndex, col: colIndex, value: 5});
 
     expect(wrapper.vm.lastCell).toEqual({
       row: rowIndex,
@@ -85,7 +85,7 @@ describe('SudokuGrid.vue', () => {
   });
 
   it('ritorna last-correct o last-incorrect basato su lastCell', () => {
-    wrapper.vm.lastCell = { row: 1, col: 1, isCorrect: true };
+    wrapper.vm.lastCell = {row: 1, col: 1, isCorrect: true};
     const classNameCorrect = wrapper.vm.getLastCellClass(1, 1);
     expect(classNameCorrect).toBe('last-correct');
 

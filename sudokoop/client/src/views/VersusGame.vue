@@ -25,9 +25,7 @@ export default {
           difficulty: this.difficulty
         });
       socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
-
       this.isInitialized = false;
-      //this.getGameData();
     },
     getGameData() {
       this.isInitialized = false;
@@ -41,7 +39,6 @@ export default {
         this.blueTeam = blueTeam;
         this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       });
-
 
 
     }
@@ -61,9 +58,9 @@ export default {
     <div class="rounded-box game-container">
       <h1 class="title">Gioco Multiplayer Versus</h1>
       <h3>Difficoltà: {{ this.difficulty }}</h3>
-  <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid"
-             :mode="'versus'" :color="color" :yellowTeam ="this.yellowTeam" :blueTeam="this.blueTeam"
-             :getGameData ="getGameData" :restartNewGame = "restartNewGame"></GameMulti>
+      <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid"
+                 :mode="'versus'" :color="color" :yellowTeam="this.yellowTeam" :blueTeam="this.blueTeam"
+                 :getGameData="getGameData" :restartNewGame="restartNewGame"></GameMulti>
     </div>
   </div>
 </template>

@@ -79,7 +79,7 @@ export default {
 
     socket.on("players", (playersArr) => {
       this.players = playersArr;
-      if (playersArr.length > 0 ) {
+      if (playersArr.length > 0) {
         this.inLobby = true;
         this.lobbyCode = sessionStorage.getItem("lobbyCode");
         this.isMaster = playersArr.some(p =>
@@ -93,7 +93,8 @@ export default {
           if (this.isMaster) {
             socket.emit("createCoopGame", {
               lobbyCode: this.lobbyCode,
-              difficulty: this.selectedDifficulty});
+              difficulty: this.selectedDifficulty
+            });
           }
           this.$router.push({name: 'CoopGame'});
         } else {

@@ -12,6 +12,7 @@ class CoopGame {
     getDifficulty() {
         return this.difficulty;
     }
+
     getVite() {
         return this.game.vite;
     }

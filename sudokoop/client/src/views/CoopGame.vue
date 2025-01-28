@@ -69,7 +69,7 @@ export default {
       <p>Vite rimanenti: <span class="hearts">{{ hearts }}</span></p>
 
       <GameMulti v-if="this.isInitialized" :puzzle="sudokuGrid" :mode="'coop'" :changeVite="changeVite"
-                 :color="'gray'" :restartNewGame="restartNewGame" :getGameData ="getGameData"></GameMulti>
+                 :color="'gray'" :restartNewGame="restartNewGame" :getGameData="getGameData"></GameMulti>
     </div>
   </div>
 

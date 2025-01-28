@@ -34,7 +34,7 @@ import socket from "../plugins/socket.js";
 export default {
   name: 'ChatBox',
   props: {
-    lobbyCode: { type: String, required: true }
+    lobbyCode: {type: String, required: true}
   },
   data() {
     return {
@@ -54,7 +54,7 @@ export default {
     this.username = sessionStorage.getItem("username") || "AnonUser";
 
     socket.on("lobbyMessage", (msg) => {
-      this.messages.push({ ...msg, type: 'chat' });
+      this.messages.push({...msg, type: 'chat'});
       this.scrollToBottom();
     });
 
@@ -115,11 +115,11 @@ export default {
     },
     getMessageStyle(message) {
       if (message.type === 'join') {
-        return { color: 'green' };
+        return {color: 'green'};
       } else if (message.type === 'leave') {
-        return { color: 'red' };
+        return {color: 'red'};
       }
-      return { color: this.getUserColor(message.author) };
+      return {color: this.getUserColor(message.author)};
     },
     getUserColor(username) {
       // Restituisce il colore assegnato all'utente dalla mappa, oppure nero se non trovato

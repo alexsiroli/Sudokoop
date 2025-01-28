@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import ChatBox from '@/components/ChatBox.vue';
 import socket from '@/plugins/socket.js';
 
@@ -15,7 +15,7 @@ describe('ChatBox.vue', () => {
   beforeEach(() => {
     sessionStorage.setItem('username', 'testuser');
     wrapper = mount(ChatBox, {
-      props: { lobbyCode }
+      props: {lobbyCode}
     });
   });
 
@@ -29,13 +29,13 @@ describe('ChatBox.vue', () => {
   });
 
   it('non invia messaggi vuoti', () => {
-    wrapper.setData({ newMessage: '    ' });
+    wrapper.setData({newMessage: '    '});
     wrapper.vm.sendMessage();
     expect(socket.emit).not.toHaveBeenCalled();
   });
 
   it('emette lobbyMessage con dati corretti', () => {
-    wrapper.setData({ newMessage: 'Hello' });
+    wrapper.setData({newMessage: 'Hello'});
     wrapper.vm.sendMessage();
     expect(socket.emit).toHaveBeenCalledWith("lobbyMessage", {
       lobbyCode,
@@ -46,19 +46,19 @@ describe('ChatBox.vue', () => {
   });
 
   it('getMessageStyle restituisce verde per join', () => {
-    const style = wrapper.vm.getMessageStyle({ type: 'join' });
-    expect(style).toEqual({ color: 'green' });
+    const style = wrapper.vm.getMessageStyle({type: 'join'});
+    expect(style).toEqual({color: 'green'});
   });
 
   it('getMessageStyle restituisce rosso per leave', () => {
-    const style = wrapper.vm.getMessageStyle({ type: 'leave' });
-    expect(style).toEqual({ color: 'red' });
+    const style = wrapper.vm.getMessageStyle({type: 'leave'});
+    expect(style).toEqual({color: 'red'});
   });
 
   it('getMessageStyle utilizza getUserColor per altri tipi', () => {
-    wrapper.vm.userColorMap = { 'user1': '#fff' };
-    const style = wrapper.vm.getMessageStyle({ type: 'chat', author: 'user1' });
-    expect(style).toEqual({ color: '#fff' });
+    wrapper.vm.userColorMap = {'user1': '#fff'};
+    const style = wrapper.vm.getMessageStyle({type: 'chat', author: 'user1'});
+    expect(style).toEqual({color: '#fff'});
   });
 
   it('getUserColor restituisce nero se utente non trovato', () => {

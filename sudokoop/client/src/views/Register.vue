@@ -5,7 +5,7 @@
 
       <!-- Se già loggato, mostra un messaggio con countdown -->
       <p v-if="alreadyLogged">
-        Sei già loggato come <strong>{{ storedUsername }}</strong>!<br /><br />
+        Sei già loggato come <strong>{{ storedUsername }}</strong>!<br/><br/>
         Verrai reindirizzato tra {{ countdown }}...
       </p>
 
@@ -70,13 +70,13 @@ export default {
         });
         sessionStorage.setItem("username", this.username);
         socket.emit("username", this.username);
-        this.$router.push({ name: "Home" });
+        this.$router.push({name: "Home"});
       } catch (error) {
         this.registerError = error.response?.data?.error || "Errore imprevisto di registrazione";
       }
     },
     goLogin() {
-      this.$router.push({ name: "Login" });
+      this.$router.push({name: "Login"});
     },
     startCountdown() {
       this.countdownInterval = setInterval(() => {
@@ -84,7 +84,7 @@ export default {
           this.countdown--;
         } else {
           clearInterval(this.countdownInterval);
-          this.$router.push({ name: "Home" });
+          this.$router.push({name: "Home"});
         }
       }, 1000);
     }

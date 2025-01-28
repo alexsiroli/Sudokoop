@@ -13,6 +13,7 @@ class VersusGame {
             team: this.teamPlayerManager.getTeams().blueTeam, points: 0
         }
     }
+
     getSudoku() {
         return this.game.sudoku.puzzle;
     }
@@ -20,6 +21,7 @@ class VersusGame {
     getDifficulty() {
         return this.difficulty;
     }
+
     getTeams() {
         return {
             yellowTeam: this.yellow.team, blueTeam: this.blue.team

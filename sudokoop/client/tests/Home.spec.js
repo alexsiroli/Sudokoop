@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Home from '@/views/Home.vue';
 import Leaderboard from '@/components/Leaderboard.vue';
 import Account from '@/components/Account.vue';
@@ -11,7 +11,7 @@ describe('Home.vue', () => {
   beforeEach(() => {
     // Crea un mock per $router con push
     routerPushMock = jest.fn();
-    const router = { push: routerPushMock };
+    const router = {push: routerPushMock};
 
     // Monta il componente Home con i componenti stub per Leaderboard, Account e Credits
     wrapper = mount(Home, {
@@ -49,7 +49,7 @@ describe('Home.vue', () => {
 
     expect(routerPushMock).toHaveBeenCalledWith({
       name: 'Game',
-      query: { difficulty: 'medium' }
+      query: {difficulty: 'medium'}
     });
   });
 
@@ -58,7 +58,7 @@ describe('Home.vue', () => {
     const multiplayerButton = wrapper.findAll('button.button').find(btn => btn.text() === 'Crea/Entra in Lobby');
     await multiplayerButton.trigger('click');
 
-    expect(routerPushMock).toHaveBeenCalledWith({ name: 'Lobby' });
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Lobby'});
   });
 
   it('mostra Leaderboard overlay quando si clicca su Mostra Classifica', async () => {

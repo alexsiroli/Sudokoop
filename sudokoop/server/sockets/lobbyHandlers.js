@@ -12,7 +12,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
   // Join lobby
   socket.on("joinLobby", (data) => {
-    const { username, code } = data;
+    const {username, code} = data;
     const result = lobbyController.joinLobby(code, username);
     if (!result.success) {
       if (result.reason === "not-exist") {
@@ -35,7 +35,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   // Gestione chat di lobby
   socket.on("lobbyMessage", (data) => {
     // data: { lobbyCode, author, text }
-    const { lobbyCode, author, text } = data;
+    const {lobbyCode, author, text} = data;
     io.in(lobbyCode).emit("lobbyMessage", {
       author,
       text,
@@ -45,7 +45,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
 
   // Abbandono della lobby: rimuove l'utente dalla lobby e lascia la room
   socket.on("leaveLobby", (data) => {
-    const { code, username } = data;
+    const {code, username} = data;
     lobbyController.removePlayerFromLobby(code, username);
     socket.leave(code);
     io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));

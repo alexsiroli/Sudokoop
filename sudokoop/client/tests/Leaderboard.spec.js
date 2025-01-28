@@ -1,4 +1,4 @@
-import { mount, flushPromises } from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import Leaderboard from '@/components/Leaderboard.vue';
 import axios from '@/main.js';
 
@@ -41,9 +41,9 @@ describe('Leaderboard.vue', () => {
 
   it('recupera i dati della classifica al mount', async () => {
     const fakeData = [
-      { username: 'user1', milliseconds: 90000, difficulty: 'easy' }
+      {username: 'user1', milliseconds: 90000, difficulty: 'easy'}
     ];
-    axios.get.mockResolvedValue({ data: fakeData });
+    axios.get.mockResolvedValue({data: fakeData});
 
     // Rimonta il componente per attivare onMounted con il nuovo mock
     wrapper = mount(Leaderboard);
@@ -56,10 +56,10 @@ describe('Leaderboard.vue', () => {
 
   it('visualizza correttamente le righe della classifica quando il caricamento è terminato', async () => {
     const fakeData = [
-      { username: 'user1', milliseconds: 90000, difficulty: 'easy' },
-      { username: 'user2', milliseconds: 120000, difficulty: 'medium' }
+      {username: 'user1', milliseconds: 90000, difficulty: 'easy'},
+      {username: 'user2', milliseconds: 120000, difficulty: 'medium'}
     ];
-    axios.get.mockResolvedValue({ data: fakeData });
+    axios.get.mockResolvedValue({data: fakeData});
 
     wrapper = mount(Leaderboard);
     await flushPromises();

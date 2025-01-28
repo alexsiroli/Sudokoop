@@ -22,7 +22,7 @@ export default {
   methods: {
     startGame() {
       // Naviga a /game con il query param della difficoltà
-      this.$router.push({ name: 'Game', query: { difficulty: this.selectedDifficulty } });
+      this.$router.push({name: 'Game', query: {difficulty: this.selectedDifficulty}});
     },
   },
 };

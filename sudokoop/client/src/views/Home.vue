@@ -68,7 +68,7 @@ import Credits from "../components/Credits.vue";
 
 export default {
   name: 'Home',
-  components: {Credits, Leaderboard, Account },
+  components: {Credits, Leaderboard, Account},
   data() {
     return {
       selectedDifficulty: 'easy',
@@ -79,10 +79,10 @@ export default {
   },
   methods: {
     playSinglePlayer() {
-      this.$router.push({ name: 'Game', query: { difficulty: this.selectedDifficulty } });
+      this.$router.push({name: 'Game', query: {difficulty: this.selectedDifficulty}});
     },
     goToLobby() {
-      this.$router.push({ name: 'Lobby' });
+      this.$router.push({name: 'Lobby'});
     },
     showLeaderboard() {
       this.leaderboardVisible = true;
@@ -132,6 +132,7 @@ export default {
   gap: 20px;
   margin-top: 20px;
 }
+
 .footer-item {
   display: flex;
 }

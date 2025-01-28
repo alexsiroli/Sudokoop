@@ -49,7 +49,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     })
 
 
-
     socket.on("createVersusGame", (data) => {
         gameController.createVersusGame(data.lobbyCode, data.difficulty);
     });
@@ -68,18 +67,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     socket.on("startVersusGame", (lobbyCode) => {
         io.to(lobbyCode).emit("startGame")
     });
-/*
-    socket.on("getTeamByColor", (data) => {
-        const {color, lobbyCode} = data;
-        const game =  gameController.getGameOfLobby(lobbyCode);
-        io.to(lobbyCode).emit("teams", {
-            playerTeam: color === "Gialla" ? game.getTeams().yellowTeam : game.getTeams().blueTeam,
-            teamPoints: color === "Gialla" ? game.getTeamsPoint().yellowTeam : game.getTeamsPoint().blueTeam,
-        })
-    })
 
-
- */
     socket.on("backToLobby", (lobbyCode) => {
         gameController.removeGame(lobbyCode);
     })
@@ -102,7 +90,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     })
 
 
-
     socket.on('cellUpdateMulti', (data) => {
         const {cellData, lobbyCode, username} = data;
         const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
@@ -112,10 +99,11 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
             io.to(lobbyCode).emit("insertedNumber", partialResult)
         }
         io.to(lobbyCode).emit("afterUpdating",
-            { data: result,
-                username: username});
+            {
+                data: result,
+                username: username
+            });
     });
-
 
 
     // Avvio partita single player
@@ -149,7 +137,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
             colIndex: colIndex,
         })
     })
-
 
 
     // Aggiornamento cella

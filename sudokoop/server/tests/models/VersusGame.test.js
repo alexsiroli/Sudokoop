@@ -158,7 +158,7 @@ describe("Logic of Versus Game", () => {
         expect(resultWrong.yellowPoint).toBe(0);
         expect(resultWrong.yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
         expect(resultWrong.bluePoint).toBe(0);
-        expect(resultWrong.blueTeam).toEqual([{username:'player2-eliminated', isMaster: false},
+        expect(resultWrong.blueTeam).toEqual([{username: 'player2-eliminated', isMaster: false},
             {username: 'masterUser', isMaster: true}]);
     });
 
@@ -279,5 +279,5 @@ describe("Logic of Versus Game", () => {
             username: 'masterUser', isMaster: true
         }]);
         expect(versusGame.blue.points).toBe(0);
-    } )
+    })
 });

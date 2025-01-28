@@ -1,4 +1,4 @@
-import { mount, flushPromises } from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import Game from '@/views/Game.vue';
 import axios from '@/main.js';
 import SudokuGrid from '@/components/SudokuGrid.vue';
@@ -23,7 +23,7 @@ describe('Game.vue', () => {
             push: routerPushMock,
           },
           $route: {
-            query: { difficulty: 'easy' }
+            query: {difficulty: 'easy'}
           }
         },
         stubs: {
@@ -43,7 +43,7 @@ describe('Game.vue', () => {
   });
 
   it('calcola correttamente la proprietà computed hearts', async () => {
-    await wrapper.setData({ vite: 3 });
+    await wrapper.setData({vite: 3});
     expect(wrapper.vm.hearts).toBe('❤️❤️❤️');
   });
 
@@ -66,7 +66,7 @@ describe('Game.vue', () => {
             push: routerPushMock,
           },
           $route: {
-            query: { difficulty: 'easy' }
+            query: {difficulty: 'easy'}
           }
         },
         stubs: {
@@ -85,8 +85,8 @@ describe('Game.vue', () => {
   });
 
   it('gestisce l\'aggiornamento di una cella con successo', async () => {
-    const cellData = { row: 0, col: 0, value: 5 };
-    wrapper.setData({ gameId: 'game1' });
+    const cellData = {row: 0, col: 0, value: 5};
+    wrapper.setData({gameId: 'game1'});
 
     axios.post.mockResolvedValue({
       data: {
@@ -114,8 +114,8 @@ describe('Game.vue', () => {
   });
 
   it('gestisce errori nell\'inserimento del numero', async () => {
-    const cellData = { row: 0, col: 0, value: 5 };
-    wrapper.setData({ gameId: 'game1' });
+    const cellData = {row: 0, col: 0, value: 5};
+    wrapper.setData({gameId: 'game1'});
 
     axios.post.mockRejectedValue(new Error('Network Error'));
     console.error = jest.fn();
@@ -126,7 +126,7 @@ describe('Game.vue', () => {
   });
 
   it('formatta il tempo correttamente', () => {
-    wrapper.setData({ timeSpent: 125000 }); // 2 minuti e 5 secondi
+    wrapper.setData({timeSpent: 125000}); // 2 minuti e 5 secondi
     expect(wrapper.vm.formattedTime).toBe('02:05');
   });
 
@@ -213,7 +213,7 @@ describe('Game.vue', () => {
   it('inizializza correttamente la griglia con soluzione con initializeGridWithSolution', () => {
     // Imposta una griglia precedente e un puzzle iniziale
     wrapper.setData({
-      sudokuGrid: Array(9).fill(null).map(() => Array(9).fill({ isGreen: false })),
+      sudokuGrid: Array(9).fill(null).map(() => Array(9).fill({isGreen: false})),
       initialPuzzle: '-'.repeat(81)
     });
 

@@ -7,10 +7,12 @@ class Game {
         this.gameOver = false;
         this.win = false;
     }
+
     insertNumberWithoutCheck(row, col, num) {
         const index = row * 9 + col;
         return this.sudoku.puzzle.substring(0, index) + num + this.sudoku.puzzle.substring(index + 1);
     }
+
     // Metodo per inserire un numero in una cella
     insertNumber(row, col, num) {
         let message;

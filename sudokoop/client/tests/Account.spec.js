@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import AccountOverlay from '@/components/Account.vue';
 import axios from '@/main.js';
 
@@ -8,7 +8,7 @@ jest.mock('@/main.js', () => ({
 
 describe('AccountOverlay.vue', () => {
   let wrapper;
-  const fakeStats = { wins: 5, losses: 3 };
+  const fakeStats = {wins: 5, losses: 3};
 
   beforeEach(() => {
     // Simula un utente loggato
@@ -24,7 +24,7 @@ describe('AccountOverlay.vue', () => {
   });
 
   it('inizializza username da sessionStorage e chiama fetchStats al mount', async () => {
-    axios.get.mockResolvedValue({ data: fakeStats });
+    axios.get.mockResolvedValue({data: fakeStats});
 
     // Chiamata manuale per fetchStats poiché onMounted l'ha già invocata
     await wrapper.vm.fetchStats();
@@ -54,7 +54,7 @@ describe('AccountOverlay.vue', () => {
   it('chiama logout e naviga a Login', async () => {
     // Simula il metodo del router
     const pushSpy = jest.fn();
-    wrapper.vm.$router = { push: pushSpy };
+    wrapper.vm.$router = {push: pushSpy};
 
     // Imposta un utente loggato
     sessionStorage.setItem('username', 'testuser');
@@ -65,6 +65,6 @@ describe('AccountOverlay.vue', () => {
     expect(sessionStorage.getItem('username')).toBeNull();
 
     // Verifica che la navigazione a Login sia stata invocata
-    expect(pushSpy).toHaveBeenCalledWith({ name: "Login" });
+    expect(pushSpy).toHaveBeenCalledWith({name: "Login"});
   });
 });
