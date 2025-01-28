@@ -75,6 +75,7 @@ class LobbyController {
     getPlayersOfLobby(code) {
         const lobby = this.findLobby(code);
         if (!lobby) return [];
+        console.log("invio i players " + playerManager.getPlayersOfLobby(code))
         // Invece di .map(...) restituisco l'intero array di obj
         return playerManager.getPlayersOfLobby(code);
     }

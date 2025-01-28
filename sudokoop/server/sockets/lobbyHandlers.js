@@ -23,7 +23,10 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       return;
     }
     socket.join(code);
-    socket.emit("joinLobby", "Ok");
+    socket.emit("joinLobby", {
+      res: "Ok",
+      lobbyCode: code,
+    });
     // Re-invia la lista aggiornata (array di obj)
     io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));
   });
@@ -32,14 +35,12 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
   // Gestione chat di lobby
   socket.on("lobbyMessage", (data) => {
     // data: { lobbyCode, author, text }
-    console.log("[DELME] SERVER: lobbyMessage =>", data);
     const { lobbyCode, author, text } = data;
     io.in(lobbyCode).emit("lobbyMessage", {
       author,
       text,
       timestamp: Date.now()
     });
-    console.log("[DELME] SERVER: => Inoltrato 'lobbyMessage' a:", lobbyCode);
   });
 
   // Abbandono della lobby: rimuove l'utente dalla lobby e lascia la room
@@ -47,11 +48,7 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
     const { code, username } = data;
     lobbyController.removePlayerFromLobby(code, username);
     socket.leave(code);
-    const updatedLobby = lobbyController.findLobby(code);
-
-    if (updatedLobby) {
-      io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));
-    }
+    io.to(code).emit("players", lobbyController.getPlayersOfLobby(code));
   });
 
   // Recupero giocatori di una lobby specifica
@@ -69,37 +66,4 @@ module.exports = function registerLobbyHandlers(socket, io, lobbyController) {
       io.to(lobbyCode).emit("players", lobbyController.getPlayersOfLobby(lobbyCode));
     }
   });
-
-
-
-
-
-
-
-
-  /*socket.on("checkForStartMultiGame", (data) => {
-    const { lobbyCode, mode, username, difficulty } = data;
-    const isMaster = lobbyController.isMaster(lobbyCode, username);
-    if (!isMaster) {
-      socket.emit("notMaster");
-      return;
-    }
-    // se ci sono meno di due giocatori nella lobby, il gioco non può iniziare
-    if (lobbyController.getPlayersOfLobby(lobbyCode).length < 2) {
-      io.to(lobbyCode).emit("notEnoughPlayers");
-      return;
-    }
-    // inizia il gioco, chiedo al gestore dei game di mandare la griglia
-    console.log("mando agli altri il sudoku")
-    // const game = gameController.newMultiPlayerGame(difficulty);
-    //console.log("game" +  game.sudoku.puzzle);
-
-    // il gioco puo partire: viene creato
-
-    gameController.createCoopGame(lobbyCode, difficulty, lobbyController.getPlayersOfLobby(lobbyCode));
-
-    io.to(lobbyCode).emit("gameCanStart", mode);
-  });
-
-   */
 };

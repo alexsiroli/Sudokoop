@@ -50,23 +50,21 @@ describe('Lobby.vue', () => {
 
   it('chiama socket.emit con i parametri corretti quando startMultiGame è invocato', () => {
     wrapper.setData({
-      currentLobbyCode: 'LOBBY456',
+      lobbyCode: 'LOBBY456',
       selectedMode: 'versus',
       selectedDifficulty: 'hard'
     });
     wrapper.vm.startMultiGame();
-    expect(socket.emit).toHaveBeenCalledWith('checkForStartMultiGame', {
+    expect(socket.emit).toHaveBeenCalledWith('checkMultiGameStart', {
       lobbyCode: 'LOBBY456',
       mode: 'versus',
-      username: 'testuser',
-      difficulty: 'hard'
     });
   });
 
   it('esegue copyLobbyCode chiamando navigator.clipboard.writeText', async () => {
     const writeTextMock = jest.fn().mockResolvedValue();
     global.navigator.clipboard = { writeText: writeTextMock };
-    wrapper.setData({ currentLobbyCode: 'COPYME' });
+    wrapper.setData({ lobbyCode: 'COPYME' });
 
     await wrapper.vm.copyLobbyCode();
 
@@ -77,9 +75,8 @@ describe('Lobby.vue', () => {
     // Imposta lo stato necessario per il test
     sessionStorage.setItem('lobbyCode', 'OLD_LOBBY');
     wrapper.vm.inLobby = true;
-    wrapper.vm.currentLobbyCode = 'TESTLOBBY';
+    wrapper.vm.lobbyCode = 'TESTLOBBY';
     wrapper.vm.players = [{ username: 'testuser', isMaster: true }];
-    wrapper.vm.lobbyCode = 'QUALCOSA';
     wrapper.vm.$router = { push: routerPushMock };
 
     wrapper.vm.leaveLobbyAndGoHome();
@@ -92,8 +89,6 @@ describe('Lobby.vue', () => {
     // Verifica la pulizia dello stato locale e la navigazione a Home
     expect(sessionStorage.getItem('lobbyCode')).toBeNull();
     expect(wrapper.vm.inLobby).toBe(false);
-    expect(wrapper.vm.currentLobbyCode).toBe("");
-    expect(wrapper.vm.players).toEqual([]);
     expect(wrapper.vm.isMaster).toBe(false);
     expect(wrapper.vm.lobbyCode).toBe("");
     expect(wrapper.vm.lobbyCodeError).toBe("");

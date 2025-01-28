@@ -14,6 +14,9 @@ class LobbyPlayerManager {
         // rimuovi dalla lobby
         this.lobbyPlayers[lobbyCode] = this.lobbyPlayers[lobbyCode].filter(player => player.username !== username);
         //assegna nuovo master se necessario
+        if (this.lobbyPlayers[lobbyCode] < 1) {
+            return [];
+        }
         const masterPlayer = this.lobbyPlayers[lobbyCode].some(player => player.isMaster);
         if (!masterPlayer && this.lobbyPlayers[lobbyCode].length > 0) {
             const master = this.lobbyPlayers[lobbyCode][0];

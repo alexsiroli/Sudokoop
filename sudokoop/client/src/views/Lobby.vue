@@ -8,7 +8,6 @@ export default {
   data() {
     return {
       inLobby: false,
-      currentLobbyCode: "",
       players: [], // array di oggetti { username, isMaster }
       isMaster: false,
       selectedMode: "coop",
@@ -32,24 +31,26 @@ export default {
 
     startMultiGame() {
       socket.emit("checkMultiGameStart", {
-        lobbyCode: this.currentLobbyCode,
+        lobbyCode: this.lobbyCode,
         mode: this.selectedMode,
       });
     },
 
     leaveLobbyAndGoHome() {
       const username = sessionStorage.getItem('username');
-      const lobbyCode = this.currentLobbyCode;
+      const lobbyCode = this.lobbyCode;
       // Se l'utente è attualmente in lobby, invia l'evento di abbandono al server
       if (this.inLobby && lobbyCode && username) {
         socket.emit("leaveLobby", {code: lobbyCode, username: username});
       }
+      this.inLobby = false;
+      this.lobbyCode = "";
       sessionStorage.removeItem("lobbyCode");
       this.$router.push({name: 'Home'});
     },
 
     copyLobbyCode() {
-      navigator.clipboard.writeText(this.currentLobbyCode)
+      navigator.clipboard.writeText(this.lobbyCode)
         .then(() => console.log("Codice lobby copiato!"))
         .catch(err => console.error("Errore nella copia:", err));
     }
@@ -58,15 +59,15 @@ export default {
   mounted() {
     socket.on("onLobbyCreated", (code) => {
       sessionStorage.setItem("lobbyCode", code);
-      this.currentLobbyCode = code;
+      this.lobbyCode = code;
       this.inLobby = true;
       this.isMaster = true;
     });
 
     socket.on("joinLobby", (res) => {
-      if (res === "Ok") {
-        sessionStorage.setItem("lobbyCode", this.lobbyCode);
-        this.currentLobbyCode = this.lobbyCode;
+      if (res.res === "Ok") {
+        sessionStorage.setItem("lobbyCode", res.lobbyCode);
+        this.lobbyCode = res.lobbyCode;
         this.inLobby = true;
         this.errorOnStart = "";
       } else if (res === "Not exists") {
@@ -78,10 +79,12 @@ export default {
 
     socket.on("players", (playersArr) => {
       this.players = playersArr;
-      this.inLobby = true;
-      this.currentLobbyCode = sessionStorage.getItem("lobbyCode");
-      this.isMaster = playersArr.some(p =>
-        p.username === sessionStorage.getItem('username') && p.isMaster);
+      if (playersArr.length > 0 ) {
+        this.inLobby = true;
+        this.lobbyCode = sessionStorage.getItem("lobbyCode");
+        this.isMaster = playersArr.some(p =>
+          p.username === sessionStorage.getItem('username') && p.isMaster);
+      }
     });
 
     socket.on('gameCanStart', (data) => {
@@ -89,7 +92,7 @@ export default {
         if (data.mode === "coop") {
           if (this.isMaster) {
             socket.emit("createCoopGame", {
-              lobbyCode: this.currentLobbyCode,
+              lobbyCode: this.lobbyCode,
               difficulty: this.selectedDifficulty});
           }
           this.$router.push({name: 'CoopGame'});
@@ -134,7 +137,7 @@ export default {
       <div v-else>
         <p>
           Codice Lobby:
-          <strong>{{ currentLobbyCode }}</strong>
+          <strong>{{ this.lobbyCode }}</strong>
           <button class="copy-button" @click="copyLobbyCode">Copia</button>
         </p>
         <h3>Giocatori:</h3>
@@ -146,7 +149,7 @@ export default {
 
         <!-- ChatBox visibile solo se inLobby è true -->
         <div style="margin-top: 20px;" v-if="inLobby">
-          <chat-box :lobbyCode="currentLobbyCode"/>
+          <chat-box :lobbyCode="this.lobbyCode"/>
         </div>
 
         <!-- Sezione Master spostata sotto la ChatBox -->
