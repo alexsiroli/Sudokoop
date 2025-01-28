@@ -27,10 +27,8 @@ export default {
     },
 
     restartNewGame() {
-      console.log("Restarting new Game")
       // Se sono il master, creo il gioco
       //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-      console.log("difficulty " + this.difficulty)
       socket.emit('createCoopGame',
         {
           lobbyCode: sessionStorage.getItem('lobbyCode'),
@@ -38,7 +36,6 @@ export default {
         });
       socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
       this.isInitialized = false;
-     // this.getGameData();
     },
 
     getGameData() {

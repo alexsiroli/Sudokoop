@@ -133,15 +133,11 @@ export default {
           col: cellData.col,
           value: cellData.value
         });
-        console.log("RESPONE "  + response.data)
         const data = response.data;
-
         this.vite = data.vite;
-
         if (data.gameOver) {
           // Ferma il timer
           this.stopTimer();
-
           // Determina se è vittoria o sconfitta
           let result = "lose";
           if (data.message.startsWith("Hai vinto")) {

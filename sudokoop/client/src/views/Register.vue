@@ -68,7 +68,6 @@ export default {
           userName: this.username,
           password: this.password
         });
-        console.log("Registrazione riuscita");
         sessionStorage.setItem("username", this.username);
         socket.emit("username", this.username);
         this.$router.push({ name: "Home" });

@@ -126,7 +126,6 @@ class GameController {
     getGameOfLobby(lobbyCode) {
         const game = this.lobbyGame[lobbyCode];
         if (!game) {
-            console.log("Lobby not found for code: " + lobbyCode);
             return null;
         }
         return game;

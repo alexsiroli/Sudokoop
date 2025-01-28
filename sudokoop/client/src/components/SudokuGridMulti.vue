@@ -33,13 +33,9 @@ export default {
     },
 
     onCellSelect(rowIndex, colIndex) {
-      console.log("hai selezionato ! ")
-      //this.setCellColor(rowIndex, colIndex, 'gray');
       this.onFocus(rowIndex, colIndex);
     },
     onCellDeselect(rowIndex, colIndex) {
-      console.log("hai deselezionato!")
-      //this.setCellColor(rowIndex, colIndex, 'white');
       this.onDeselect(rowIndex, colIndex);
     },
 
@@ -47,7 +43,6 @@ export default {
     setCellColor(rowIndex, colIndex, color) {
       const cell = this.grid[rowIndex][colIndex];
       if (!cell) return;
-      console.log("changinbg color to " + color)
       // Imposta il colore direttamente
       cell.color = color;
     },

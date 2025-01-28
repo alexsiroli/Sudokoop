@@ -39,52 +39,12 @@ class LobbyController {
         return {success: true};
     }
 
-
-    /*
-        emptyTeam (lobbyCode) {
-            if (this.lobbyTeams[lobbyCode]) {
-                this.lobbyTeams[lobbyCode] = {
-                    yellowTeam: [],
-                    blueTeam: [],
-                };
-            }
-        }
-
-
-
-
-        getTeams(lobbyCode) {
-           return gameController.getGameOfLobby(lobbyCode).getTeams();
-        }
-
-     */
-
-
-    /*    createNewVersusGame (lobbyCode, difficulty) {
-            GameController.createVersusGame(lobbyCode, new VersusGame(difficulty,
-                this.lobbyTeams[lobbyCode].yellowTeam, this.lobbyTeams[lobbyCode].blueTeam));
-        }
-
-        isVersusGame(lobbyCode) {
-            return GameController.getGameOfLobby(lobbyCode) instanceof VersusGame;
-        }
-
-     */
-
-
     getPlayersOfLobby(code) {
         const lobby = this.findLobby(code);
         if (!lobby) return [];
-        console.log("invio i players " + playerManager.getPlayersOfLobby(code))
         // Invece di .map(...) restituisco l'intero array di obj
         return playerManager.getPlayersOfLobby(code);
     }
-
-    /*getPlayerFromUsername(code, username) {
-        return this.findLobby(code).players.find(p => p.username === username);
-    }
-
-     */
 
     isMaster(code, username) {
         const lobby = this.findLobby(code);

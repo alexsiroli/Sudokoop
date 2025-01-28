@@ -52,16 +52,13 @@ export default {
   },
   mounted() {
     this.username = sessionStorage.getItem("username") || "AnonUser";
-    console.log("[DELME] ChatBox mounted => user:", this.username, " lobbyCode prop:", this.lobbyCode);
 
     socket.on("lobbyMessage", (msg) => {
-      console.log("[DELME] ChatBox => 'lobbyMessage' ricevuto:", msg);
       this.messages.push({ ...msg, type: 'chat' });
       this.scrollToBottom();
     });
 
     socket.on("players", (playersArr) => {
-      console.log("[DELME] ChatBox => 'players' evento ricevuto:", playersArr);
       // Determina i nuovi giocatori e quelli che hanno lasciato la lobby
       const newPlayers = playersArr.filter(p => !this.knownPlayers.some(k => k.username === p.username));
       const leftPlayers = this.knownPlayers.filter(k => !playersArr.some(p => p.username === k.username));
@@ -97,18 +94,14 @@ export default {
   unmounted() {
     socket.off("lobbyMessage");
     socket.off("players");
-    console.log("[DELME] ChatBox unmounted => listener rimosso");
   },
   methods: {
     sendMessage() {
-      console.log("[DELME] ChatBox => sendMessage() chiamato. newMessage:", this.newMessage);
 
       if (!this.newMessage.trim()) {
-        console.log("[DELME] ChatBox => messaggio vuoto, non invio.");
         return;
       }
       if (!this.lobbyCode) {
-        console.warn("[DELME] ChatBox => nessun lobbyCode disponibile.");
         return;
       }
 
@@ -118,7 +111,6 @@ export default {
         text: this.newMessage
       });
 
-      console.log("[DELME] ChatBox => messaggio inviato");
       this.newMessage = "";
     },
     getMessageStyle(message) {

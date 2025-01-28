@@ -17,7 +17,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("createCoopGame", (data) => {
-        console.log("GAME HADLER creating coop Game" + data.lobbyCode + data.difficulty);
         gameController.createCoopGame(data.lobbyCode, data.difficulty);
     });
 
@@ -46,14 +45,12 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("joinTeam", (data) => {
         const {lobbyCode, color, player} = data;
-        console.log("joiningTEams" + color + "by " + player.username)
         io.to(lobbyCode).emit("onJoinTeam", gameController.addPlayerToTeam(lobbyCode, color, player));
     })
 
 
 
     socket.on("createVersusGame", (data) => {
-        console.log("GAME HADLER creating coop Game" + data.lobbyCode + data.difficulty);
         gameController.createVersusGame(data.lobbyCode, data.difficulty);
     });
 
@@ -112,10 +109,8 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
 
         if (!result.gameOver) {
-            console.log("mando il parziale" + partialResult)
             io.to(lobbyCode).emit("insertedNumber", partialResult)
         }
-        console.log("result after update " + result);
         io.to(lobbyCode).emit("afterUpdating",
             { data: result,
                 username: username});

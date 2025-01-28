@@ -81,11 +81,8 @@ export default {
     })
 
     socket.on("onJoinTeam", (res) => {
-      console.log("onJoinTeam", res);
       this.blueTeam = res.blueTeam;
-      console.log("blu team " + this.blueTeam)
       this.yellowTeam = res.yellowTeam;
-      console.log("yellow tea " + this.yellowTeam)
     })
 
   },

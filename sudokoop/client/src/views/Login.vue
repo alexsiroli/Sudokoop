@@ -72,12 +72,10 @@ export default {
           userName: this.username,
           password: this.password
         });
-        console.log("Login riuscito");
         socket.emit("username", this.username);
         sessionStorage.setItem("username", this.username);
         this.$router.push({ name: "Home" });
       } catch (error) {
-        console.log("Login fallito:", error.response?.data?.error);
         this.loginError = error.response?.data?.error || "Errore imprevisto di login";
       }
     },

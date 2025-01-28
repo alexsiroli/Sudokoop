@@ -30,7 +30,6 @@ export default {
 
     // chiamato la prima inizializzazione oppure quando ho perso e devo riiniziare
     startNewGame() {
-      //console.log("puzzle : " + this.puzzle);
       if (this.gameOver && this.isMaster) {
         this.restartNewGame();
       }
@@ -58,7 +57,6 @@ export default {
           const isReadOnly = char !== "-";
           const previous = this.sudokuGrid[i] && this.sudokuGrid[i][j];
           const previousCol = previous === undefined ? 'white' : this.sudokuGrid[i][j].color;
-          //console.log("previous", previous);
           row.push({
             value: isReadOnly ? char : "",
             readOnly: this.firstInitialization ? isReadOnly : this.sudokuGrid[i][j].readOnly,
@@ -72,12 +70,10 @@ export default {
 
     // inserimento di un valore
     handleCellUpdate(cellData) {
-      console.log("handleCellUpdate", cellData);
       // dico al server che ho inserito
       socket.emit("cellUpdateMulti", {
         cellData: cellData,
         lobbyCode: sessionStorage.getItem("lobbyCode"),
-      //color: this.team,
         username: sessionStorage.getItem("username"),
       });
 
@@ -128,9 +124,7 @@ export default {
     },
 
     setReadOnlyForEliminated(username) {
-      console.log("Setting readOnlyForEliminated user");
       if (sessionStorage.getItem('username') === username) {
-        console.log(" I am eliminated");
         for (let i = 0; i < 9; i++) {
           for (let j = 0; j < 9; j++) {
             this.sudokuGrid[i][j].readOnly = true;
@@ -175,7 +169,6 @@ export default {
     });
 
     socket.on("teams", (data) => {
-      console.log("receiving teams " + data)
       this.yellow.team = data.yellowTeam;
       this.blue.team = data.blueTeam;
     });
@@ -187,15 +180,12 @@ export default {
 
     // reagisco al focus di un utente
     socket.on("cellFocus", (data) => {
-      console.log("cellFocus!!!");
       const {rowIndex, colIndex, color} = data;
       this.changeCelColor(rowIndex, colIndex, color);
     });
 
     socket.on("cellDeselect", (data) => {
-      console.log("DESELECTING cell")
       const {rowIndex, colIndex} = data;
-      console.log("color " + this.sudokuGrid[rowIndex][colIndex].color)
       if (this.sudokuGrid[rowIndex][colIndex].color !== "red" &&
         !this.sudokuGrid[rowIndex][colIndex].color.endsWith("-selected")) {
         this.changeCelColor(rowIndex, colIndex, 'white');
@@ -209,7 +199,6 @@ export default {
 
     socket.on("afterUpdating", (result) => {
       const {data,  username} = result;
-      console.log("ADDED NUMBER")
       // aggiorna vite se coop
       if (this.mode === "coop") {
         this.changeVite(data.vite);
@@ -236,8 +225,6 @@ export default {
         // ho perso
         if (!data.win) {
           this.initializeGridWithSolution(data.solution);
-
-          //this.onEliminatedPlayer(data.eliminated, data.color);
         }
         else {
           const {row, col} = data.cellData;
@@ -245,7 +232,6 @@ export default {
           // vinto: imposti l'ultimo inserimento a verde e imposta il valore
           this.sudokuGrid[row][col].value = data.solution[index];
           this.sudokuGrid[row][col].readOnly = true;
-
           this.changeCelColor(row, col, color+"-selected")
         }
         // non ho finito vado avanti
@@ -255,7 +241,6 @@ export default {
 
           if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
             if (this.lastCell != null) {
-              console.log("lastCell is null")
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
             this.sudokuGrid[row][col].readOnly = true;
