@@ -29,10 +29,12 @@ export default {
       });
     },
 
+    // chiamata solo dal master
     startMultiGame() {
       socket.emit("checkMultiGameStart", {
         lobbyCode: this.lobbyCode,
         mode: this.selectedMode,
+        difficulty: this.selectedDifficulty
       });
     },
 
@@ -79,8 +81,8 @@ export default {
 
     socket.on("players", (playersArr) => {
       this.players = playersArr;
-      if (playersArr.length > 0) {
-        this.inLobby = true;
+      this.inLobby = sessionStorage.getItem('lobbyCode') !== null;
+      if (playersArr.length > 0 && this.inLobby) {
         this.lobbyCode = sessionStorage.getItem("lobbyCode");
         this.isMaster = playersArr.some(p =>
           p.username === sessionStorage.getItem('username') && p.isMaster);
@@ -88,20 +90,17 @@ export default {
     });
 
     socket.on('gameCanStart', (data) => {
+      console.log("game can start i'm in lobby ")
+
       if (data.res.res) {
         if (data.mode === "coop") {
-          if (this.isMaster) {
-            socket.emit("createCoopGame", {
-              lobbyCode: this.lobbyCode,
-              difficulty: this.selectedDifficulty
-            });
-          }
           this.$router.push({name: 'CoopGame'});
         } else {
           this.$router.push({name: 'SelectTeamVersusGame'});
         }
       } else {
-        this.errorOnStart = data.message;
+        socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
+        this.errorOnStart = data.res.message;
       }
     })
 

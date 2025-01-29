@@ -8,12 +8,18 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
 
     socket.on("checkMultiGameStart", (data) => {
-        const {lobbyCode, mode} = data;
+        const {lobbyCode, mode, difficulty} = data;
+        console.log("check multigame start")
+        let check = gameController.multiPlayerGameCanStart(lobbyCode, mode);
+        if (check.res && mode === 'coop') {
+            gameController.createCoopGame(data.lobbyCode, data.difficulty);
+        }
         io.to(lobbyCode).emit("gameCanStart", {
             res: gameController.multiPlayerGameCanStart(lobbyCode, mode),
-            mode: mode
-        });
+            mode: mode,
+            difficulty: difficulty,
 
+        });
     });
 
     socket.on("createCoopGame", (data) => {

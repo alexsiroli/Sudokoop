@@ -30,6 +30,7 @@ export default {
       if (this.gameOver && this.isMaster) {
         this.restartNewGame();
       }
+      console.log("vite nel multiplayer" + this.vite)
       this.isInitialized = true;
       this.gameOver = false;
       this.firstInitialization = true;
@@ -135,6 +136,7 @@ export default {
           code: sessionStorage.getItem("lobbyCode"),
           username: sessionStorage.getItem("username"),
         });
+      sessionStorage.removeItem('lobbyCode')
       this.$router.push({name: 'Lobby'});
     },
     backToLobby() {
@@ -168,8 +170,7 @@ export default {
     });
 
     socket.on("startGame", () => {
-      this.getGameData();
-      this.startNewGame();
+        this.$router.push({name: 'Lobby'});
     });
 
     // reagisco al focus di un utente

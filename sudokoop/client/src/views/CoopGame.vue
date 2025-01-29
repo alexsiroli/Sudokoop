@@ -29,13 +29,14 @@ export default {
     restartNewGame() {
       // Se sono il master, creo il gioco
       //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-      socket.emit('createCoopGame',
+      socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
+      socket.emit('checkMultiGameStart',
         {
           lobbyCode: sessionStorage.getItem('lobbyCode'),
-          difficulty: this.difficulty
+          mode: 'coop',
+          difficulty: this.difficulty,
         });
-      socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
-      this.isInitialized = false;
+      //this.isInitialized = false;
     },
 
     getGameData() {
@@ -43,7 +44,9 @@ export default {
       console.log("getting coop game ")
       socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
       socket.on("game", (data) => {
+        console.log("data " + data)
         const {sudoku, vite, difficulty} = data;
+        console.log("vite  " + vite)
         this.sudokuGrid = sudoku;
         this.vite = vite;
         this.difficulty = difficulty;
