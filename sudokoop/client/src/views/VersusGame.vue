@@ -17,15 +17,14 @@ export default {
   },
   methods: {
     restartNewGame() {
+      socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
 
-      //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-      socket.emit('createVersusGame',
-        {
-          lobbyCode: sessionStorage.getItem('lobbyCode'),
+      // check
+      socket.emit("checkVersusGameCanStart",
+        { lobbyCode: sessionStorage.getItem('lobbyCode'),
           difficulty: this.difficulty
         });
-      socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
-      this.isInitialized = false;
+
     },
     getGameData() {
       this.isInitialized = false;

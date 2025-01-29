@@ -45,8 +45,13 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         io.to(lobbyCode).emit("playersOfGame", players);
     });
 
-    socket.on("checkVersusGameCanStart", (lobbyCode) => {
-        io.to(lobbyCode).emit("versusGameCanStart", gameController.versusGameCanStart(lobbyCode));
+    socket.on("checkVersusGameCanStart", (data) => {
+        const {lobbyCode, difficulty} = data;
+        const check = gameController.versusGameCanStart(lobbyCode);
+        if (check.res) {
+            gameController.createVersusGame(lobbyCode, difficulty);
+        }
+        io.to(lobbyCode).emit("versusGameCanStart", check);
     });
 
     socket.on("joinTeam", (data) => {
@@ -83,7 +88,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         // rimuovendolo dal gioco, lo rimuovo dalla lobby
         gameController.removePlayerFromGame(code, username);
         io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
-
+        socket.leave(code);
         // se era un versus game devo rimandare i team
         if (gameController.getGameOfLobby(code) instanceof VersusGame) {
             io.to(code).emit("teams",

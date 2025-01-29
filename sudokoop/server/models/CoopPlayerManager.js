@@ -9,7 +9,9 @@ class CoopPlayerManager {
 
     removePlayer(username) {
         this.gamePlayers = this.gamePlayers.filter(p => p.username !== username);
-        this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
+        if (this.gamePlayers.length > 0) {
+            this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
+        }
     }
 
     setMaster(master) {

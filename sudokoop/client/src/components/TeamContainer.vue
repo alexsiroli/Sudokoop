@@ -15,7 +15,7 @@ export default {
     <ul>
       <li v-for="player in this.team.team">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
     </ul>
-    <h6>Points: {{ this.team.points }}</h6>
+    <h6>Points: {{ this.team.point }}</h6>
   </div>
 </template>
 

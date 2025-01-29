@@ -59,6 +59,7 @@ export default {
   },
 
   mounted() {
+    console.log("sono in lobby ", sessionStorage.getItem("lobbyCode"));
     socket.on("onLobbyCreated", (code) => {
       sessionStorage.setItem("lobbyCode", code);
       this.lobbyCode = code;
@@ -89,15 +90,24 @@ export default {
       }
     });
 
-    socket.on('gameCanStart', (data) => {
-      console.log("game can start i'm in lobby ")
 
-      if (data.res.res) {
+    socket.on('gameCanStart', (data) => {
+      if (data.res.res ) {
         if (data.mode === "coop") {
           this.$router.push({name: 'CoopGame'});
         } else {
           this.$router.push({name: 'SelectTeamVersusGame'});
         }
+      } else {
+        socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
+        this.errorOnStart = data.res.message;
+      }
+    });
+
+    // chiamata alla fine di una partita versus
+    socket.on('versusGameCanStart', (data) => {
+      if (data.res) {
+        this.$router.push({name: 'VersusGame'});
       } else {
         socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
         this.errorOnStart = data.res.message;

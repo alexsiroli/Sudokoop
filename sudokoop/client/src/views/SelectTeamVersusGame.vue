@@ -43,7 +43,9 @@ export default {
 
     checkVersusGameCanStart() {
       // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
-      socket.emit("checkVersusGameCanStart", sessionStorage.getItem('lobbyCode'));
+      socket.emit("checkVersusGameCanStart",
+        { lobbyCode: sessionStorage.getItem('lobbyCode'),
+          difficulty: this.selectedDifficulty});
 
     },
   },
@@ -64,12 +66,6 @@ export default {
 
     socket.on('versusGameCanStart', (data) => {
       if (data.res) {
-        if (this.player.isMaster) {
-          socket.emit('createVersusGame', {
-            lobbyCode: sessionStorage.getItem('lobbyCode'),
-            difficulty: this.selectedDifficulty,
-          });
-        }
         this.$router.push({name: 'VersusGame'});
       } else {
         this.errorMessage = data.message;

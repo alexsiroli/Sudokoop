@@ -36,7 +36,6 @@ export default {
           mode: 'coop',
           difficulty: this.difficulty,
         });
-      //this.isInitialized = false;
     },
 
     getGameData() {
