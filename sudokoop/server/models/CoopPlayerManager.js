@@ -8,14 +8,18 @@ class CoopPlayerManager {
     }
 
     removePlayer(username) {
+        console.log("removing " + username + " from coopGame")
         this.gamePlayers = this.gamePlayers.filter(p => p.username !== username);
-        if (this.gamePlayers.length > 0) {
-            this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
-        }
+        this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
+
     }
 
     setMaster(master) {
-        this.gamePlayers.find(p => p.username === master.username).isMaster = true;
+
+        if (master && this.gamePlayers.length > 0) {
+            console.log("coop game " + master.username)
+            this.gamePlayers.find(p => p.username === master.username).isMaster = true;
+        }
     }
 
     getPlayers() {

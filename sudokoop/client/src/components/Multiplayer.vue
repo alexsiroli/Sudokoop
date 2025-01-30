@@ -153,7 +153,11 @@ export default {
     });
     socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
     socket.on('playersOfGame', players => {
+      console.log("ricevuti i players of game ", players)
       this.players = players;
+      if(this.players === []) {
+        this.$router.push({name: 'Lobby'});
+      }
       players.forEach(player => {
         if (player.isMaster) {
           this.masterUser = player.username;

@@ -110,7 +110,15 @@ class GameController {
 
     // Rimuove un giocatore da una partita
     removePlayerFromGame(lobbyCode, username) {
-        this.lobbyGame[lobbyCode]?.removePlayer(username);
+        if (this.lobbyGame[lobbyCode]) {
+            this.lobbyGame[lobbyCode].removePlayer(username);
+            return true;
+        }
+        return false;
+    }
+
+    getPlayersOfLobby(lobbyCode) {
+        return lobbyPlayerManager.getPlayersOfLobby(lobbyCode);
     }
 
     // Recupera i giocatori di una partita

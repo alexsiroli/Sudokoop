@@ -54,10 +54,11 @@ export default {
     };
   },
   mounted() {
-    const user = sessionStorage.getItem('username');
-    if (user) {
+    const username = sessionStorage.getItem('username');
+    if (username) {
+      socket.emit("username", username);
       this.alreadyLogged = true;
-      this.storedUsername = user;
+      this.storedUsername = username;
       this.startCountdown();
     }
   },
@@ -69,7 +70,6 @@ export default {
           password: this.password
         });
         sessionStorage.setItem("username", this.username);
-        socket.emit("username", this.username);
         this.$router.push({name: "Home"});
       } catch (error) {
         this.registerError = error.response?.data?.error || "Errore imprevisto di registrazione";

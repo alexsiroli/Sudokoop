@@ -14,6 +14,7 @@ export default {
       showError: false,
       errorMessage: "",
       player: [],
+      allPlayers: [],
     };
   },
   computed: {},
@@ -53,6 +54,8 @@ export default {
   mounted() {
     socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"))
     socket.on("players", (players) => {
+      console.log("players in lobby Select team" + players);
+      this.allPlayers = players;
       players.forEach(p => {
         if (p.username === sessionStorage.getItem('username')) {
           this.player = p;
@@ -112,7 +115,7 @@ export default {
       </div>
     </div>
 
-    <LobbyUsers></LobbyUsers>
+    <LobbyUsers :players = "allPlayers" ></LobbyUsers>
     <!-- Pulsante Start -->
     <div class="controls" v-if="this.player.isMaster">
       <label>Difficoltà:
