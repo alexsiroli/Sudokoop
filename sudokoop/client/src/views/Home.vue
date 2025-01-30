@@ -136,11 +136,4 @@ export default {
 .footer-item {
   display: flex;
 }
-
-/* Bottone bianco */
-.white-button {
-  background-color: #fff !important;
-  color: #000 !important;
-  border: 2px solid #444 !important;
-}
 </style>

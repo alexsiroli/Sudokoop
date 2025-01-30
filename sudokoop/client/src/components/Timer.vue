@@ -43,6 +43,3 @@ export default {
   <p>Tempo trascorso: {{ formattedTime }}</p>
 </template>
 
-<style scoped>
-
-</style>

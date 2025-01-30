@@ -1,6 +1,6 @@
 /* ===================================
    main.css
-   (Stili specifici e override)
+   (Stili globali + override)
    =================================== */
 
 /* Import delle variabili e regole di base */
@@ -13,6 +13,7 @@
   font-weight: normal;
 }
 
+/* Link, color, hover */
 a,
 .green {
   text-decoration: none;
@@ -20,7 +21,6 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
@@ -64,6 +64,9 @@ a,
   position: relative;
   box-sizing: border-box;
   overflow: auto;
+
+  /* Se la box deve contenere contenuti centrati verticalmente,
+     puoi tenerla in flex mode: */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -103,27 +106,27 @@ a,
   transform: scale(1.05);
 }
 
-/* Pulsante freccia indietro */
-.back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: var(--box-bg-color);
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  font-size: 1.5em;
-  line-height: 36px;
-  text-align: center;
-  padding: 0;
-}
-.back-button:hover {
-  background-color: var(--color-background-mute);
+/* Variante "white-button" (testo nero, sfondo bianco) */
+.white-button {
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #444;
 }
 
-/* Input e select */
+/* Pulsante "exit" (rosso) usato ad es. in Multiplayer */
+.button-exit {
+  color: #fff;
+  background-color: red;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+}
+
+/* [RIMOSSO] .back-button globale
+   Ora definito in BackButton.vue (scoped) */
+
+/* Layout input e select */
 .select,
 .input {
   padding: 15px;
@@ -161,7 +164,6 @@ a,
   background-color: lightgreen;
   transition: background-color 0.3s ease;
 }
-
 .cell-incorrect input,
 .cell-readonly.cell-incorrect input {
   background-color: lightcoral;
@@ -171,4 +173,12 @@ a,
 /* Stile comune per .hearts */
 .hearts {
   font-size: 1.5em;
+}
+
+/* Raccogliamo un pattern comune per righe di pulsanti (buttons-row) */
+.buttons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
 }

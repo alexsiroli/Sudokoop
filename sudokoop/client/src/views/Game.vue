@@ -1,7 +1,7 @@
 <template>
   <div class="centered-container">
     <div class="rounded-box game-container">
-      <button @click="goToHome" class="back-button" title="Torna alla Home">&#8592;</button>
+      <BackButton @click="goToHome" title="Torna alla Home" />
       <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
 
       <!-- Se l'utente ha perso, messaggio sopra la griglia -->
@@ -59,10 +59,11 @@
 import axios from "../main.js";
 import SudokuGrid from "../components/SudokuGrid.vue";
 import Leaderboard from "../components/Leaderboard.vue";
+import BackButton from "../components/BackButton.vue";
 
 export default {
   name: "Game",
-  components: {SudokuGrid, Leaderboard},
+  components: { SudokuGrid, Leaderboard, BackButton },
   data() {
     return {
       gameId: null,
@@ -296,12 +297,5 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
-}
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 10px;
 }
 </style>

@@ -1,27 +1,31 @@
 <template>
-  <div class="account-overlay">
-    <div class="account-container">
-      <h2>Il Tuo Account</h2>
-      <p><strong>Username:</strong> {{ username }}</p>
-      <!-- Vittorie e Sconfitte su una singola riga -->
-      <div class="stats-row">
-        <p><strong>Vittorie:</strong> {{ wins }}</p>
-        <p><strong>Sconfitte:</strong> {{ losses }}</p>
-      </div>
+  <!-- OverlayDialog gestisce lo sfondo e il contenitore -->
+  <OverlayDialog @close="closeOverlay">
+    <h2>Il Tuo Account</h2>
+    <p><strong>Username:</strong> {{ username }}</p>
 
-      <div class="buttons-row">
-        <button class="button white-button" @click="closeOverlay">Chiudi</button>
-        <button class="button" @click="logout">Esci (Logout)</button>
-      </div>
+    <!-- Vittorie e Sconfitte su una singola riga -->
+    <div class="stats-row">
+      <p><strong>Vittorie:</strong> {{ wins }}</p>
+      <p><strong>Sconfitte:</strong> {{ losses }}</p>
     </div>
-  </div>
+
+    <div class="buttons-row">
+      <button class="button white-button" @click="closeOverlay">Chiudi</button>
+      <button class="button" @click="logout">Esci (Logout)</button>
+    </div>
+  </OverlayDialog>
 </template>
 
 <script>
 import axios from "../main.js";
+import OverlayDialog from './OverlayDialog.vue'
 
 export default {
   name: "AccountOverlay",
+  components: {
+    OverlayDialog
+  },
   emits: ["close"],
   data() {
     return {
@@ -46,9 +50,10 @@ export default {
     },
     logout() {
       sessionStorage.removeItem('username');
-      this.$router.push({name: "Login"});
+      this.$router.push({ name: "Login" });
     },
     closeOverlay() {
+      // emette l'evento "close" al padre
       this.$emit("close");
     }
   },
@@ -56,44 +61,9 @@ export default {
 </script>
 
 <style scoped>
-.account-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.account-container {
-  background-color: var(--box-bg-color);
-  color: var(--text-color);
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  text-align: center;
-}
-
 .stats-row {
   display: flex;
   justify-content: space-around;
   margin: 15px 0;
-}
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.white-button {
-  background-color: #fff;
-  color: #000;
-  border: 2px solid #444;
 }
 </style>

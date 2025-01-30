@@ -63,9 +63,6 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
 <template>
 
   <div class="centered-container">

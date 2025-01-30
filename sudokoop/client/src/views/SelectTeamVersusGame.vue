@@ -1,10 +1,11 @@
 <script>
 import LobbyUsers from "../components/LobbyUsers.vue";
 import socket from '../plugins/socket.js';
+import BackButton from "../components/BackButton.vue";
 
 export default {
   name: 'SelectTeamVersusGame',
-  components: {LobbyUsers},
+  components: { LobbyUsers, BackButton },
   data() {
     return {
       yellowTeam: [],
@@ -85,13 +86,7 @@ export default {
 </script>
 <template>
   <div class="rounded-box">
-    <button
-      class="back-button"
-      @click="backToLobby"
-      title="Torna alla lobby"
-    >
-      &#8592;
-    </button>
+    <BackButton @click="backToLobby" title="Torna alla lobby" />
 
     <h2>Scegli una squadra!</h2>
     <h4>Ogni squadra deve avere almeno un giocatore</h4>
@@ -135,6 +130,7 @@ export default {
 
   </div>
 </template>
+
 <style scoped>
 .error-popup {
   color: #721c24;
