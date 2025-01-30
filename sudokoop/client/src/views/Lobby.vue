@@ -82,6 +82,7 @@ export default {
     });
 
     socket.on("players", (playersArr) => {
+      console.log("players in lobby"  + playersArr);
       this.players = playersArr;
       this.inLobby = sessionStorage.getItem('lobbyCode') !== null;
       if (playersArr.length > 0 && this.inLobby) {

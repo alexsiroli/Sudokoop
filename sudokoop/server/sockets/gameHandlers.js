@@ -106,6 +106,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         // rimuovendolo dal gioco, lo rimuovo dalla lobby
         gameController.removePlayerFromGame(code, username);
         io.to(code).emit("playersOfGame", gameController.getPlayersOfGame(code));
+        io.to(code).emit("players", gameController.getPlayersOfLobby(code));
         socket.leave(code);
         // se era un versus game devo rimandare i team
         if (gameController.getGameOfLobby(code) instanceof VersusGame) {

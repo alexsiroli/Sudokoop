@@ -24,6 +24,11 @@ class LobbyController {
         return this.lobbies.find((l) => l.code === code);
     }
 
+    findLobbyOfUser(username) {
+        return this.lobbies.find(l =>
+            playerManager.getPlayersOfLobby(l.code).some(p => p.username === username)
+        );
+    }
     joinLobby(code, username) {
         const lobby = this.findLobby(code);
         if (!lobby) return {success: false, reason: "not-exist"};
