@@ -1,10 +1,11 @@
 <script>
 import socket from "../plugins/socket.js";
 import ChatBox from "../components/ChatBox.vue";
+import BackButton from "../components/BackButton.vue";
 
 export default {
   name: "Lobby",
-  components: {ChatBox},
+  components: { ChatBox, BackButton },
   data() {
     return {
       inLobby: false,
@@ -128,13 +129,10 @@ export default {
 <template>
   <div class="centered-container">
     <div class="rounded-box">
-      <button
-        class="back-button"
-        @click="leaveLobbyAndGoHome"
-        title="Torna alla Home (e abbandona la lobby)"
-      >
-        &#8592;
-      </button>
+      <BackButton
+         @click="leaveLobbyAndGoHome"
+         title="Torna alla Home (e abbandona la lobby)"
+      />
 
       <h1>Lobby</h1>
       <div v-if="!inLobby">
