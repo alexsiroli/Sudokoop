@@ -127,6 +127,7 @@ export default {
 
   </div>
 </template>
+
 <style scoped>
 .error-popup {
   color: #721c24;

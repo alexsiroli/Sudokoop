@@ -71,7 +71,6 @@ function formatTime(ms) {
 </template>
 
 <style scoped>
-
 .leaderboard-scrollable {
   width: 100%;
   max-height: 250px;
@@ -94,7 +93,6 @@ table td {
   padding: 8px;
 }
 
-/* Stile del pulsante extra di chiusura in basso */
 .close-button {
   margin-top: 10px;
 }

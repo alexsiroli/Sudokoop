@@ -19,7 +19,6 @@ export default {
 
 <style scoped>
 .back-button {
-  /* Stile generale del pulsante 'indietro' */
   position: absolute;
   top: 20px;
   left: 20px;

@@ -43,20 +43,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Bottone bianco (come in Account) */
-.white-button {
-  background-color: #fff;
-  color: #000;
-  border: 2px solid #444;
-}
-</style>

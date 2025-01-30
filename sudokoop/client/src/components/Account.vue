@@ -61,24 +61,9 @@ export default {
 </script>
 
 <style scoped>
-
 .stats-row {
   display: flex;
   justify-content: space-around;
   margin: 15px 0;
-}
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Esempio di "white-button" */
-.white-button {
-  background-color: #fff;
-  color: #000;
-  border: 2px solid #444;
 }
 </style>

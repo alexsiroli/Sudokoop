@@ -96,7 +96,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Stili locali */
-</style>

@@ -285,7 +285,7 @@ export default {
 
   </div>
   <LobbyUser :players="this.players"></LobbyUser>
-  <button v-if="!this.gameOver" @click="leaveGame" class="exit">
+  <button v-if="!this.gameOver" @click="leaveGame" class="button-exit">
     Abbandona la partita
   </button>
   <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
@@ -309,24 +309,9 @@ export default {
 }
 
 .sudoku-container {
-  flex-grow: 1; /* Consenti alla griglia Sudoku di occupare lo spazio centrale */
-  margin: 0 20px; /* Margine laterale per distanziare dalle squadre */
+  flex-grow: 1;
+  margin: 0 20px;
   text-align: center;
-}
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.exit {
-  color: white;
-  background-color: red;
-  justify-content: center;
-  padding: 10px;
-  border-radius: 10px;
 }
 
 .game-layout {

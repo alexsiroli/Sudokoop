@@ -298,11 +298,4 @@ export default {
   font-weight: bold;
   margin-bottom: 20px;
 }
-
-.buttons-row {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 10px;
-}
 </style>

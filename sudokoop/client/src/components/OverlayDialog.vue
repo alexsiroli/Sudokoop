@@ -46,7 +46,7 @@ export default {
   color: var(--text-color, #000);
   padding: 20px;
   border-radius: 10px;
-  width: 400px; /* stai usando 400px anche in Account/Credits */
+  width: 400px;
   text-align: center;
   position: relative;
 }
