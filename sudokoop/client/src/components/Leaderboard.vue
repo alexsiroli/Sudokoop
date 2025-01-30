@@ -94,11 +94,6 @@ table td {
   padding: 8px;
 }
 
-.overlay-container {
-  width: 500px;
-  height: 400px;
-}
-
 /* Stile del pulsante extra di chiusura in basso */
 .close-button {
   margin-top: 10px;
