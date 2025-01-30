@@ -110,7 +110,7 @@ export default {
         this.$router.push({name: 'VersusGame'});
       } else {
         socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
-        this.errorOnStart = data.res.message;
+        this.errorOnStart = data.message;
       }
     })
 
@@ -120,6 +120,7 @@ export default {
     socket.off("joinLobby");
     socket.off("players");
     socket.off("gameCanStart");
+    socket.off("versusGameCanStart");
 
   }
 };

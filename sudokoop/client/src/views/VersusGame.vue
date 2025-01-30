@@ -29,7 +29,7 @@ export default {
     getGameData() {
       this.isInitialized = false;
       socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
-      socket.on("game", (data) => {
+      socket.on("versusGame", (data) => {
         const {sudoku, difficulty, yellowTeam, blueTeam} = data;
         this.sudokuGrid = sudoku;
         this.isInitialized = true;
@@ -41,6 +41,9 @@ export default {
 
 
     }
+  },
+  beforeUnmount() {
+    socket.off("versusGame");
   },
   mounted() {
     this.getGameData();

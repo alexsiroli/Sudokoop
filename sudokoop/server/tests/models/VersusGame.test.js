@@ -120,7 +120,7 @@ describe("Logic of Versus Game", () => {
         gameController.addPlayerToTeam(lobby.code, 'blue', players[0]);
         gameController.createVersusGame(lobby.code, 'easy');
     });
-    it('Game class initializes correctly', () => {
+    it('Game class inizializzata correttamente', () => {
 
         const versusGame = gameController.getGameOfLobby(lobby.code);
         expect(versusGame.game.sudoku.puzzle).toBe('12-456-89'.repeat(9));
@@ -134,7 +134,7 @@ describe("Logic of Versus Game", () => {
         expect(versusGame.blue.points).toBe(0);
     });
 
-    it('Insert number correctly', () => {
+    it('Numero inserito correttamente', () => {
         let cellData = {row: 0, col: 2, value: 3}
         const resultCorrect = gameController.insertNumberMulti(cellData, lobby.code, 'player1');
         expect(resultCorrect.message).toBe('Giusto!');
@@ -151,7 +151,7 @@ describe("Logic of Versus Game", () => {
         }]);
     });
 
-    it('Insert wrong number', () => {
+    it('Numero inserito sbagliato', () => {
         let cellData = {row: 0, col: 2, value: 4}
         const resultWrong = gameController.insertNumberMulti(cellData, lobby.code, 'player2');
         expect(resultWrong.message).toBe('Sbagliato! Riprova.');
@@ -162,7 +162,7 @@ describe("Logic of Versus Game", () => {
             {username: 'masterUser', isMaster: true}]);
     });
 
-    it('Lost', () => {
+    it('Sconfitta', () => {
         let cellData = {row: 0, col: 2, value: 4}
         const resultWrong = gameController.insertNumberMulti(cellData, lobby.code, 'player1');
         expect(resultWrong.message).toBe('Squadra Blu vince!');
@@ -174,7 +174,7 @@ describe("Logic of Versus Game", () => {
         }]);
     });
 
-    it('Win', () => {
+    it('Vincita', () => {
         let resultCorrect, cellData;
         for (i = 0; i < 9; i++) {
             cellData = {row: i, col: 2, value: 3};
@@ -212,7 +212,7 @@ describe("Logic of Versus Game", () => {
         }]);
     })
 
-    it('Parity', () => {
+    it('Pareggio', () => {
         let resultCorrect, cellData;
         for (i = 0; i < 9; i++) {
             cellData = {row: i, col: 2, value: 3};
@@ -244,6 +244,22 @@ describe("Logic of Versus Game", () => {
     });
 
     it('Exit of player during a match. It should be deleted from teams and from lobby', () => {
+        gameController.removePlayerFromGame(lobby.code, 'player2');
+        expect(gameController.getTeamsOfGame(lobby.code).yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
+        expect(gameController.getTeamsOfGame(lobby.code).blueTeam).toEqual([{username: 'masterUser', isMaster: true}]);
+        expect(lobbyController.getPlayersOfLobby(lobby.code)).toEqual([{username: 'masterUser', isMaster: true},
+            {username: 'player1', isMaster: false}]);
+    });
+
+    it('Uscita di un giocatore eliminato durante un match. Deve essere rimosso dal team e dalla lobby', () => {
+        let cellData = {row: 0, col: 2, value: 4}
+        const resultWrong = gameController.insertNumberMulti(cellData, lobby.code, 'player2');
+        expect(resultWrong.message).toBe('Sbagliato! Riprova.');
+        expect(resultWrong.yellowPoint).toBe(0);
+        expect(resultWrong.yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
+        expect(resultWrong.bluePoint).toBe(0);
+        expect(resultWrong.blueTeam).toEqual([{username: 'player2-eliminated', isMaster: false},
+            {username: 'masterUser', isMaster: true}]);
         gameController.removePlayerFromGame(lobby.code, 'player2');
         expect(gameController.getTeamsOfGame(lobby.code).yellowTeam).toEqual([{username: 'player1', isMaster: false}]);
         expect(gameController.getTeamsOfGame(lobby.code).blueTeam).toEqual([{username: 'masterUser', isMaster: true}]);

@@ -13,7 +13,7 @@ class TeamPlayerManager {
     }
 
     removePlayerFromTeam(username) {
-        const team = this.yellowTeam.some(p => p.username === username) ? this.yellowTeam : this.blueTeam;
+        const team = this.findTeam(username);
         this.removeIfPresent(username, team);
         this.removeFromAllPlayersList(username);
         return {
@@ -23,7 +23,7 @@ class TeamPlayerManager {
     }
 
     findTeam(username) {
-        return this.yellowTeam.some(p => p.username === username) ? this.yellowTeam : this.blueTeam;
+        return this.yellowTeam.some(p => p.username.startsWith(username)) ? this.yellowTeam : this.blueTeam;
     }
 
     getTeams() {
@@ -34,16 +34,23 @@ class TeamPlayerManager {
     }
 
     setPlayerAsEliminated(username) {
-        this.findTeam(username).find(p => p.username === username).username = username + "-eliminated";
+        const team = this.findTeam(username);
+        const player = team.find(p => p.username === username);
+
+        if (player) {
+            player.username += "-eliminated";
+        }
     }
 
     // chiamato durante la fase di gioco (quando abbandoni)
     removePlayerFromGame(username) {
         this.removePlayerFromTeam(username)
         this.setMaster(playerManager.removePlayer(this.lobbyCode, username));
+
     }
 
     setMaster(master) {
+        console.log("setto il nuovo master " + master.username)
         if (master) {
             const team = this.findTeam(master.username);
             team.find(p => p.username === master.username).isMaster = true;
@@ -66,8 +73,8 @@ class TeamPlayerManager {
     }
 
     removeIfPresent(username, team) {
-        if (team.some(p => p.username === username)) {
-            const index = team.findIndex(user => user.username === username);
+        if (team.some(p => p.username.startsWith(username))) {
+            const index = team.findIndex(user => user.username.startsWith(username));
             if (index !== -1) {
                 team.splice(index, 1);
             }

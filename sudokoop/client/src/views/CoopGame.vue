@@ -42,7 +42,7 @@ export default {
       this.isInitialized = false;
       console.log("getting coop game ")
       socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
-      socket.on("game", (data) => {
+      socket.on("coopGame", (data) => {
         console.log("data " + data)
         const {sudoku, vite, difficulty} = data;
         console.log("vite  " + vite)
@@ -53,6 +53,10 @@ export default {
       })
     }
   },
+  beforeUnmount() {
+    socket.off("coopGame");
+  },
+
   mounted() {
     this.getGameData();
   },

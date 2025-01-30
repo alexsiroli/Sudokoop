@@ -32,7 +32,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("getCoopGame", (lobbyCode) => {
-        io.to(lobbyCode).emit("game",
+        io.to(lobbyCode).emit("coopGame",
             {
                 vite: gameController.getGameOfLobby(lobbyCode).getVite(),
                 sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
@@ -65,7 +65,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("getVersusGame", (lobbyCode) => {
-        io.to(lobbyCode).emit("game",
+        io.to(lobbyCode).emit("versusGame",
             {
                 sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
                 difficulty: gameController.getGameOfLobby(lobbyCode).getDifficulty(),

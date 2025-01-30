@@ -12,7 +12,9 @@ class LobbyPlayerManager {
 
     removePlayer(lobbyCode, username) {
         // rimuovi dalla lobby
-        this.lobbyPlayers[lobbyCode] = this.lobbyPlayers[lobbyCode].filter(player => player.username !== username);
+        console.log("rimuovo " + username)
+        this.lobbyPlayers[lobbyCode].forEach(player => {console.log("giuocatore " + player.username)})
+        this.lobbyPlayers[lobbyCode] = this.lobbyPlayers[lobbyCode].filter(player => !player.username.startsWith(username));
         //assegna nuovo master se necessario
         if (this.lobbyPlayers[lobbyCode] < 1) {
             return [];
