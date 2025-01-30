@@ -20,7 +20,8 @@ export default {
       socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
 
       // check
-      socket.emit("checkVersusGameCanStart",
+
+      socket.emit("checkRestartVersusGame",
         { lobbyCode: sessionStorage.getItem('lobbyCode'),
           difficulty: this.difficulty
         });

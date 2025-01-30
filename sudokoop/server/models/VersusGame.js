@@ -60,6 +60,12 @@ class VersusGame {
         return "";
     }
 
+    checkGameCanRestart() {
+        console.log("players versus "+ this.getPlayers().length)
+        console.log("players lobby " + this.teamPlayerManager.getPlayersOfLobby())
+        return this.getPlayers().length === this.teamPlayerManager.getPlayersOfLobby().length
+    }
+
     insertNumberWithoutCheck(row, col, num) {
         return this.game.insertNumberWithoutCheck(row, col, num);
     }

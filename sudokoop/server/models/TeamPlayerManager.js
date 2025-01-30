@@ -33,6 +33,10 @@ class TeamPlayerManager {
         }
     }
 
+    getPlayersOfLobby(){
+        return playerManager.getPlayersOfLobby(this.lobbyCode);
+    }
+
     setPlayerAsEliminated(username) {
         const team = this.findTeam(username);
         const player = team.find(p => p.username === username);

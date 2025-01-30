@@ -15,7 +15,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
             gameController.createCoopGame(data.lobbyCode, data.difficulty);
         }
         io.to(lobbyCode).emit("gameCanStart", {
-            res: gameController.multiPlayerGameCanStart(lobbyCode, mode),
+            res: check,
             mode: mode,
             difficulty: difficulty,
 
@@ -30,6 +30,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     socket.on("startCoopGame", (lobbyCode) => {
         io.to(lobbyCode).emit("startGame")
     });
+
 
     socket.on("getCoopGame", (lobbyCode) => {
         io.to(lobbyCode).emit("coopGame",
@@ -53,6 +54,23 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         }
         io.to(lobbyCode).emit("versusGameCanStart", check);
     });
+
+    socket.on("checkRestartVersusGame", (data) => {
+        const {lobbyCode, difficulty} = data;
+        if (gameController.checkVersusGameCanRestart(lobbyCode)) {
+            const check = gameController.versusGameCanStart(lobbyCode);
+            if (check.res) {
+                gameController.createVersusGame(lobbyCode, difficulty);
+            }
+            io.to(lobbyCode).emit("versusGameCanStart", check);
+        } else {
+            io.to(lobbyCode).emit("gameCanStart", {
+                res: gameController.multiPlayerGameCanStart(lobbyCode, 'versus'),
+                mode: 'versus',
+                difficulty: difficulty,
+            });
+        }
+    })
 
     socket.on("joinTeam", (data) => {
         const {lobbyCode, color, player} = data;

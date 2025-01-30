@@ -94,6 +94,10 @@ class GameController {
         return this.lobbyTeams[lobbyCode].checkVersusGameCanStart();
     }
 
+    checkVersusGameCanRestart(lobbyCode) {
+        return this.lobbyGame[lobbyCode].checkGameCanRestart();
+    }
+
     // Crea una nuova partita multiplayer
     createCoopGame(lobbyCode, difficulty) {
         this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
