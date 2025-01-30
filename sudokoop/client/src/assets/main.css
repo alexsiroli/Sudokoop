@@ -3,17 +3,20 @@
    (Stili globali + override)
    =================================== */
 
-/* Import delle variabili e regole di base */
+/* Importa base.css o altre risorse di reset/variabili */
 @import 'base.css';
 
+/* Layout globale #app */
 #app {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
+  /* Per migliorare la leggibilità su schermi molto ampi */
+  box-sizing: border-box;
 }
 
-/* Link, color, hover */
+/* Link e color transitions */
 a,
 .green {
   text-decoration: none;
@@ -28,49 +31,93 @@ a,
 }
 
 /* =========================================
-   Variabili generiche per i tuoi stili extra
+   Variabili di colore e dimensioni
    ========================================= */
 :root {
   --bg-color: var(--color-background);
   --box-bg-color: var(--color-background-soft);
-  --border-color: #444;  /* leggermente più scuro per dark mode */
-  --primary-color: #007bff;
-  --primary-dark: #0056b3;
-  --text-color: var(--color-text);
+  --border-color: #444; /* default fallback dark grey */
+  --primary-color: #007bff; /* Blu */
+  --primary-dark: #0062cc;  /* Blu scuro per hover */
+  --text-color: var(--color-text, #333);
   --error-color: #f8d7da;
   --success-color: #d4edda;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-hover: rgba(0, 0, 0, 0.15);
+
+  /* Font sizes e spaziature di base */
+  --font-size-base: 16px;
+  --border-radius: 10px;
+  --transition-speed: 0.3s;
 }
 
 /* Layout Globale */
+html {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Per default, tutti gli elementi includono box-sizing: border-box */
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Contenitori principali */
 .centered-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 80vh; /* ridotto un po’ per evitare che su smartphone ci siano troppi scroll */
   padding: 20px;
 }
 
+/* rimpicciolisci la dimensione in mobile */
+@media (max-width: 600px) {
+  .centered-container {
+    padding: 10px;
+  }
+}
+
+/* Riquadro principale */
 .rounded-box {
   width: 850px;
-  height: auto;
   max-height: 90vh;
   padding: 40px;
-  border: 3px solid var(--border-color);
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
   background-color: var(--box-bg-color);
   text-align: center;
   margin: 0 auto;
-  position: relative;
-  box-sizing: border-box;
   overflow: auto;
-
-  /* Se la box deve contenere contenuti centrati verticalmente,
-     puoi tenerla in flex mode: */
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  position: relative;
+
+  /* Aggiungiamo un’ombra più leggera */
+  box-shadow: 0 4px 10px var(--shadow-color);
+  transition: box-shadow var(--transition-speed), transform var(--transition-speed);
+}
+
+/* su schermi piccoli, la .rounded-box si restringe */
+@media (max-width: 600px) {
+  .rounded-box {
+    width: 100%;
+    padding: 20px;
+  }
+}
+
+.rounded-box:hover {
+  box-shadow: 0 6px 14px var(--shadow-color-hover);
+  transform: translateY(-2px);
 }
 
 .rounded-box input {
@@ -79,7 +126,7 @@ a,
 
 /* Titoli e testo */
 .title {
-  font-size: 3.5em;
+  font-size: 2.5rem;
   margin-bottom: 30px;
   font-weight: bold;
 }
@@ -89,90 +136,95 @@ a,
   font-weight: bold;
 }
 
-/* Bottoni */
+/* Bottoni generici */
 .button {
-  padding: 15px 25px;
+  padding: 12px 20px;
   background-color: var(--primary-color);
   color: #fff;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
+  border: 2px solid var(--primary-dark);
+  border-radius: var(--border-radius);
   cursor: pointer;
-  font-size: 1.2em;
+  font-size: 1rem;
   margin-bottom: 15px;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color var(--transition-speed), transform var(--transition-speed);
 }
 .button:hover {
   background-color: var(--primary-dark);
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
-/* Variante "white-button" (testo nero, sfondo bianco) */
+/* Bottone con sfondo bianco, testo nero */
 .white-button {
   background-color: #fff;
   color: #000;
-  border: 2px solid #444;
+  border: 2px solid #ccc;
+}
+.white-button:hover {
+  background-color: #f2f2f2;
 }
 
-/* Pulsante "exit" (rosso) usato ad es. in Multiplayer */
+/* Pulsante “exit” / “danger” in rosso */
 .button-exit {
-  color: #fff;
-  background-color: red;
-  justify-content: center;
-  padding: 10px;
-  border-radius: 10px;
-  border: 2px solid var(--border-color);
+  background-color: #d9534f; /* un rosso bootstrap-like */
+  border-color: #c9302c;
+}
+.button-exit:hover {
+  background-color: #c9302c;
+  transform: scale(1.03);
 }
 
-/* [RIMOSSO] .back-button globale
-   Ora definito in BackButton.vue (scoped) */
-
-/* Layout input e select */
+/* Input e select generici */
 .select,
 .input {
-  padding: 15px;
-  font-size: 1.1em;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  outline: none;
-  box-sizing: border-box;
   width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
   margin-bottom: 20px;
+  outline: none;
+  transition: border-color var(--transition-speed);
+}
+.select:focus,
+.input:focus {
+  border-color: var(--primary-color);
 }
 
-/* Link stile pulsante */
+/* router-link con stile pulsante */
 .router-link-button {
   display: inline-block;
   text-decoration: none;
   color: #fff;
   background-color: var(--primary-color);
   padding: 20px 35px;
-  border-radius: 15px;
-  border: 2px solid var(--border-color);
-  font-size: 1.7em;
+  border-radius: var(--border-radius);
+  border: 2px solid var(--primary-dark);
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color var(--transition-speed), transform var(--transition-speed);
   margin-bottom: 15px;
 }
 .router-link-button:hover {
   background-color: var(--primary-dark);
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
-/* Stili per celle corrette e sbagliate */
+/* Celle corrette / errate */
 .cell-correct input,
 .cell-readonly.cell-correct input {
-  background-color: lightgreen;
+  background-color: #c5f4d0; /* un verde pastello */
   transition: background-color 0.3s ease;
 }
 .cell-incorrect input,
 .cell-readonly.cell-incorrect input {
-  background-color: lightcoral;
+  background-color: #f7c2c2; /* un rosso chiaro */
   transition: background-color 0.3s ease;
 }
 
-/* Stile comune per .hearts */
+/* Cuori vite */
 .hearts {
   font-size: 1.5em;
+  color: #ff5a5f; /* un rosso “airbnb style” */
 }
 
 /* Raccogliamo un pattern comune per righe di pulsanti (buttons-row) */
@@ -181,4 +233,18 @@ a,
   gap: 20px;
   justify-content: center;
   margin-top: 20px;
+}
+
+/* Responsività generale per font e dimensioni */
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.8rem;
+  }
+  .subtitle {
+    font-size: 1.4rem;
+  }
+  .button {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+  }
 }

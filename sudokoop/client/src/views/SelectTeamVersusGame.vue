@@ -131,17 +131,17 @@ export default {
 <style scoped>
 .error-popup {
   color: #721c24;
-  border-radius: 5px;
+  background-color: #f8d7da; /* rosato “errore” */
+  border-radius: var(--border-radius);
   padding: 10px 20px;
   z-index: 1000;
   font-size: 16px;
+  margin-top: 10px;
 }
-
 
 h3 {
   color: black;
 }
-
 li {
   color: black;
 }
@@ -153,57 +153,59 @@ li {
   margin-bottom: 20px;
   padding-top: 20px;
 }
-
 .controls {
   display: flex;
-  flex-direction: column; /* Dispone gli elementi in colonna */
-  align-items: center; /* Centra gli elementi orizzontalmente */
-  gap: 15px; /* Spazio tra gli elementi */
-  margin-top: 20px; /* Margine superiore per separare dal resto */
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  text-align: center;
 }
-
 .team {
   width: 30%;
   padding: 20px;
   border: 2px solid #ccc;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   text-align: center;
 }
-
 .yellow-team {
   background-color: #fffbe6;
 }
-
 .blue-team {
   background-color: #e6f2ff;
 }
-
 .team ul {
   list-style: none;
   padding: 0;
   margin: 10px 0;
 }
-
 .team button {
   margin-top: 10px;
   padding: 10px 20px;
   font-size: 18px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
+  border: none;
+  transition: background-color var(--transition-speed);
+  background-color: var(--primary-color);
+  color: #fff;
 }
-
-.controls {
-  text-align: center;
+.team button:hover {
+  background-color: var(--primary-dark);
 }
-
 .start-button {
   padding: 15px 30px;
   font-size: 18px;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   cursor: pointer;
+  background-color: var(--primary-color);
+  color: #fff;
+  transition: background-color var(--transition-speed);
 }
-
+.start-button:hover {
+  background-color: var(--primary-dark);
+}
 .start-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;

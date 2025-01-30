@@ -21,25 +21,27 @@ export default {
 
 <style scoped>
 .team-container {
-  width: 17%; /* Dimensiona le sezioni delle squadre */
+  width: 17%;
   padding: 5px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   text-align: center;
+  box-shadow: 0 1px 4px var(--shadow-color);
+  background-color: var(--box-bg-color);
+  margin: 0 5px;
 }
 
 .Gialla-team {
   background-color: #fffbe6;
 }
-
 .Blu-team {
   background-color: #e6f2ff;
 }
 
 .team-container h3 {
   color: black;
+  margin: 10px 0;
 }
-
 
 .team-container ul {
   list-style: none;

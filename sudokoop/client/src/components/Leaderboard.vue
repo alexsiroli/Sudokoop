@@ -76,10 +76,9 @@ function formatTime(ms) {
   max-height: 250px;
   overflow-y: auto;
   margin: 10px 0;
-}
-
-.leaderboard-row {
-  width: 100%;
+  box-shadow: inset 0 1px 3px var(--shadow-color);
+  border-radius: var(--border-radius);
+  background-color: var(--box-bg-color);
 }
 
 table {
@@ -87,13 +86,20 @@ table {
   border-collapse: collapse;
   margin-top: 10px;
 }
+.leaderboard-row {
+  width: 100%;
+}
 
 table td {
   border-bottom: 1px solid #ccc;
   padding: 8px;
+  text-align: center;
 }
 
+/* Bottone "close-button" extra in basso */
 .close-button {
   margin-top: 10px;
+  border-radius: var(--border-radius);
+  padding: 10px 20px;
 }
 </style>

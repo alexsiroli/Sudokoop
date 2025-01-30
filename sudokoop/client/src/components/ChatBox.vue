@@ -140,12 +140,13 @@ export default {
 <style scoped>
 .chat-box {
   border: 1px solid #ccc;
+  border-radius: var(--border-radius);
   padding: 10px;
   width: 300px;
   background-color: var(--box-bg-color);
-  border-radius: 5px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 6px var(--shadow-color);
 }
 
 .messages {
@@ -154,7 +155,8 @@ export default {
   margin-bottom: 10px;
   padding: 5px;
   background-color: var(--color-background-soft);
-  border-radius: 5px;
+  border-radius: var(--border-radius);
+  box-shadow: inset 0 1px 3px var(--shadow-color);
 }
 
 .message-item {

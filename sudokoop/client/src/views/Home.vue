@@ -101,9 +101,16 @@ export default {
 .home-box {
   min-width: 600px;
   text-align: center;
+  margin-bottom: 40px;
+  /* su mobile, riduci la spaziatura */
+}
+@media (max-width: 600px) {
+  .home-box {
+    min-width: 100%;
+    margin-bottom: 20px;
+  }
 }
 
-/* Colonna per Singleplayer e Multiplayer */
 .menu-column {
   display: flex;
   flex-direction: column;
@@ -111,14 +118,13 @@ export default {
   gap: 20px;
   margin-bottom: 40px;
 }
-
 .menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 250px;
+  margin-bottom: 20px;
 }
-
 .menu-row.centered {
   display: flex;
   justify-content: center;
@@ -132,8 +138,8 @@ export default {
   gap: 20px;
   margin-top: 20px;
 }
-
 .footer-item {
   display: flex;
 }
+
 </style>

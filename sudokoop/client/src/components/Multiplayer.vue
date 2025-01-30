@@ -306,12 +306,16 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
+  color: #c9302c; /* rosso scuro se perso */
 }
 
 .sudoku-container {
   flex-grow: 1;
   margin: 0 20px;
   text-align: center;
+  box-shadow: 0 2px 6px var(--shadow-color);
+  border-radius: var(--border-radius);
+  padding: 10px;
 }
 
 .game-layout {
