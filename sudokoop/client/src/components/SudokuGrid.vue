@@ -78,9 +78,9 @@ export default {
   margin: 0 auto;
   max-width: 500px;
   padding: 20px;
-  border: 3px solid var(--border-color);
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px var(--shadow-color);
   background-color: var(--box-bg-color);
 }
 
@@ -111,27 +111,26 @@ input {
   box-sizing: border-box;
   border-radius: 0;
   background-color: white;
+  transition: background-color var(--transition-speed);
 }
 
 .cell-border-right {
   border-right: 2px solid var(--border-color);
 }
-
 .cell-border-bottom {
   border-bottom: 2px solid var(--border-color);
 }
 
 .cell-readonly input {
-  background-color: #eaeaea;
+  background-color: #f2f2f2;
   font-weight: bold;
 }
 
 /* Stili specifici per Single Player */
 .sp-green input {
-  background-color: lightgreen;
+  background-color: #c5f4d0;
 }
-
 .sp-red input {
-  background-color: lightcoral;
+  background-color: #f7c2c2;
 }
 </style>

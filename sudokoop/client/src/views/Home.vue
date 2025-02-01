@@ -2,7 +2,7 @@
   <div class="centered-container">
     <div class="rounded-box home-box">
       <div class="header">
-        <h1 class="title">Sudokoop</h1>
+        <img src="/logo.png" alt="Sudokoop Logo" class="logo">
       </div>
 
       <!-- Singleplayer e Multiplayer impilati verticalmente -->
@@ -101,9 +101,24 @@ export default {
 .home-box {
   min-width: 600px;
   text-align: center;
+  margin-bottom: 40px;
 }
-
-/* Colonna per Singleplayer e Multiplayer */
+@media (max-width: 600px) {
+  .home-box {
+    min-width: 100%;
+    margin-bottom: 20px;
+  }
+}
+.logo {
+  width: 60%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.header {
+  margin-bottom: 40px;
+}
 .menu-column {
   display: flex;
   flex-direction: column;
@@ -111,14 +126,13 @@ export default {
   gap: 20px;
   margin-bottom: 40px;
 }
-
 .menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 250px;
+  margin-bottom: 20px;
 }
-
 .menu-row.centered {
   display: flex;
   justify-content: center;
@@ -132,7 +146,6 @@ export default {
   gap: 20px;
   margin-top: 20px;
 }
-
 .footer-item {
   display: flex;
 }

@@ -197,14 +197,14 @@ export default {
 </template>
 
 <style scoped>
-/* Stili per la sezione master */
 .master-panel {
   margin-top: 20px;
   padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   background-color: var(--box-bg-color);
   width: 300px;
+  box-shadow: 0 1px 4px var(--shadow-color);
 }
 
 .options {
@@ -219,17 +219,17 @@ export default {
   flex-direction: column;
   font-weight: bold;
 }
-
 .options select {
   margin-top: 5px;
   padding: 5px;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: var(--border-radius);
 }
 
 .copy-button {
   margin-left: 10px;
   padding: 5px;
   font-size: 0.8em;
+  border-radius: var(--border-radius);
 }
 </style>

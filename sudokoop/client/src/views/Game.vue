@@ -297,5 +297,6 @@ export default {
   font-size: 1.5em;
   font-weight: bold;
   margin-bottom: 20px;
+  color: #d9534f; /* un rosso “danger” */
 }
 </style>

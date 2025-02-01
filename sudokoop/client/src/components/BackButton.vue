@@ -26,5 +26,11 @@ export default {
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
+  color: var(--primary-color);
+  transition: color 0.3s;
+}
+.back-button:hover {
+  color: var(--primary-dark);
+  transform: scale(1.1);
 }
 </style>

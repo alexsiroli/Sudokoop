@@ -96,9 +96,9 @@ export default {
   margin: 0 auto;
   max-width: 500px;
   padding: 20px;
-  border: 3px solid var(--border-color);
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px var(--shadow-color);
   background-color: var(--box-bg-color);
 }
 
@@ -106,7 +106,6 @@ table {
   border-collapse: collapse;
   width: 100%;
 }
-
 td {
   border: 1px solid #ccc;
   width: 50px;
@@ -116,7 +115,6 @@ td {
   vertical-align: middle;
   box-sizing: border-box;
 }
-
 input {
   width: 100%;
   height: 100%;
@@ -127,65 +125,48 @@ input {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  border-radius: 0;
-  background-color: white;
+  transition: background-color var(--transition-speed);
 }
 
+/* Bordi più spessi per le sezioni sudoku */
 .cell-border-right {
   border-right: 2px solid var(--border-color);
 }
-
 .cell-border-bottom {
   border-bottom: 2px solid var(--border-color);
 }
-/* Stili specifici per Single Player */
-.sp-green input {
-  background-color: lightgreen;
-}
 
-.sp-red input {
-  background-color: lightcoral;
-}
-
-/* Stili specifici per Single Player */
+/* Vari colori per le selezioni di celle in multi */
 .cell-green-selected input {
-  background-color: lightgreen;
+  background-color: #c5f4d0;
   font-weight: bold;
 }
-
 .cell-red input {
-  background-color: lightcoral;
+  background-color: #f7c2c2;
   font-weight: bold;
 }
-
 .cell-yellow input {
-  background-color: blanchedalmond;
+  background-color: #fff9cc;
 }
-
 .cell-blue input {
-  background-color: lightblue;
+  background-color: #cce6ff;
 }
-
 .cell-yellow-selected input {
-  background-color: khaki;
+  background-color: #fef5b1;
   font-weight: bold;
 }
-
 .cell-blue-selected input {
-  background-color: lightskyblue;
+  background-color: #aedaff;
   font-weight: bold;
 }
-
 .cell-gray input {
-  background-color: cadetblue;
+  background-color: #b0bec5;
 }
-
 .cell-white input {
   background-color: white;
 }
-
 .cell-filled input {
-  background-color: rgb(234, 234, 234);
+  background-color: #f2f2f2;
   font-weight: bold;
 }
 </style>

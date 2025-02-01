@@ -26,29 +26,28 @@ export default {
 </script>
 
 <style scoped>
-/* Sfondo semitrasparente e centratura */
 .overlay-background {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
-/* Contenitore del contenuto */
 .overlay-container {
   background-color: var(--box-bg-color, #fff);
   color: var(--text-color, #000);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   width: 400px;
   text-align: center;
   position: relative;
+  box-shadow: 0 4px 12px var(--shadow-color-hover);
 }
 
 .overlay-close {
@@ -59,5 +58,11 @@ export default {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: var(--primary-color);
+  transition: color 0.3s;
+}
+.overlay-close:hover {
+  color: var(--primary-dark);
+  transform: scale(1.2);
 }
 </style>
