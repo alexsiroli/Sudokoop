@@ -3,6 +3,7 @@ const gameController = require('../controllers/gameController');
 
 const registerLobbyHandlers = require('./lobbyHandlers');
 const registerGameHandlers = require('./gameHandlers');
+const VersusGame = require("../models/VersusGame");
 
 module.exports = (io) => {
     const lobbyController = new LobbyController();
@@ -24,23 +25,38 @@ module.exports = (io) => {
             console.log("utente disconnesso " + socket.username);  //
 
             if (!socket.username) return;  // Evitiamo errori se `username` non è stato impostato
-
+            //TODO: mandare i team se rimosso da versus
             // Rimuoviamo il player dalla lobby se presente
             const lobby = lobbyController.findLobbyOfUser(socket.username);
             console.log("lobby ", lobby);
-
+            const removedFromTeam = gameController.removePlayerFromTeam(lobby.code, socket.username)
+            console.log("removedFRomTEam", removedFromTeam)
+            lobbyController.removePlayerFromLobby(lobby.code, socket.username);
             if (lobby) {
                 if (gameController.removePlayerFromGame(lobby.code, socket.username)) {
                     console.log("lo rimuovo dal gioco");
                     const players = gameController.getPlayersOfGame(lobby.code);
                     console.log("mando i players of game", players);
                     io.to(lobby.code).emit("playersOfGame", players);
-                    io.to(lobby.code).emit("players", lobbyController.getPlayersOfLobby(lobby.code));
-                } else {
-                    console.log("non l ho rimosso dal gioco");
-                    lobbyController.removePlayerFromLobby(lobby.code, socket.username);
-                    io.to(lobby.code).emit("players", lobbyController.getPlayersOfLobby(lobby.code));
+                    if (gameController.getGameOfLobby(lobby.code) instanceof VersusGame) {
+                        io.to(lobby.code).emit("teams",
+                            {
+                                yellowTeam: gameController.getTeamsOfGame(lobby.code).yellowTeam,
+                                blueTeam: gameController.getTeamsOfGame(lobby.code).blueTeam
+                            })
+                    }
+
+                } else if(removedFromTeam) {
+                    console.log("rimosso dal team, mando ", removedFromTeam)
+                    io.to(lobby.code).emit("onJoinTeam", removedFromTeam);
                 }
+
+                else {
+                    console.log("non l ho rimosso dal gioco");
+
+
+                }
+                io.to(lobby.code).emit("players", lobbyController.getPlayersOfLobby(lobby.code));
             }
         });
     });

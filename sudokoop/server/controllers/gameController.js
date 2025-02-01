@@ -66,6 +66,13 @@ class GameController {
         this.lobbyTeams[lobbyCode] = new TeamPlayerManager(lobbyCode);
     }
 
+    playersAreInTeamSelection(lobbyCode) {
+        console.log( "team creatu " + this.lobbyTeams[lobbyCode] !== null)
+        console.log("gioco non iniziato " + this.lobbyGame[lobbyCode] === null)
+        console.log("gioco non inizato alternayiva " +  !this.lobbyGame[lobbyCode])
+        return this.lobbyTeams[lobbyCode] !== null && !this.lobbyGame[lobbyCode];
+    }
+
     // Aggiunge un giocatore a un team
     addPlayerToTeam(lobbyCode, color, player) {
         if (this.lobbyTeams[lobbyCode]) {
@@ -77,6 +84,7 @@ class GameController {
         if (this.lobbyTeams[lobbyCode]) {
             return this.lobbyTeams[lobbyCode].removePlayerFromTeam(username);
         }
+        return false;
     }
 
 
@@ -112,6 +120,9 @@ class GameController {
     removePlayerFromGame(lobbyCode, username) {
         if (this.lobbyGame[lobbyCode]) {
             this.lobbyGame[lobbyCode].removePlayer(username);
+            if (this.getPlayersOfGame(lobbyCode).length < 1) {
+                this.removeGame(lobbyCode);
+            }
             return true;
         }
         return false;

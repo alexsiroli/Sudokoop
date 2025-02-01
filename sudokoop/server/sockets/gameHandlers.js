@@ -112,12 +112,20 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         if (gameController.getGameOfLobby(code) instanceof VersusGame) {
             io.to(code).emit("teams",
                 {
-                    yellowTeam: gameController.getGameOfLobby(code).getTeams().yellowTeam,
-                    blueTeam: gameController.getGameOfLobby(code).getTeams().blueTeam
+                    yellowTeam: gameController.getTeamsOfGame(code).yellowTeam,
+                    blueTeam: gameController.getTeamsOfGame(code).blueTeam
                 })
         }
 
     })
+
+    socket.on("joinLobby", (data) => {
+        const {username, code} = data;
+        if (gameController.playersAreInTeamSelection(code)) {
+            console.log("vai a scegliere i team")
+            socket.emit('goInTeamSelection')
+        }
+    });
 
 
     socket.on('cellUpdateMulti', (data) => {

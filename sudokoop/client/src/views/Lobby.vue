@@ -81,6 +81,10 @@ export default {
       }
     });
 
+    socket.on('goInTeamSelection', () => {
+      this.$router.push({name: 'SelectTeamVersusGame'});
+    });
+
     socket.on("players", (playersArr) => {
       console.log("players in lobby"  + playersArr);
       this.players = playersArr;
