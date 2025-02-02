@@ -56,7 +56,7 @@ export default {
   mounted() {
     const username = sessionStorage.getItem('username');
     if (username) {
-      socket.emit("username", username);
+      //socket.emit("username", username);
       this.alreadyLogged = true;
       this.storedUsername = username;
       this.startCountdown();

@@ -13,7 +13,7 @@ module.exports = (io) => {
         // Ogni client, dopo il login REST, emette "username"
         socket.on("username", (username) => {
             console.log("connected " + username)
-            socket.username = username; // ✅ Salviamo lo username nel socket
+            socket.username = username;
         });
 
         // Registra i vari handler
