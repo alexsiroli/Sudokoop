@@ -58,6 +58,7 @@ describe('Lobby.vue', () => {
     expect(socket.emit).toHaveBeenCalledWith('checkMultiGameStart', {
       lobbyCode: 'LOBBY456',
       mode: 'versus',
+      difficulty: 'hard',
     });
   });
 

@@ -25,7 +25,6 @@ module.exports = (io) => {
             console.log("utente disconnesso " + socket.username);  //
 
             if (!socket.username) return;  // Evitiamo errori se `username` non è stato impostato
-            //TODO: mandare i team se rimosso da versus
             // Rimuoviamo il player dalla lobby se presente
             const lobby = lobbyController.findLobbyOfUser(socket.username);
             console.log("lobby ", lobby);
