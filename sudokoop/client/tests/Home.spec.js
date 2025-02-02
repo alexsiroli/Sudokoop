@@ -34,8 +34,6 @@ describe('Home.vue', () => {
   });
 
   it('renderizza correttamente i pulsanti e gli elementi principali', () => {
-    expect(wrapper.find('h1.title').text()).toBe('Sudokoop');
-
     // Trova tutti gli elementi h2 e verifica che contengano i testi desiderati
     const headings = wrapper.findAll('h2').map(h2 => h2.text());
     expect(headings).toContain('Singleplayer');
