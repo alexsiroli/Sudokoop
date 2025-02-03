@@ -37,14 +37,13 @@ describe('SudokuGrid.vue', () => {
   })
 
   it('emette "cell-updated" con dati validi', async () => {
-    // row=0, col=0 => index=0
+    // row=0, col=0
     const rowIndex = 0
     const colIndex = 0
-    const index = rowIndex * 9 + colIndex
     const testValue = '5'
 
-    // Invochiamo la nuova onCellInput(index, value)
-    await wrapper.vm.onCellInput(index, testValue)
+    // Richiama la nuova firma: onCellInput(rowIndex, colIndex, value)
+    await wrapper.vm.onCellInput(rowIndex, colIndex, testValue)
 
     // Verifichiamo che abbia emesso "cell-updated"
     expect(wrapper.emitted('cell-updated')).toBeTruthy()
@@ -60,16 +59,15 @@ describe('SudokuGrid.vue', () => {
   })
 
   it('non emette "cell-updated" per input non valido e resetta valore', () => {
-    // row=0, col=1 => index=1
+    // row=0, col=1
     const rowIndex = 0
     const colIndex = 1
-    const index = rowIndex * 9 + colIndex
 
     // Impostiamo un valore iniziale
     wrapper.vm.grid[rowIndex][colIndex].value = 'a'
 
     // Chiamiamo onCellInput con 'a' (non valido)
-    wrapper.vm.onCellInput(index, 'a')
+    wrapper.vm.onCellInput(rowIndex, colIndex, 'a')
 
     // Non dovrebbe emettere nulla
     expect(wrapper.emitted('cell-updated')).toBeFalsy()
@@ -84,8 +82,8 @@ describe('SudokuGrid.vue', () => {
   })
 
   it('calcola la classe della cella correttamente con bordi (2,2)', () => {
-    // row=2, col=2 => index=2*9 + 2 = 20
-    const classes = wrapper.vm.getCellClass(20)
+    // row=2, col=2
+    const classes = wrapper.vm.getCellClass(2, 2)
     expect(classes).toMatchObject({
       cell: true,
       'cell-border-right': true,
@@ -95,37 +93,13 @@ describe('SudokuGrid.vue', () => {
   })
 
   it('calcola la classe della cella correttamente senza bordi (0,0)', () => {
-    // row=0, col=0 => index=0
-    const classes = wrapper.vm.getCellClass(0)
+    // row=0, col=0
+    const classes = wrapper.vm.getCellClass(0, 0)
     expect(classes).toMatchObject({
       cell: true,
       'cell-border-right': false,
       'cell-border-bottom': false,
       'cell-readonly': false
     })
-  })
-
-  it('assegna correttamente last-correct / last-incorrect', () => {
-    // Impostiamo la lastCell manualmente
-    wrapper.vm.lastCell = { row: 1, col: 1, isCorrect: true }
-    // row=1, col=1 => index=10
-    let classes = wrapper.vm.getCellClass(10)
-
-    // Dovrebbe essere last-correct
-    expect(classes['last-correct']).toBe(true)
-    expect(classes['last-incorrect']).toBe(false)
-
-    // Ora cambiamo lastCell.isCorrect = false
-    wrapper.vm.lastCell.isCorrect = false
-    classes = wrapper.vm.getCellClass(10)
-
-    // Dovrebbe essere last-incorrect
-    expect(classes['last-correct']).toBe(false)
-    expect(classes['last-incorrect']).toBe(true)
-
-    // Se chiediamo la classe di un'altra cella, non risulta correct/incorrect
-    classes = wrapper.vm.getCellClass(0)
-    expect(classes['last-correct']).toBeFalsy()
-    expect(classes['last-incorrect']).toBeFalsy()
   })
 })

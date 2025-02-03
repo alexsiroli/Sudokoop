@@ -77,22 +77,26 @@ export default {
 .sudoku-grid {
   margin: 0 auto;
   max-width: 500px;
-  padding: 20px;
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
   box-shadow: 0 2px 6px var(--shadow-color);
   background-color: var(--box-bg-color);
+
+  /* Rende il contenitore quadrato */
+  aspect-ratio: 1 / 1;
+  position: relative;
+  box-sizing: border-box;
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 td {
   border: 1px solid #ccc;
-  width: 50px;
-  height: 50px;
   text-align: center;
   position: relative;
   vertical-align: middle;
