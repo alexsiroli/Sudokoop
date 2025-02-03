@@ -1,5 +1,5 @@
 <script>
-import SudokuGrid from "./SudokuGridMulti.vue";
+import SudokuGrid from "./SudokuGrid.vue";
 import socket from "../plugins/socket";
 import LobbyUser from "./LobbyUsers.vue";
 import Timer from "./Timer.vue";

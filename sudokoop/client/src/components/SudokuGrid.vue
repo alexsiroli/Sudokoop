@@ -3,8 +3,9 @@ export default {
   name: 'SudokuGrid',
   props: {
     grid: {type: Array, required: true},
-    coloredCell: {type: Object, default: null},
-    final: {type: Boolean, default: false}
+    onFocus: {type: Function, required: false},
+    onDeselect: {type: Function, required: false},
+
   },
   data() {
     return {
@@ -12,6 +13,7 @@ export default {
     };
   },
   methods: {
+
     onCellInput(rowIndex, colIndex, value) {
       const isValid = /^[1-9]$/.test(value);
       this.lastCell = {
@@ -26,6 +28,29 @@ export default {
       const cellData = {row: rowIndex, col: colIndex, value: parseInt(value, 10)};
       this.$emit('cell-updated', cellData);
     },
+
+    onCellSelect(rowIndex, colIndex) {
+      if (this.onFocus){
+        this.onFocus(rowIndex, colIndex);
+      }
+
+    },
+
+    onCellDeselect(rowIndex, colIndex) {
+      if (this.onDeselect){
+        this.onDeselect(rowIndex, colIndex);
+      }
+
+    },
+
+    // Metodo per aggiornare il colore di una cella
+    setCellColor(rowIndex, colIndex, color) {
+      const cell = this.grid[rowIndex][colIndex];
+      if (!cell) return;
+      // Imposta il colore direttamente
+      cell.color = color;
+    },
+
     getCellClass(rowIndex, colIndex) {
       return {
         'cell': true,
@@ -34,12 +59,7 @@ export default {
         'cell-readonly': this.grid[rowIndex][colIndex].readOnly,
       };
     },
-    getLastCellClass(rowIndex, colIndex) {
-      if (this.lastCell && this.lastCell.row === rowIndex && this.lastCell.col === colIndex) {
-        return this.lastCell.isCorrect ? 'last-correct' : 'last-incorrect';
-      }
-      return '';
-    },
+
   }
 };
 </script>
@@ -53,18 +73,16 @@ export default {
           :key="colIndex"
           :class="[
               getCellClass(rowIndex, colIndex),
-              cell.isGreen ? 'sp-green' :
-                (final && cell.isRed ? 'sp-red' :
-                  (!final && coloredCell && coloredCell.row === rowIndex && coloredCell.col === colIndex && coloredCell.color === 'red' ? 'sp-red' : '')
-                )
-            ]"
+              `cell-${cell.color}`]"
         >
           <input
             type="text"
             maxlength="1"
             v-model="cell.value"
             :disabled="cell.readOnly"
+            @focus="onCellSelect(rowIndex, colIndex)"
             @input="onCellInput(rowIndex, colIndex, cell.value)"
+            @blur="onCellDeselect(rowIndex, colIndex)"
           />
         </td>
       </tr>
@@ -87,13 +105,14 @@ export default {
   position: relative;
   box-sizing: border-box;
 }
-
 table {
   width: 100%;
   height: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
+
+
 
 td {
   border: 1px solid #ccc;
@@ -118,6 +137,9 @@ input {
   transition: background-color var(--transition-speed);
 }
 
+
+
+/* Bordi più spessi per le sezioni sudoku */
 .cell-border-right {
   border-right: 2px solid var(--border-color);
 }
@@ -125,16 +147,37 @@ input {
   border-bottom: 2px solid var(--border-color);
 }
 
-.cell-readonly input {
-  background-color: #f2f2f2;
+/* Vari colori per le selezioni di celle in multi */
+.cell-green-selected input {
+  background-color: #c5f4d0;
   font-weight: bold;
 }
-
-/* Stili specifici per Single Player */
-.sp-green input {
-  background-color: #c5f4d0;
-}
-.sp-red input {
+.cell-red input {
   background-color: #f7c2c2;
+  font-weight: bold;
+}
+.cell-yellow input {
+  background-color: #fff9cc;
+}
+.cell-blue input {
+  background-color: #cce6ff;
+}
+.cell-yellow-selected input {
+  background-color: #fef5b1;
+  font-weight: bold;
+}
+.cell-blue-selected input {
+  background-color: #aedaff;
+  font-weight: bold;
+}
+.cell-gray input {
+  background-color: #b0bec5;
+}
+.cell-white input {
+  background-color: white;
+}
+.cell-filled input {
+  background-color: #f2f2f2;
+  font-weight: bold;
 }
 </style>
