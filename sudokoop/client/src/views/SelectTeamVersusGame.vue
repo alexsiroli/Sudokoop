@@ -120,9 +120,9 @@ export default {
           <option value="hard">Difficile</option>
         </select>
       </label>
-      <div class="error-popup">
+
         <p>{{ errorMessage }}</p>
-      </div>
+
       <button class="start-button" @click="checkVersusGameCanStart">
         Inizia la Partita
       </button>
