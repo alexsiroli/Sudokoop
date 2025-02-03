@@ -19,16 +19,16 @@ export default {
 
 <style scoped>
 .back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+  position: relative;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
   color: var(--primary-color);
   transition: color 0.3s;
+  margin-right: 10px; /* Eventuale margine per distanziare se sta a sinistra di un titolo */
 }
+
 .back-button:hover {
   color: var(--primary-dark);
   transform: scale(1.1);
