@@ -128,20 +128,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
 
-    socket.on('cellUpdateMulti', (data) => {
-        const {cellData, lobbyCode, username} = data;
-        const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
-        const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
-
-        if (!result.gameOver) {
-            io.to(lobbyCode).emit("insertedNumber", partialResult)
-        }
-        io.to(lobbyCode).emit("afterUpdating",
-            {
-                data: result,
-                username: username
-            });
-    });
 
 
     // Avvio partita single player
@@ -174,7 +160,22 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
             rowIndex: rowIndex,
             colIndex: colIndex,
         })
-    })
+    });
+
+    socket.on('cellUpdateMulti', (data) => {
+        const {cellData, lobbyCode, username} = data;
+        const partialResult = gameController.insertNumberWithoutCheck(cellData, lobbyCode);
+        const result = gameController.insertNumberMulti(cellData, lobbyCode, username);
+
+        if (!result.gameOver) {
+            io.to(lobbyCode).emit("insertedNumber", partialResult)
+        }
+        io.to(lobbyCode).emit("afterUpdating",
+            {
+                data: result,
+                username: username
+            });
+    });
 
 
     // Aggiornamento cella

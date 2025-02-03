@@ -67,10 +67,10 @@ class GameController {
     }
 
     playersAreInTeamSelection(lobbyCode) {
-        console.log( "team creatu " + this.lobbyTeams[lobbyCode] !== null)
+        console.log( "team creatu " + this.lobbyTeams[lobbyCode])
         console.log("gioco non iniziato " + this.lobbyGame[lobbyCode] === null)
         console.log("gioco non inizato alternayiva " +  !this.lobbyGame[lobbyCode])
-        return this.lobbyTeams[lobbyCode] !== null && !this.lobbyGame[lobbyCode];
+        return this.lobbyTeams[lobbyCode] && !this.lobbyGame[lobbyCode];
     }
 
     // Aggiunge un giocatore a un team
