@@ -13,7 +13,11 @@ export default {
   <div :class="['team-container', `${teamName}-team`]">
     <h3>Squadra {{ this.teamName }}</h3>
     <ul>
-      <li v-for="player in this.team.team">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
+      <li v-for="player in this.team.team">
+        <span :style="player.username.endsWith('-eliminated') ? 'text-decoration: line-through;' : ''">
+    {{ player.username.replace('-eliminated', '') }}
+  </span>
+        <span v-if="player.isMaster"> (Master)</span></li>
     </ul>
     <h6>Points: {{ this.team.point }}</h6>
   </div>

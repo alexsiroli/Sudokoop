@@ -16,6 +16,7 @@ class TeamPlayerManager {
         const team = this.findTeam(username);
         this.removeIfPresent(username, team);
         this.removeFromAllPlayersList(username);
+        this.setMaster(playerManager.getMasterOfLobby(this.lobbyCode))
         return {
             yellowTeam: this.yellowTeam,
             blueTeam: this.blueTeam

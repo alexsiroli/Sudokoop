@@ -29,9 +29,9 @@ module.exports = (io) => {
             const lobby = lobbyController.findLobbyOfUser(socket.username);
             console.log("lobby ", lobby);
             if (lobby) {
+                lobbyController.removePlayerFromLobby(lobby.code, socket.username);
                 const removedFromTeam = gameController.removePlayerFromTeam(lobby.code, socket.username)
                 console.log("removedFRomTEam", removedFromTeam)
-                lobbyController.removePlayerFromLobby(lobby.code, socket.username);
                 if (gameController.removePlayerFromGame(lobby.code, socket.username)) {
                     console.log("lo rimuovo dal gioco");
                     const players = gameController.getPlayersOfGame(lobby.code);
