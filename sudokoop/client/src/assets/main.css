@@ -209,18 +209,6 @@ body {
   transform: scale(1.03);
 }
 
-/* Celle corrette / errate */
-.cell-correct input,
-.cell-readonly.cell-correct input {
-  background-color: #c5f4d0; /* un verde pastello */
-  transition: background-color 0.3s ease;
-}
-.cell-incorrect input,
-.cell-readonly.cell-incorrect input {
-  background-color: #f7c2c2; /* un rosso chiaro */
-  transition: background-color 0.3s ease;
-}
-
 /* Cuori vite */
 .hearts {
   font-size: 1.5em;
@@ -247,4 +235,34 @@ body {
     font-size: 0.9rem;
     padding: 10px 16px;
   }
+  /* Rimpicciolisce il contenitore principale .rounded-box */
+  .rounded-box {
+    width: 100%;
+    padding: 20px;
+    /* Eventualmente togli o riduci box-shadow se vuoi un layout più essenziale su mobile */
+    box-shadow: none;
+  }
+  /* Nel single player, “game-container” o “sudoku-container” */
+  .game-container {
+    width: 100%;
+    padding: 10px; /* meno margini */
+  }
+  .sudoku-container {
+    margin: 0 auto;
+    padding: 0;
+    /* elimina o riduci box-shadow se stona in mobile */
+    box-shadow: none;
+    border: none;
+  }
+  /* La griglia Sudoku vera e propria */
+  .sudoku-grid {
+    max-width: 100%;  /* si adatta in larghezza */
+    padding: 5px;     /* riduce i margini interni */
+    grid-template-columns: repeat(9, 1fr); /* conserva la struttura 9 colonne */
+  }
+  /* Le celle e gli input, un po’ più piccoli */
+  .sudoku-grid .cell input {
+    font-size: 1rem; /* Se 1.4em su schermi piccoli sembra troppo grande, riduci qui */
+  }
+
 }
