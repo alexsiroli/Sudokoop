@@ -219,7 +219,7 @@ describe('Game.vue', () => {
 
     const puzzle = '-'.repeat(81);
     const solution = '1'.repeat(81);
-    wrapper.vm.initializeGridWithSolution(puzzle, solution);
+    wrapper.vm.initializeGridWithSolution(solution);
 
     const grid = wrapper.vm.sudokuGrid;
     expect(grid.length).toBe(9);
