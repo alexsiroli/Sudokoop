@@ -60,4 +60,12 @@ h6 {
 .team-container li {
   color: black;
 }
+
+@media (max-width: 768px) {
+  .team-container {
+    width: 60%; /* Occupa quasi tutta la larghezza su mobile */
+    margin: 5%;
+  }
+}
+
 </style>

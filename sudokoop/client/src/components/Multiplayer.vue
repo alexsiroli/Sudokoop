@@ -327,4 +327,21 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
 }
+
+@media (max-width: 768px) { /* Adatta la larghezza in base alle tue necessità */
+  .game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sudoku-container {
+    margin: 10px;
+    width: 100%;
+  }
+
+  .game-layout > * {
+    width: 100%;
+  }
+}
+
 </style>
