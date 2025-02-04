@@ -82,12 +82,18 @@ class GameController {
 
     removePlayerFromTeam(lobbyCode, username) {
         if (this.lobbyTeams[lobbyCode]) {
-            return this.lobbyTeams[lobbyCode].removePlayerFromTeam(username);
+            const res = this.lobbyTeams[lobbyCode].removePlayerFromTeam(username);
+            if (this.lobbyTeams[lobbyCode].getPlayersOfLobby().length === 0) {
+                this.removeTeam(lobbyCode);
+            }
+            return res;
         }
         return false;
     }
 
-
+    removeTeam(lobbyCode) {
+        this.lobbyTeams[lobbyCode] = null;
+    }
     multiPlayerGameCanStart(lobbyCode, mode) {
         if (lobbyPlayerManager.getPlayersOfLobby(lobbyCode).length < 2) {
             return {res: false, message: "Devono esserci almeno 2 giocatori per iniziare la partita"}
@@ -122,6 +128,7 @@ class GameController {
             this.lobbyGame[lobbyCode].removePlayer(username);
             if (this.getPlayersOfGame(lobbyCode).length < 1) {
                 this.removeGame(lobbyCode);
+                this.removeTeam(lobbyCode)
             }
             return true;
         }

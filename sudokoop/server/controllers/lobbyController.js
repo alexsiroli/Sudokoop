@@ -31,7 +31,12 @@ class LobbyController {
     }
     joinLobby(code, username) {
         const lobby = this.findLobby(code);
-        if (!lobby) return {success: false, reason: "not-exist"};
+        if (!lobby || playerManager.getPlayersOfLobby(code).length === 0)
+        {
+            this.removeLobby(code);
+            return {success: false, reason: "not-exist"};
+        }
+
         if (playerManager.lobbyPlayers[code].length >= 10) {
             return {success: false, reason: "full"};
         }

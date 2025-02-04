@@ -20,6 +20,7 @@ export default {
   },
   methods: {
     createLobby() {
+      console.log("creo lobby")
       socket.emit("createLobby", sessionStorage.getItem('username'));
     },
 
@@ -62,6 +63,7 @@ export default {
   mounted() {
     console.log("sono in lobby ", sessionStorage.getItem("lobbyCode"));
     socket.on("onLobbyCreated", (code) => {
+      console.log("lobbyCreata")
       sessionStorage.setItem("lobbyCode", code);
       this.lobbyCode = code;
       this.inLobby = true;
