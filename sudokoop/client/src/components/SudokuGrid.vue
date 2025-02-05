@@ -76,7 +76,7 @@ export default {
               `cell-${cell.color}`]"
         >
           <input
-            type="text"
+            type="number"
             maxlength="1"
             v-model="cell.value"
             :disabled="cell.readOnly"
@@ -120,6 +120,17 @@ td {
   position: relative;
   vertical-align: middle;
   box-sizing: border-box;
+}
+/* Per browser WebKit (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Per Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 input {
