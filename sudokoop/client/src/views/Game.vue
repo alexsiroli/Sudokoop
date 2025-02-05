@@ -244,7 +244,6 @@ export default {
 <template>
   <div class="centered-container">
     <div class="rounded-box game-container">
-      <BackButton @click="goToHome" title="Torna alla Home" />
       <h1 class="title">Gioco Singolo - Difficoltà: {{ difficulty }}</h1>
 
       <!-- Se l'utente ha perso, messaggio sopra la griglia -->
@@ -267,6 +266,8 @@ export default {
 
           />
         </div>
+
+        <button @click="goToHome" class="button-exit"> Abbandona la partita </button>
 
         <!-- Se il gioco è finito -->
         <div v-if="gameOver" class="game-over-container" style="margin-top: 20px;">
