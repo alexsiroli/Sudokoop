@@ -55,7 +55,6 @@ class TeamPlayerManager {
     }
 
     setMaster(master) {
-        console.log("setto il nuovo master " + master.username)
         if (master && playerManager.getPlayersOfLobby(this.lobbyCode).length > 0) {
             const team = this.findTeam(master.username);
             if (team.some(p => p.username === master.username)) {
