@@ -14,4 +14,4 @@ RUN npm install -g serve
 # Porta 8080, se vuoi servire il frontend su questa porta
 EXPOSE 8080
 
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["serve", "-s", "dist", "-l", "0.0.0.0:8080"]
