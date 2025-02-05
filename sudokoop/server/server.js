@@ -33,6 +33,7 @@ app.use("/api/game", gameRoutes);
 require('./sockets')(io);
 
 // Avvio server
-server.listen(5001, '0.0.0.0', () => {
-    console.log(`Server in ascolto sulla porta 5001`);
+const PORT = process.env.PORT || 5001;
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server in ascolto sulla porta ${PORT}`);
 });
