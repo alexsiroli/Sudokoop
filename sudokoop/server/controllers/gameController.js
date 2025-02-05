@@ -150,6 +150,7 @@ class GameController {
 
     removeGame(lobbyCode) {
         this.lobbyGame[lobbyCode] = null;
+        this.lobbyTeams[lobbyCode] = null;
     }
 
     // Recupera il gioco associato a una lobby
