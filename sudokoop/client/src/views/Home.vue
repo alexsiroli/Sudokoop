@@ -1,3 +1,46 @@
+
+<script>
+import Leaderboard from "../components/Leaderboard.vue";
+import Account from "../components/Account.vue";
+import Credits from "../components/Credits.vue";
+import socket from "../plugins/socket";
+
+export default {
+  name: 'Home',
+  components: {Credits, Leaderboard, Account},
+  data() {
+    return {
+      selectedDifficulty: 'easy',
+      leaderboardVisible: false,
+      accountVisible: false,
+      creditsVisible: false
+    };
+  },
+  methods: {
+    playSinglePlayer() {
+      this.$router.push({name: 'Game', query: {difficulty: this.selectedDifficulty}});
+    },
+    createAndGoToLobby() {
+      socket.emit("createLobby", sessionStorage.getItem('username'));
+      this.$router.push({name: 'Lobby'});
+    },
+    joinLobby() {
+      this.$router.push({name: 'Lobby'});
+    },
+    showLeaderboard() {
+      this.leaderboardVisible = true;
+    },
+    showAccount() {
+      this.accountVisible = true;
+    },
+    showCredits() {
+      this.creditsVisible = true;
+    }
+  },
+};
+</script>
+
+
 <template>
   <div class="centered-container">
     <div class="rounded-box home-box">
@@ -18,7 +61,8 @@
         </div>
         <div class="menu-item">
           <h2>Multiplayer</h2>
-          <button @click="goToLobby" class="button">Crea/Entra in Lobby</button>
+          <button @click="createAndGoToLobby" class="button">Crea Lobby</button>
+          <button @click="joinLobby" class="button">Entra in Lobby</button>
         </div>
       </div>
 
@@ -60,42 +104,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import Leaderboard from "../components/Leaderboard.vue";
-import Account from "../components/Account.vue";
-import Credits from "../components/Credits.vue";
-
-export default {
-  name: 'Home',
-  components: {Credits, Leaderboard, Account},
-  data() {
-    return {
-      selectedDifficulty: 'easy',
-      leaderboardVisible: false,
-      accountVisible: false,
-      creditsVisible: false
-    };
-  },
-  methods: {
-    playSinglePlayer() {
-      this.$router.push({name: 'Game', query: {difficulty: this.selectedDifficulty}});
-    },
-    goToLobby() {
-      this.$router.push({name: 'Lobby'});
-    },
-    showLeaderboard() {
-      this.leaderboardVisible = true;
-    },
-    showAccount() {
-      this.accountVisible = true;
-    },
-    showCredits() {
-      this.creditsVisible = true;
-    }
-  },
-};
-</script>
 
 <style scoped>
 .home-box {

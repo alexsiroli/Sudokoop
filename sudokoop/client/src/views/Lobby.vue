@@ -19,10 +19,6 @@ export default {
     };
   },
   methods: {
-    createLobby() {
-      console.log("creo lobby")
-      socket.emit("createLobby", sessionStorage.getItem('username'));
-    },
 
     joinLobby() {
       socket.emit("joinLobby", {
@@ -143,7 +139,6 @@ export default {
 
       <h1>Lobby</h1>
       <div v-if="!inLobby">
-        <button @click="createLobby" class="button">Crea Lobby</button>
         <div style="margin-top:20px;">
           <input v-model="lobbyCode" class="input" placeholder="Inserisci Codice Lobby"/>
           <button @click="joinLobby" class="button">Unisciti</button>
