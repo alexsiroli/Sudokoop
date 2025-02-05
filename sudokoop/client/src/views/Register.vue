@@ -11,21 +11,35 @@
 
       <!-- Altrimenti mostra il form di registrazione -->
       <template v-else>
-        <form @submit.prevent="onSubmit">
+        <form @submit.prevent="onSubmit" class="form-container">
           <input
             type="text"
             v-model="username"
             placeholder="Username"
+            min="1"
             required
           />
           <input
             type="password"
             v-model="password"
             placeholder="Password"
+            min="1"
             required
           />
+          <input
+            type="password"
+            v-model="confirmPassword"
+            placeholder="Conferma Password"
+            required
+          />
+
+          <p v-if="confirmPassword && password !== confirmPassword" class="error-text">
+            Le password non coincidono
+          </p>
+
+
           <p class="text-bg-danger">{{ registerError }}</p>
-          <button class="button" type="submit">Registrati</button>
+          <button class="button" type="submit" :disabled="confirmPassword && password !== confirmPassword">Registrati</button>
         </form>
         <p style="margin-top: 20px;">
           Hai già un account?
@@ -46,6 +60,7 @@ export default {
     return {
       username: "",
       password: "",
+      confirmPassword: "",
       registerError: "",
       alreadyLogged: false,
       storedUsername: "",
@@ -97,3 +112,32 @@ export default {
   }
 };
 </script>
+<style scoped>
+.form-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px; /* Imposta una larghezza massima */
+  margin: auto; /* Centra il form */
+  padding: 20px;
+
+}
+.form-container input {
+  padding: 10px;
+  margin-bottom: 15px; /* Spazio tra gli input */
+  border: 1px solid #ccc;
+}
+  .form-container button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+.form-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+</style>
