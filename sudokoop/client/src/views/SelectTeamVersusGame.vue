@@ -110,8 +110,7 @@ export default {
     <LobbyUsers :players = "allPlayers" ></LobbyUsers>
     <!-- Pulsante Start -->
     <div class="controls" v-if="this.player.isMaster">
-
-        <p>{{ errorMessage }}</p>
+      <p class="text-danger">{{ errorMessage }}</p>
 
       <button class="start-button" @click="checkVersusGameCanStart">
         Inizia la Partita
