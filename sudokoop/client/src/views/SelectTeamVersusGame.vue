@@ -93,7 +93,7 @@ export default {
     <div class="teams-container">
       <!-- Squadra Gialla -->
       <div class="team yellow-team">
-        <h3>Squadra Gialla</h3>
+        <h5>Squadra Gialla</h5>
         <ul>
           <li v-for="player in this.yellowTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
@@ -102,7 +102,7 @@ export default {
 
       <!-- Squadra Blu -->
       <div class="team blue-team">
-        <h3>Squadra Blu</h3>
+        <h5>Squadra Blu</h5>
         <ul>
           <li v-for="player in this.blueTeam">{{ player.username }} <span v-if="player.isMaster"> (Master)</span></li>
         </ul>
@@ -142,7 +142,7 @@ export default {
   margin-top: 10px;
 }
 
-h3 {
+h5 {
   color: black;
 }
 li {
@@ -171,6 +171,20 @@ li {
   border-radius: var(--border-radius);
   text-align: center;
 }
+
+@media (max-width: 768px) {
+  .teams-container {
+    font-size: 1rem; /* Riduzione del font per schermi piccoli */
+  }
+  .team {
+    width: 45%;
+    padding: 5%;
+  }
+  .team button {
+
+    width: 80%; /* Riduzione della larghezza del pulsante su schermi piccoli */
+  }
+}
 .yellow-team {
   background-color: #fffbe6;
 }
@@ -184,7 +198,7 @@ li {
 }
 .team button {
   margin-top: 10px;
-  padding: 10px 20px;
+  padding: 5%;
   font-size: 18px;
   cursor: pointer;
   border-radius: var(--border-radius);
