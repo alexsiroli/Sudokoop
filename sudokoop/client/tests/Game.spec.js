@@ -213,7 +213,7 @@ describe('Game.vue', () => {
   it('inizializza correttamente la griglia con soluzione con initializeGridWithSolution', () => {
     // Imposta una griglia precedente e un puzzle iniziale
     wrapper.setData({
-      sudokuGrid: Array(9).fill(null).map(() => Array(9).fill({color: 'white'})),
+      sudokuGrid: Array(9).fill(null).map(() => Array(9).fill({isGreen: false})),
       initialPuzzle: '-'.repeat(81)
     });
 
