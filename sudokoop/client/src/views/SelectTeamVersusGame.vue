@@ -11,7 +11,6 @@ export default {
       yellowTeam: [],
       blueTeam: [],
       buttonDisabled: false,
-      selectedDifficulty: "easy",
       showError: false,
       errorMessage: "",
       player: [],
@@ -45,9 +44,7 @@ export default {
 
     checkVersusGameCanStart() {
       // creo il gioco e avviso gli altri che possono andare nella schermata di gameVersus
-      socket.emit("checkVersusGameCanStart",
-        { lobbyCode: sessionStorage.getItem('lobbyCode'),
-          difficulty: this.selectedDifficulty});
+      socket.emit("checkVersusGameCanStart", sessionStorage.getItem('lobbyCode'));
 
     },
   },
@@ -113,13 +110,6 @@ export default {
     <LobbyUsers :players = "allPlayers" ></LobbyUsers>
     <!-- Pulsante Start -->
     <div class="controls" v-if="this.player.isMaster">
-      <label>Difficoltà:
-        <select v-model="selectedDifficulty">
-          <option value="easy">Facile</option>
-          <option value="medium">Medio</option>
-          <option value="hard">Difficile</option>
-        </select>
-      </label>
 
         <p>{{ errorMessage }}</p>
 

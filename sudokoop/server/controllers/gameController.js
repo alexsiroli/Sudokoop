@@ -62,8 +62,8 @@ class GameController {
 
     // chiamato nel momento in cui i giocatori scelgono modalità versus
     // e devono dividersi in squadre
-    createTeamManager(lobbyCode) {
-        this.lobbyTeams[lobbyCode] = new TeamPlayerManager(lobbyCode);
+    createTeamManager(lobbyCode, difficulty) {
+        this.lobbyTeams[lobbyCode] = new TeamPlayerManager(lobbyCode, difficulty);
     }
 
     playersAreInTeamSelection(lobbyCode) {
@@ -94,12 +94,12 @@ class GameController {
     removeTeam(lobbyCode) {
         this.lobbyTeams[lobbyCode] = null;
     }
-    multiPlayerGameCanStart(lobbyCode, mode) {
+    multiPlayerGameCanStart(lobbyCode, mode, difficulty) {
         if (lobbyPlayerManager.getPlayersOfLobby(lobbyCode).length < 2) {
             return {res: false, message: "Devono esserci almeno 2 giocatori per iniziare la partita"}
         }
         if (mode === 'versus') {
-            this.createTeamManager(lobbyCode);
+            this.createTeamManager(lobbyCode, difficulty);
         }
         return {res: true};
     }
@@ -107,6 +107,7 @@ class GameController {
     versusGameCanStart(lobbyCode) {
         return this.lobbyTeams[lobbyCode].checkVersusGameCanStart();
     }
+
 
     checkVersusGameCanRestart(lobbyCode) {
         return this.lobbyGame[lobbyCode].checkGameCanRestart();
@@ -117,7 +118,8 @@ class GameController {
         this.lobbyGame[lobbyCode] = new CoopGame(difficulty, lobbyCode);
     }
 
-    createVersusGame(lobbyCode, difficulty) {
+    createVersusGame(lobbyCode) {
+        const difficulty = this.lobbyTeams[lobbyCode].getDifficulty();
         this.lobbyTeams[lobbyCode].restorePlayer()
         this.lobbyGame[lobbyCode] = new VersusGame(difficulty, this.lobbyTeams[lobbyCode]);
     }

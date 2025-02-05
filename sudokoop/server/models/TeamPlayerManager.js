@@ -4,9 +4,10 @@ class TeamPlayerManager {
     // inizializzo i team con tutti i player della lobby: in questo modo vedo
     // se i giocatori aggiunti appartenevano effettivamente alla lobby e faccio
     // controllo per iniziare un game (tutti i giocatori hanno scelto una squadra)
-    constructor(lobbyCode) {
+    constructor(lobbyCode, difficulty) {
         this.yellowTeam = [];
         this.blueTeam = [];
+        this.difficulty = difficulty;
         this.lobbyCode = lobbyCode;
         //allPlayers serve solo durante la scelta iniziate dei team per capire quando tutti hanno scelto
         this.allPlayers = [...playerManager.getPlayersOfLobby(lobbyCode)];
@@ -21,6 +22,10 @@ class TeamPlayerManager {
             yellowTeam: this.yellowTeam,
             blueTeam: this.blueTeam
         }
+    }
+
+    getDifficulty() {
+        return this.difficulty;
     }
 
     findTeam(username) {

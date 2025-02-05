@@ -177,7 +177,6 @@ export default {
                 <option value="versus">Versus</option>
               </select>
             </label>
-            <div v-if="selectedMode==='coop'">
               <label>Difficoltà:
                 <select v-model="selectedDifficulty">
                   <option value="easy">Facile</option>
@@ -185,7 +184,6 @@ export default {
                   <option value="hard">Difficile</option>
                 </select>
               </label>
-            </div>
           </div>
           <button
             @click="startMultiGame"
