@@ -1,0 +1,16 @@
+@startuml JoinLobby
+actor "Utente" as U
+participant "Client (Socket)" as C
+participant "Server (Socket Handler)" as S
+participant "All Clients" as AC
+
+U -> C : Inserisce codice lobby e invia richiesta
+C -> S : Socket.emit("joinLobby", {username, code})
+S -> S : Verifica se la lobby esiste e non è piena
+alt Lobby esistente e disponibile
+    S -> C : Socket.emit("joinLobby", {res:"Ok", lobbyCode})
+    S -> AC : Socket.emit("players", playersList)
+else Lobby inesistente o piena
+    S -> C : Socket.emit("joinLobby", "Not exists / Full")
+end
+@enduml

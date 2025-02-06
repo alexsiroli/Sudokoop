@@ -1,0 +1,13 @@
+@startuml CreateLobby
+actor "Utente" as U
+participant "Client (Socket)" as C
+participant "Server (Socket Handler)" as S
+participant "All Clients" as AC
+
+U -> C : Richiesta di creazione lobby (master)
+C -> S : Socket.emit("createLobby", username)
+S -> S : Genera codice lobby e crea nuova lobby
+S -> S : Aggiunge il master alla lobby
+S -> C : Socket.emit("onLobbyCreated", lobbyCode)
+S -> AC : Socket.emit("players", playersList)
+@enduml

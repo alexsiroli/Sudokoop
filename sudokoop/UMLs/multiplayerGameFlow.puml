@@ -1,0 +1,16 @@
+@startuml MultiplayerGameFlow
+actor "Giocatore" as P
+participant "Client (Socket)" as C
+participant "Server (Game Controller)" as S
+participant "All Clients" as AC
+
+P -> C : Effettua una mossa (aggiornamento cella)
+C -> S : Socket.emit("cellUpdateMulti", {cellData, lobbyCode, username})
+S -> S : Elabora mossa, aggiorna stato partita e puzzle
+S -> AC : Socket.emit("afterUpdating", {result, username})
+alt Partita in corso
+    S -> AC : Socket.emit("insertedNumber", updatedPartialPuzzle)
+else Partita terminata
+    S -> AC : Socket.emit("afterUpdating", {result, username, gameOver:true})
+end
+@enduml

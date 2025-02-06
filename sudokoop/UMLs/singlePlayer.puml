@@ -1,0 +1,24 @@
+@startuml SinglePlayerGame
+actor "Utente" as U
+participant "Client" as C
+participant "Server (API Game)" as S
+database "Database" as DB
+
+U -> C : Seleziona difficoltà e avvia partita
+C -> S : GET /game/new?difficulty=easy
+S -> S : Crea nuova partita (GameWithVite)
+S --> C : Response {gameId, puzzle, vite}
+
+U -> C : Effettua una mossa (aggiornamento cella)
+C -> S : POST /game/insert (gameId, row, col, value)
+S -> S : Valida mossa e aggiorna stato partita
+alt Partita in corso
+    S --> C : Response {message, puzzle, vite}
+else Partita terminata
+    S --> C : Response {message (vittoria/sconfitta), puzzle, vite}
+    C -> S : POST /game/time (user, time, difficulty)
+    S -> DB : Salva risultato su Leaderboard
+    C -> S : POST /game/updateStats (user, result)
+    S -> DB : Aggiorna statistiche utente
+end
+@enduml

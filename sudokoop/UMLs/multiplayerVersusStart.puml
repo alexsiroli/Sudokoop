@@ -1,0 +1,22 @@
+@startuml MultiplayerVersusStart
+actor "Master (Utente)" as M
+participant "Client (Socket)" as C
+participant "Server (Game Controller)" as S
+participant "All Clients" as AC
+
+M -> C : Richiesta di avvio partita (versus)
+C -> S : Socket.emit("checkMultiGameStart", {lobbyCode, mode:"versus", difficulty})
+S -> S : Verifica giocatori e crea Team Manager
+alt Selezione team incompleta
+    S -> C : Socket.emit("gameCanStart", {res:false, message:"Tutti i giocatori devono scegliere una squadra"})
+else Selezione tem incompatibile
+        S -> C : Socket.emit("gameCanStart", {res:false, message:"Ogni squadra deve avere almeno un giocatore"})
+
+else
+    S -> S : Crea partita Versus (createVersusGame)
+    S -> AC : Socket.emit("versusGameCanStart", {res:true})
+end
+M -> C : Conferma avvio partita
+C -> S : Socket.emit("createVersusGame", {lobbyCode, difficulty})
+S -> AC : Socket.emit("startGame")
+@enduml

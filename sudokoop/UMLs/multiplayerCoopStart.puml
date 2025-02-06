@@ -1,0 +1,19 @@
+@startuml MultiplayerCoopStart
+actor "Master (Utente)" as M
+participant "Client (Socket)" as C
+participant "Server (Game Controller)" as S
+participant "All Clients" as AC
+
+M -> C : Richiesta di avvio partita (coop)
+C -> S : Socket.emit("checkMultiGameStart", {lobbyCode, mode:"coop", difficulty})
+S -> S : Verifica numero giocatori sufficienti
+alt Giocatori insufficienti
+    S -> C : Socket.emit("gameCanStart", {res:false, message:"Almeno 2 giocatori necessari"})
+else
+    S -> S : Crea partita Coop (createCoopGame)
+    S -> AC : Socket.emit("gameCanStart", {res:true, mode:"coop", difficulty})
+    M -> C : Conferma avvio
+    C -> S : Socket.emit("startCoopGame", lobbyCode)
+    S -> AC : Socket.emit("startGame")
+end
+@enduml

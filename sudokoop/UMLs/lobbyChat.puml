@@ -1,0 +1,15 @@
+@startuml LobbyChatFlow
+actor "Utente" as U
+participant "ChatBox Component" as CB
+participant "Socket.IO Client" as SC
+participant "Server (Lobby Handler)" as S
+
+U -> CB : Digita messaggio
+CB -> CB : Verifica che il messaggio non sia vuoto
+CB -> SC : Socket.emit("lobbyMessage", {lobbyCode, author, text})
+SC -> S : Riceve "lobbyMessage" dal client
+S -> S : Inoltra il messaggio a tutti i client nella room
+S -> SC : Socket.emit("lobbyMessage", {author, text, timestamp})
+SC -> CB : Riceve "lobbyMessage"
+CB -> CB : Aggiunge il messaggio alla lista e aggiorna la visualizzazione
+@enduml
