@@ -109,12 +109,13 @@ export default {
 .home-box {
   min-width: 600px;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  padding: 20px;
 }
 @media (max-width: 600px) {
   .home-box {
     min-width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 }
 .logo {
@@ -125,21 +126,21 @@ export default {
   margin: 0 auto;
 }
 .header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 .menu-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 .menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 250px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .menu-row.centered {
   display: flex;
@@ -151,8 +152,8 @@ export default {
 .footer {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 10px;
+  margin-top: 10px;
 }
 .footer-item {
   display: flex;
