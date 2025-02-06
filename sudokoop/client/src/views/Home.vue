@@ -1,13 +1,13 @@
-
 <script>
 import Leaderboard from "../components/Leaderboard.vue";
 import Account from "../components/Account.vue";
 import Credits from "../components/Credits.vue";
+import DifficultySelector from "../components/DifficultySelector.vue";
 import socket from "../plugins/socket";
 
 export default {
   name: 'Home',
-  components: {Credits, Leaderboard, Account},
+  components: {Credits, Leaderboard, Account, DifficultySelector},
   data() {
     return {
       selectedDifficulty: 'easy',
@@ -36,7 +36,7 @@ export default {
     showCredits() {
       this.creditsVisible = true;
     }
-  },
+  }
 };
 </script>
 
@@ -52,11 +52,8 @@ export default {
       <div class="menu-column">
         <div class="menu-item">
           <h2>Singleplayer</h2>
-          <select v-model="selectedDifficulty" class="select difficulty-select">
-            <option value="easy">Facile</option>
-            <option value="medium">Medio</option>
-            <option value="hard">Difficile</option>
-          </select>
+          <!-- Utilizzo del componente DifficultySelector -->
+          <DifficultySelector v-model="selectedDifficulty" />
           <button @click="playSinglePlayer" class="button">Inizia</button>
         </div>
         <div class="menu-item">
@@ -84,23 +81,10 @@ export default {
         </div>
       </div>
 
-      <!-- Leaderboard in overlay, se richiesto -->
-      <Leaderboard
-        v-if="leaderboardVisible"
-        @close="leaderboardVisible = false"
-      />
-
-      <!-- Account in overlay, se richiesto -->
-      <Account
-        v-if="accountVisible"
-        @close="accountVisible = false"
-      />
-
-      <!-- Credits in overlay, se richiesto -->
-      <Credits
-        v-if="creditsVisible"
-        @close="creditsVisible = false"
-      />
+      <!-- Overlay components -->
+      <Leaderboard v-if="leaderboardVisible" @close="leaderboardVisible = false" />
+      <Account v-if="accountVisible" @close="accountVisible = false" />
+      <Credits v-if="creditsVisible" @close="creditsVisible = false" />
     </div>
   </div>
 </template>
@@ -112,12 +96,14 @@ export default {
   margin-bottom: 20px;
   padding: 20px;
 }
+
 @media (max-width: 600px) {
   .home-box {
     min-width: 100%;
     margin-bottom: 10px;
   }
 }
+
 .logo {
   width: 60%;
   max-width: 500px;
@@ -125,9 +111,11 @@ export default {
   display: block;
   margin: 0 auto;
 }
+
 .header {
   margin-bottom: 20px;
 }
+
 .menu-column {
   display: flex;
   flex-direction: column;
@@ -135,6 +123,7 @@ export default {
   gap: 10px;
   margin-bottom: 20px;
 }
+
 .menu-item {
   display: flex;
   flex-direction: column;
@@ -142,19 +131,20 @@ export default {
   width: 250px;
   margin-bottom: 10px;
 }
+
 .menu-row.centered {
   display: flex;
   justify-content: center;
   margin-bottom: 40px;
 }
 
-/* Footer */
 .footer {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 10px;
 }
+
 .footer-item {
   display: flex;
 }

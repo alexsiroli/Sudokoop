@@ -2,14 +2,15 @@
 import socket from "../plugins/socket.js";
 import ChatBox from "../components/ChatBox.vue";
 import BackButton from "../components/BackButton.vue";
+import DifficultySelector from "../components/DifficultySelector.vue";
 
 export default {
   name: "Lobby",
-  components: { ChatBox, BackButton },
+  components: { ChatBox, BackButton, DifficultySelector },
   data() {
     return {
       inLobby: false,
-      players: [], // array di oggetti { username, isMaster }
+      players: [],
       isMaster: false,
       selectedMode: "coop",
       selectedDifficulty: "easy",
@@ -19,47 +20,41 @@ export default {
     };
   },
   methods: {
-
     joinLobby() {
       socket.emit("joinLobby", {
-        username: sessionStorage.getItem('username'),
-        code: this.lobbyCode
+        username: sessionStorage.getItem("username"),
+        code: this.lobbyCode,
       });
     },
-
-    // chiamata solo dal master
     startMultiGame() {
       socket.emit("checkMultiGameStart", {
         lobbyCode: this.lobbyCode,
         mode: this.selectedMode,
-        difficulty: this.selectedDifficulty
+        difficulty: this.selectedDifficulty,
       });
     },
-
     leaveLobbyAndGoHome() {
-      const username = sessionStorage.getItem('username');
+      const username = sessionStorage.getItem("username");
       const lobbyCode = this.lobbyCode;
-      // Se l'utente è attualmente in lobby, invia l'evento di abbandono al server
       if (this.inLobby && lobbyCode && username) {
-        socket.emit("leaveLobby", {code: lobbyCode, username: username});
+        socket.emit("leaveLobby", { code: lobbyCode, username: username });
       }
       this.inLobby = false;
       this.lobbyCode = "";
       sessionStorage.removeItem("lobbyCode");
-      this.$router.push({name: 'Home'});
+      this.$router.push({ name: "Home" });
     },
-
     copyLobbyCode() {
-      navigator.clipboard.writeText(this.lobbyCode)
+      navigator.clipboard
+        .writeText(this.lobbyCode)
         .then(() => console.log("Codice lobby copiato!"))
-        .catch(err => console.error("Errore nella copia:", err));
-    }
+        .catch((err) => console.error("Errore nella copia:", err));
+    },
   },
-
   mounted() {
-    console.log("sono in lobby ", sessionStorage.getItem("lobbyCode"));
+    console.log("sono in lobby", sessionStorage.getItem("lobbyCode"));
     socket.on("onLobbyCreated", (code) => {
-      console.log("lobbyCreata")
+      console.log("lobbyCreata");
       sessionStorage.setItem("lobbyCode", code);
       this.lobbyCode = code;
       this.inLobby = true;
@@ -79,45 +74,44 @@ export default {
       }
     });
 
-    socket.on('goInTeamSelection', () => {
-      this.$router.push({name: 'SelectTeamVersusGame'});
+    socket.on("goInTeamSelection", () => {
+      this.$router.push({ name: "SelectTeamVersusGame" });
     });
 
     socket.on("players", (playersArr) => {
-      console.log("players in lobby"  + playersArr);
+      console.log("players in lobby", playersArr);
       this.players = playersArr;
-      this.inLobby = sessionStorage.getItem('lobbyCode') !== null;
+      this.inLobby = sessionStorage.getItem("lobbyCode") !== null;
       if (playersArr.length > 0 && this.inLobby) {
         this.lobbyCode = sessionStorage.getItem("lobbyCode");
-        this.isMaster = playersArr.some(p =>
-          p.username === sessionStorage.getItem('username') && p.isMaster);
+        this.isMaster = playersArr.some(
+          (p) =>
+            p.username === sessionStorage.getItem("username") && p.isMaster
+        );
       }
     });
 
-
-    socket.on('gameCanStart', (data) => {
-      if (data.res.res ) {
+    socket.on("gameCanStart", (data) => {
+      if (data.res.res) {
         if (data.mode === "coop") {
-          this.$router.push({name: 'CoopGame'});
+          this.$router.push({ name: "CoopGame" });
         } else {
-          this.$router.push({name: 'SelectTeamVersusGame'});
+          this.$router.push({ name: "SelectTeamVersusGame" });
         }
       } else {
-        socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
+        socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"));
         this.errorOnStart = data.res.message;
       }
     });
 
-    // chiamata alla fine di una partita versus
-    socket.on('versusGameCanStart', (data) => {
+    socket.on("versusGameCanStart", (data) => {
       if (data.res) {
-        this.$router.push({name: 'VersusGame'});
+        this.$router.push({ name: "VersusGame" });
       } else {
-        socket.emit("getPlayersOfLobby", sessionStorage.getItem('lobbyCode'))
+        socket.emit("getPlayersOfLobby", sessionStorage.getItem("lobbyCode"));
         this.errorOnStart = data.message;
       }
-    })
-
+    });
   },
   beforeUnmount() {
     socket.off("onLobbyCreated");
@@ -125,16 +119,16 @@ export default {
     socket.off("players");
     socket.off("gameCanStart");
     socket.off("versusGameCanStart");
-
-  }
+  },
 };
 </script>
+
 <template>
   <div class="centered-container">
     <div class="rounded-box">
       <BackButton
-         @click="leaveLobbyAndGoHome"
-         title="Torna alla Home (e abbandona la lobby)"
+        @click="leaveLobbyAndGoHome"
+        title="Torna alla Home (e abbandona la lobby)"
       />
 
       <h1>Lobby</h1>
@@ -148,7 +142,7 @@ export default {
       <div v-else>
         <p>
           Codice Lobby:
-          <strong>{{ this.lobbyCode }}</strong>
+          <strong>{{ lobbyCode }}</strong>
           <button class="copy-button" @click="copyLobbyCode">Copia</button>
         </p>
         <h3>Giocatori:</h3>
@@ -158,32 +152,28 @@ export default {
           </li>
         </ul>
 
-        <!-- ChatBox visibile solo se inLobby è true -->
+        <!-- ChatBox visibile se inLobby è true -->
         <div style="margin-top: 20px;" v-if="inLobby">
-          <chat-box :lobbyCode="this.lobbyCode"/>
+          <chat-box :lobbyCode="lobbyCode" />
         </div>
 
-        <!-- Sezione Master spostata sotto la ChatBox -->
+        <!-- Sezione Master per avviare la partita -->
         <div v-if="isMaster" class="master-panel">
           <div class="options">
-            <label>Modalità:
+            <label>
+              Modalità:
               <select v-model="selectedMode">
                 <option value="coop">Coop</option>
                 <option value="versus">Versus</option>
               </select>
             </label>
-              <label>Difficoltà:
-                <select v-model="selectedDifficulty">
-                  <option value="easy">Facile</option>
-                  <option value="medium">Medio</option>
-                  <option value="hard">Difficile</option>
-                </select>
-              </label>
+            <label>
+              Difficoltà:
+              <!-- Uso del componente DifficultySelector -->
+              <DifficultySelector v-model="selectedDifficulty" />
+            </label>
           </div>
-          <button
-            @click="startMultiGame"
-            class="button">Avvia Partita
-          </button>
+          <button @click="startMultiGame" class="button">Avvia Partita</button>
           <p class="text-danger">{{ errorOnStart }}</p>
         </div>
       </div>
@@ -201,14 +191,12 @@ export default {
   width: 300px;
   box-shadow: 0 1px 4px var(--shadow-color);
 }
-
 .options {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 15px;
 }
-
 .options label {
   display: flex;
   flex-direction: column;
@@ -220,7 +208,6 @@ export default {
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
 }
-
 .copy-button {
   margin-left: 10px;
   padding: 5px;
