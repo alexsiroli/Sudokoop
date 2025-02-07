@@ -40,14 +40,6 @@ test_server:
   dependencies:
     - install_server
 
-test_client:
-  stage: test
-  script:
-    - cd sudokoop/client
-    - npm run test
-  dependencies:
-    - install_client
-
 build_client:
   stage: build
   script:

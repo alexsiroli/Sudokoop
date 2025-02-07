@@ -1,3 +1,9 @@
+/**
+* @file Leaderboard.vue
+* @description Componente per la visualizzazione della classifica dei tempi di gioco.
+* Mostra i migliori tempi registrati per diverse difficoltà e permette di chiudere l'overlay.
+*/
+
 <script setup>
 import { onMounted, ref } from "vue";
 import axios from "../main.js";
@@ -6,12 +12,15 @@ import OverlayDialog from "./OverlayDialog.vue";
 const leaderboardData = ref([]);
 const loading = ref(false);
 
-// Emette un evento "close" verso il genitore (Game.vue, ecc.)
+// Emette un evento "close" verso il genitore
 const emit = defineEmits(["close"]);
 
 // Carica la leaderboard al mount
 onMounted(fetchLeaderboard);
 
+/**
+ * Recupera i dati della classifica dal server.
+ */
 async function fetchLeaderboard() {
   try {
     loading.value = true;
@@ -24,12 +33,16 @@ async function fetchLeaderboard() {
   }
 }
 
-// Emette l’evento di chiusura
+/**
+ * Emette l'evento di chiusura per chiudere l'overlay.
+ */
 function closeLeaderboard() {
   emit("close");
 }
 
-// Helper per formattare ms => "mm:ss"
+/**
+ * Converte i millisecondi in formato "mm:ss".
+ */
 function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -49,11 +62,7 @@ function formatTime(ms) {
       <p v-if="loading">Caricamento classifica...</p>
       <table v-else>
         <tbody>
-        <tr
-          v-for="(record, index) in leaderboardData"
-          :key="index"
-          class="leaderboard-row"
-        >
+        <tr v-for="(record, index) in leaderboardData" :key="index" class="leaderboard-row">
           <td style="width: 10%;">{{ index + 1 }}</td>
           <td style="width: 30%;">{{ record.username }}</td>
           <td style="width: 30%;">{{ formatTime(record.milliseconds) }}</td>
@@ -63,14 +72,15 @@ function formatTime(ms) {
       </table>
     </div>
 
-    <!-- Bottone di chiusura custom (in aggiunta alla X in alto a destra) -->
-    <button class="button close-button" @click="closeLeaderboard">
-      Chiudi
-    </button>
+    <!-- Bottone di chiusura -->
+    <button class="button close-button" @click="closeLeaderboard">Chiudi</button>
   </OverlayDialog>
 </template>
 
 <style scoped>
+/**
+ * Contenitore scrollabile della classifica.
+ */
 .leaderboard-scrollable {
   width: 100%;
   max-height: 250px;
@@ -81,11 +91,15 @@ function formatTime(ms) {
   background-color: var(--box-bg-color);
 }
 
+/**
+ * Stile della tabella per la classifica.
+ */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
+
 .leaderboard-row {
   width: 100%;
 }
@@ -96,7 +110,9 @@ table td {
   text-align: center;
 }
 
-/* Bottone "close-button" extra in basso */
+/**
+ * Stile del bottone di chiusura.
+ */
 .close-button {
   margin-top: 10px;
   border-radius: var(--border-radius);
