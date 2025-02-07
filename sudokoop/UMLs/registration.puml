@@ -5,13 +5,13 @@ participant "Server" as S
 database "Database" as DB
 
 U -> C : Inserisce dati di registrazione
-C -> S : POST /register (user, password)
+C -> S : POST /register (userName, password)
 S -> DB : Query per verificare se l'utente esiste
 alt Utente già presente
     S --> C : 401 Error ("Utente già presente. Effettua il login.")
 else
     S -> S : Hash della password (bcrypt)
-    S -> DB : Crea nuovo record utente
+    S -> DB : Crea nuovo record utente con isOnline = true
     S --> C : 200 OK ("Registrazione riuscita")
 end
 @enduml

@@ -13,17 +13,13 @@ describe('Lobby.vue', () => {
   let routerPushMock;
 
   beforeEach(() => {
-    // Imposta uno username simulato in sessionStorage
     sessionStorage.setItem('username', 'testuser');
-
-    // Crea un mock per $router con push
     routerPushMock = jest.fn();
 
-    // Monta il componente Lobby passando il mock del router
     wrapper = mount(Lobby, {
       global: {
         mocks: {
-          $router: {push: routerPushMock}
+          $router: { push: routerPushMock }
         }
       }
     });
@@ -34,13 +30,14 @@ describe('Lobby.vue', () => {
     sessionStorage.clear();
   });
 
-  it('chiama socket.emit con i parametri corretti quando createLobby è invocato', () => {
-    wrapper.vm.createLobby();
-    expect(socket.emit).toHaveBeenCalledWith('createLobby', 'testuser');
-  });
+  // RIMOSSO/COMMENTATO: Non esiste più un metodo "createLobby" nel componente Lobby
+  // it('chiama socket.emit con i parametri corretti quando createLobby è invocato', () => {
+  //   wrapper.vm.createLobby(); // <-- Non esiste più
+  //   expect(socket.emit).toHaveBeenCalledWith('createLobby', 'testuser');
+  // });
 
   it('chiama socket.emit con i parametri corretti quando joinLobby è invocato', () => {
-    wrapper.setData({lobbyCode: 'LOBBY123'});
+    wrapper.setData({ lobbyCode: 'LOBBY123' });
     wrapper.vm.joinLobby();
     expect(socket.emit).toHaveBeenCalledWith('joinLobby', {
       username: 'testuser',
@@ -58,36 +55,32 @@ describe('Lobby.vue', () => {
     expect(socket.emit).toHaveBeenCalledWith('checkMultiGameStart', {
       lobbyCode: 'LOBBY456',
       mode: 'versus',
-      difficulty: 'hard',
+      difficulty: 'hard'
     });
   });
 
   it('esegue copyLobbyCode chiamando navigator.clipboard.writeText', async () => {
     const writeTextMock = jest.fn().mockResolvedValue();
-    global.navigator.clipboard = {writeText: writeTextMock};
-    wrapper.setData({lobbyCode: 'COPYME'});
+    global.navigator.clipboard = { writeText: writeTextMock };
+    wrapper.setData({ lobbyCode: 'COPYME' });
 
     await wrapper.vm.copyLobbyCode();
-
     expect(writeTextMock).toHaveBeenCalledWith('COPYME');
   });
 
   it('esegue leaveLobbyAndGoHome correttamente', () => {
-    // Imposta lo stato necessario per il test
     sessionStorage.setItem('lobbyCode', 'OLD_LOBBY');
     wrapper.vm.inLobby = true;
     wrapper.vm.lobbyCode = 'TESTLOBBY';
     wrapper.vm.players = [{username: 'testuser', isMaster: true}];
-    wrapper.vm.$router = {push: routerPushMock};
+    wrapper.vm.$router = { push: routerPushMock };
 
     wrapper.vm.leaveLobbyAndGoHome();
 
-    // Verifica che venga chiamato socket.emit per lasciare la lobby
     expect(socket.emit).toHaveBeenCalledWith('leaveLobby', {
       code: 'TESTLOBBY',
       username: 'testuser'
     });
-    // Verifica la pulizia dello stato locale e la navigazione a Home
     expect(sessionStorage.getItem('lobbyCode')).toBeNull();
     expect(wrapper.vm.inLobby).toBe(false);
     expect(wrapper.vm.isMaster).toBe(false);

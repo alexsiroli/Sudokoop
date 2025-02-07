@@ -9,11 +9,9 @@ describe('Home.vue', () => {
   let routerPushMock;
 
   beforeEach(() => {
-    // Crea un mock per $router con push
     routerPushMock = jest.fn();
     const router = {push: routerPushMock};
 
-    // Monta il componente Home con i componenti stub per Leaderboard, Account e Credits
     wrapper = mount(Home, {
       global: {
         mocks: {
@@ -34,16 +32,14 @@ describe('Home.vue', () => {
   });
 
   it('renderizza correttamente i pulsanti e gli elementi principali', () => {
-    // Trova tutti gli elementi h2 e verifica che contengano i testi desiderati
     const headings = wrapper.findAll('h2').map(h2 => h2.text());
     expect(headings).toContain('Singleplayer');
     expect(headings).toContain('Multiplayer');
   });
 
   it('naviga a Game con la difficoltà selezionata quando si clicca su Inizia singleplayer', async () => {
-    // Simula la selezione di una difficoltà
     await wrapper.find('select.difficulty-select').setValue('medium');
-    await wrapper.find('button.button').trigger('click'); // pulsante Inizia Singleplayer
+    await wrapper.find('button.button').trigger('click'); // pulsante "Inizia" sotto Singleplayer
 
     expect(routerPushMock).toHaveBeenCalledWith({
       name: 'Game',
@@ -51,27 +47,33 @@ describe('Home.vue', () => {
     });
   });
 
-  it('naviga a Lobby quando si clicca su Crea/Entra in Lobby', async () => {
-    // Trova il pulsante Multiplayer e cliccalo
-    const multiplayerButton = wrapper.findAll('button.button').find(btn => btn.text() === 'Crea/Entra in Lobby');
-    await multiplayerButton.trigger('click');
+  // Nuovo test -> "Crea Lobby"
+  it('naviga a Lobby quando si clicca su "Crea Lobby"', async () => {
+    // Trova il pulsante "Crea Lobby" e cliccalo
+    const createButton = wrapper.findAll('button.button').find(btn => btn.text() === 'Crea Lobby');
+    await createButton.trigger('click');
+
+    expect(routerPushMock).toHaveBeenCalledWith({name: 'Lobby'});
+  });
+
+  // Nuovo test -> "Entra in Lobby"
+  it('naviga a Lobby quando si clicca su "Entra in Lobby"', async () => {
+    // Trova il pulsante "Entra in Lobby" e cliccalo
+    const joinButton = wrapper.findAll('button.button').find(btn => btn.text() === 'Entra in Lobby');
+    await joinButton.trigger('click');
 
     expect(routerPushMock).toHaveBeenCalledWith({name: 'Lobby'});
   });
 
   it('mostra Leaderboard overlay quando si clicca su Mostra Classifica', async () => {
-    // Trova tutti i pulsanti e poi filtra quello con il testo "Mostra Classifica"
     const buttons = wrapper.findAll('button');
     const leaderboardButton = buttons.filter(btn => btn.text() === 'Mostra Classifica').at(0);
 
-    // Se non viene trovato, lancia un errore significativo
     if (!leaderboardButton) {
       throw new Error('Pulsante "Mostra Classifica" non trovato');
     }
-
     await leaderboardButton.trigger('click');
 
-    // Controlla che la proprietà leaderboardVisible sia true e che Leaderboard sia renderizzato
     expect(wrapper.vm.leaderboardVisible).toBe(true);
     expect(wrapper.findComponent(Leaderboard).exists()).toBe(true);
   });

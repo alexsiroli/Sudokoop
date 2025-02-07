@@ -1,0 +1,14 @@
+@startuml Logout
+actor "Utente" as U
+participant "Client" as C
+participant "Server" as S
+database "Database" as DB
+
+U -> C : Richiede logout
+C -> S : POST /logout (userName)
+S -> DB : Query utente per userName
+DB --> S : Utente trovato
+S -> S : Imposta isOnline = false
+S -> DB : Aggiorna record utente
+S --> C : 200 OK ("Logout eseguito")
+@enduml

@@ -12,7 +12,7 @@
 
     <div class="buttons-row">
       <button class="button white-button" @click="closeOverlay">Chiudi</button>
-      <button class="button" @click="logout">Esci (Logout)</button>
+      <button class="button" @click="logout">Logout</button>
     </div>
   </OverlayDialog>
 </template>
@@ -48,9 +48,15 @@ export default {
         console.error("Errore nel recupero delle statistiche utente:", err);
       }
     },
-    logout() {
+    async logout() {
+      try {
+        await axios.post('/logout', {userName: this.username});
+      } catch (err) {
+        console.error("Errore durante il logout:", err);
+      }
+      // Rimuovi dal sessionStorage e vai al login
       sessionStorage.removeItem('username');
-      this.$router.push({ name: "Login" });
+      this.$router.push({name: "Login"});
     },
     closeOverlay() {
       // emette l'evento "close" al padre

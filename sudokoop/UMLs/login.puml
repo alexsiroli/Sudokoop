@@ -5,13 +5,13 @@ participant "Server" as S
 database "Database" as DB
 
 U -> C : Inserisce credenziali
-C -> S : POST /login (user, password)
-S -> DB : Query utente per username
+C -> S : POST /login (userName, password)
+S -> DB : Query utente per userName
 DB --> S : Risultato (utente trovato o null)
 S -> S : Verifica password (bcrypt.compare)
 alt Password corretta
     S --> C : 200 OK ("Login riuscito")
-else Password errata o utente non trovato
-    S --> C : 401 Error ("Username non trovato" o "Password errata")
+else Password errata o utente non trovato o utente già online
+    S --> C : 401 Error ("Username non trovato", "Password errata" o "Utente già collegato da un altro dispositivo")
 end
 @enduml
