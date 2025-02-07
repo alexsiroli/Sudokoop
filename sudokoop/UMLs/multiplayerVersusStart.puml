@@ -6,19 +6,26 @@ participant "All Clients" as AC
 
 M -> C : Richiesta di avvio partita (versus)
 C -> S : Socket.emit("checkMultiGameStart", {lobbyCode, mode:"versus", difficulty})
-S -> S : Verifica se in lobby ci sono almeno 2 giocatori e crea Team Manager
+
+S -> S : Verifica se in lobby ci sono almeno 2 giocatori
 alt Giocatori insufficienti
     S -> C : Socket.emit("gameCanStart", {res:false, message:"Devono esserci almeno 2 giocatori"})
-else Selezione team incompleta
-    S -> C : Socket.emit("gameCanStart", {res:false, message:"Tutti i giocatori devono scegliere una squadra"})
-else Selezione team incompatibile
-    S -> C : Socket.emit("gameCanStart", {res:false, message:"Ogni squadra deve avere almeno un giocatore"})
 else
-    S -> S : Crea partita Versus (createVersusGame)
-    S -> AC : Socket.emit("versusGameCanStart", {res:true})
+    S -> S : Crea Team Manager
+    S -> AC : Socket.emit("gameCanStart", {res:true})
+    AC -> AC : Passaggio alla schermata di selezione squadra
+
+    C -> S : Socket.emit("joinTeam", {lobbyCode, team})
+
+    S -> S : Verifica che tutti abbiano scelto una squadra
+    alt Selezione team incompleta
+        S -> C : Socket.emit("gameCanStart", {res:false, message:"Tutti i giocatori devono scegliere una squadra"})
+    else Selezione team incompatibile
+        S -> C : Socket.emit("gameCanStart", {res:false, message:"Ogni squadra deve avere almeno un giocatore"})
+    else
+        S -> AC : Socket.emit("versusGameCanStart", {res:true})
+        AC -> AC : Passaggio alla schermata di gioco
+    end
 end
 
-M -> C : Conferma avvio partita
-C -> S : Socket.emit("createVersusGame", {lobbyCode, difficulty})
-S -> AC : Socket.emit("startGame")
 @enduml

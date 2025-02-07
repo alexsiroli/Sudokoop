@@ -17,11 +17,9 @@ S -> AC : Socket.emit("cellDeselect", {rowIndex, colIndex})
 P -> C : Effettua una mossa (aggiornamento cella)
 C -> S : Socket.emit("cellUpdateMulti", {cellData, lobbyCode, username})
 S -> S : Elabora mossa, aggiorna stato partita e puzzle
-S -> AC : Socket.emit("afterUpdating", {result, username})
 
 alt Partita in corso
     S -> AC : Socket.emit("insertedNumber", updatedPartialPuzzle)
-else Partita terminata
-    S -> AC : Socket.emit("afterUpdating", {result, username, gameOver:true})
+    S -> AC : Socket.emit("afterUpdating", {result})
 end
 @enduml

@@ -70,7 +70,8 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
             });
             io.to(lobbyCode).emit("gameCanRestart");
         }
-    })
+    });
+
     socket.on("checkVersusGameCanStart", (lobbyCode) => {
         const check = gameController.versusGameCanStart(lobbyCode);
         if (check.res) {
@@ -88,14 +89,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                 mode: 'versus',
                 difficulty: difficulty,
             });
-            /*io.to(code).emit("teams",
-                {
-                    yellowTeam: gameController.getTeamsOfGame(code).yellowTeam,
-                    blueTeam: gameController.getTeamsOfGame(code).blueTeam
-                })
-
-             */
-
             return;
         }
         // verifica che non si è aggiunto alcun giocatore
@@ -116,7 +109,8 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         else {
             io.to(lobbyCode).emit("backToTeamSelection");
         }
-    })
+    });
+
 
     socket.on("joinTeam", (data) => {
         const {lobbyCode, color, player} = data;

@@ -1,0 +1,45 @@
+@startuml MultiplayerEndGame
+actor "Master (Utente)" as M
+participant "Client (Socket)" as C
+participant "Server (Game Controller)" as S
+participant "All Clients" as AC
+
+AC -> AC : Il gioco termina
+
+M -> C : Sceglie se rigiocare o abbandonare la lobby
+alt Il master sceglie di abbandonare
+    C -> S : Socket.emit("leaveLobby", {lobbyCode})
+    S -> AC : Socket.emit("backToLobby")
+else Il master sceglie di rigiocare
+    alt Modalità Coop
+        M -> C : Clicca "Nuova Partita"
+        C -> S : Socket.emit("checkRestartCoopGame", {lobbyCode, mode: 'coop', difficulty})
+        S -> S : Controlla numero giocatori
+        alt Giocatori insufficienti
+            S -> AC : Socket.emit("backToLobby")
+            S -> AC : Socket.emit("gameCanStart", {res: false, message: "Devono esserci almeno 2 giocatori"})
+        else
+            S -> S : Crea nuova partita Coop
+            S -> AC : Socket.emit("coopGame", {vite, sudoku, difficulty})
+            S -> AC : Socket.emit("gameCanRestart")
+        end
+    else Modalità Versus
+        M -> C : Clicca "Nuova Partita"
+        C -> S : Socket.emit("checkRestartVersusGame", {lobbyCode, difficulty})
+        S -> S : Controlla numero giocatori
+        alt Giocatori insufficienti
+            S -> AC : Socket.emit("backToLobby")
+            S -> AC : Socket.emit("gameCanStart", {res: false, message: "Devono esserci almeno 2 giocatori"})
+        else
+            alt Nessun nuovo giocatore si è unito
+                S -> S : Verifica condizioni di riavvio
+                S -> AC : Socket.emit("versusGame", {sudoku, difficulty, yellowTeam, blueTeam})
+                S -> AC : Socket.emit("gameCanRestart")
+            else Nuovi giocatori si sono uniti
+                S -> AC : Socket.emit("backToTeamSelection")
+            end
+        end
+    end
+end
+
+@enduml
