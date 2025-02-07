@@ -15,7 +15,6 @@ Include anche funzioni di login, registrazione, chat in lobby, leaderboard, stat
   - `router/` con le route
   - `plugins/` con configurazione Socket.io
   - `assets/` con CSS personalizzato (main.css, base.css)
-  - `tests/` con test di unità (Jest + Vue Test Utils)
   - File di configurazione come `vite.config.js`, `babel.config.js`, ecc.
 - **server/** (cartella Node/Express):
   - `controllers/`, `models/` e `routes/`
@@ -90,11 +89,6 @@ http://localhost:8080
 
 ## Testing
 
-- I test unitari (**frontend**) si eseguono con:
-```bash
-cd client
-npm run test
-```
 - I test relativi al **server**, si eseguono con:
 ```bash
   cd server

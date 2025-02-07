@@ -1,5 +1,27 @@
+/**
+* @file OverlayDialog.vue
+* @description Componente generico per mostrare un overlay modale.
+* Utilizzato per contenere altre sezioni come Account, Credits, ecc.
+* Può essere chiuso tramite il pulsante "×" presente nell'overlay.
+*/
+
+<script>
+export default {
+  name: "OverlayDialog",
+  props: {
+    /**
+     * Controlla la visibilità dell'overlay.
+     */
+    visible: {
+      type: Boolean,
+      default: true,
+    },
+  },
+};
+</script>
+
 <template>
-  <!-- Viene mostrato solo se visible === true -->
+  <!-- Viene mostrato solo se "visible" è true -->
   <div class="overlay-background" v-if="visible">
     <div class="overlay-container">
       <!-- Pulsante di chiusura in alto a destra -->
@@ -13,19 +35,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "OverlayDialog",
-  props: {
-    visible: {
-      type: Boolean,
-      default: true
-    }
-  }
-}
-</script>
-
 <style scoped>
+/**
+ * Sfondo semi-trasparente dell'overlay.
+ */
 .overlay-background {
   position: fixed;
   top: 0;
@@ -39,6 +52,9 @@ export default {
   z-index: 9999;
 }
 
+/**
+ * Contenitore principale dell'overlay.
+ */
 .overlay-container {
   background-color: var(--box-bg-color, #fff);
   color: var(--text-color, #000);
@@ -50,6 +66,9 @@ export default {
   box-shadow: 0 4px 12px var(--shadow-color-hover);
 }
 
+/**
+ * Pulsante di chiusura dell'overlay.
+ */
 .overlay-close {
   position: absolute;
   top: 8px;
@@ -61,6 +80,7 @@ export default {
   color: var(--primary-color);
   transition: color 0.3s;
 }
+
 .overlay-close:hover {
   color: var(--primary-dark);
   transform: scale(1.2);
