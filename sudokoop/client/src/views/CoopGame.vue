@@ -39,7 +39,6 @@ export default {
 
     getGameData() {
       this.isInitialized = false;
-      console.log("getting coop game ")
       socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
 
     }
@@ -51,9 +50,7 @@ export default {
   mounted() {
     this.getGameData();
     socket.on("coopGame", (data) => {
-      console.log("data " + data)
       const {sudoku, vite, difficulty} = data;
-      console.log("vite  " + vite)
       this.sudokuGrid = sudoku;
       this.vite = vite;
       this.difficulty = difficulty;

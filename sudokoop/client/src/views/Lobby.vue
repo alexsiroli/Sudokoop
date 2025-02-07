@@ -52,9 +52,7 @@ export default {
     },
   },
   mounted() {
-    console.log("sono in lobby", sessionStorage.getItem("lobbyCode"));
     socket.on("onLobbyCreated", (code) => {
-      console.log("lobbyCreata");
       sessionStorage.setItem("lobbyCode", code);
       this.lobbyCode = code;
       this.inLobby = true;
@@ -79,7 +77,6 @@ export default {
     });
 
     socket.on("players", (playersArr) => {
-      console.log("players in lobby", playersArr);
       this.players = playersArr;
       this.inLobby = sessionStorage.getItem("lobbyCode") !== null;
       if (playersArr.length > 0 && this.inLobby) {

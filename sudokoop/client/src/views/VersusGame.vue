@@ -24,7 +24,6 @@ export default {
         });
     },
     getGameData() {
-      console.log("Getitng gameData")
       this.isInitialized = false;
       socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
     }
@@ -35,16 +34,12 @@ export default {
   mounted() {
     this.getGameData();
     socket.on("versusGame", (data) => {
-      console.log("ottenutoi versus game")
       const {sudoku, difficulty, yellowTeam, blueTeam} = data;
       this.sudokuGrid = sudoku;
 
       this.difficulty = difficulty;
       this.yellowTeam = yellowTeam;
       this.blueTeam = blueTeam;
-
-      yellowTeam.forEach(a => console.log(a.username));
-      blueTeam.forEach(a => console.log(a.username));
       this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.isInitialized = true;
     });

@@ -8,8 +8,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("checkMultiGameStart", (data) => {
         const {lobbyCode, mode, difficulty} = data;
-        //io.to(lobbyCode).emit("backToLobby");
-        console.log("check multigame start")
         let check = gameController.multiPlayerGameCanStart(lobbyCode, mode, difficulty);
         if (check.res && mode === 'coop') {
             gameController.createCoopGame(data.lobbyCode, data.difficulty);
@@ -49,7 +47,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     socket.on("checkRestartCoopGame", (data) => {
         const {lobbyCode,difficulty} = data;
         if (gameController.getPlayersOfLobby(lobbyCode).length < 2) {
-            console.log("Vai in lobb ")
             io.to(lobbyCode).emit("backToLobby")
             io.to(lobbyCode).emit("gameCanStart", {
                 res: gameController.multiPlayerGameCanStart(lobbyCode, 'coop'),
@@ -85,7 +82,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     socket.on("checkRestartVersusGame", (data) => {
         const {lobbyCode, difficulty} = data;
         if (gameController.getPlayersOfLobby(lobbyCode).length < 2) {
-            console.log("Vai in lobb ")
             io.to(lobbyCode).emit("backToLobby")
             io.to(lobbyCode).emit("gameCanStart", {
                 res: gameController.multiPlayerGameCanStart(lobbyCode, 'versus'),
@@ -117,7 +113,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                 io.to(lobbyCode).emit("gameCanRestart");
             }
         } // si è aggiunto un giocatore, vado in teamSelec
-        else {console.log("gioca in lobb" + gameController.getPlayersOfLobby(lobbyCode).length)
+        else {
             io.to(lobbyCode).emit("backToTeamSelection");
         }
     })
@@ -172,7 +168,6 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     socket.on("joinLobby", (data) => {
         const {username, code} = data;
         if (gameController.playersAreInTeamSelection(code)) {
-            console.log("vai a scegliere i team")
             socket.emit('goInTeamSelection')
         }
     });

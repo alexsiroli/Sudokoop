@@ -109,7 +109,6 @@ export default {
           this.final = true;
 
           if (!data.win) {
-            console.log("inizializzo con soluzione")
             this.initializeGridWithSolution(data.solution);
           } else {
             const {row, col} = cellData;
@@ -125,7 +124,6 @@ export default {
 
             if (this.sudokuGrid[row] && this.sudokuGrid[row][col]) {
               if (this.lastCell != null) {
-                console.log("decoloro ultima cell");
                 this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
               }
               this.changeCelColor(row, col,   "green-selected")
@@ -138,7 +136,6 @@ export default {
               this.changeCelColor(this.lastCell.row, this.lastCell.col, 'white');
             }
             this.lastCell = cellData;
-            console.log("segno last Cell " + cellData.row + cellData.col );
             this.changeCelColor(row, col, 'red')
           }
           this.initializeGrid(data.puzzle);
@@ -204,14 +201,12 @@ export default {
 
     // Griglia soluzione a fine partita
     initializeGridWithSolution(solution) {
-      console.log("solution " + solution)
       for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
           const index = i * 9 + j;
 
           if (this.sudokuGrid[i][j].color === 'white' || (this.sudokuGrid[i][j].color !== 'filled'
             && !this.sudokuGrid[i][j].color.endsWith('-selected'))) {
-            console.log("riwempio con " + solution[index])
             this.sudokuGrid[i][j].value = solution[index];
             this.changeCelColor(i, j, 'red')
           }

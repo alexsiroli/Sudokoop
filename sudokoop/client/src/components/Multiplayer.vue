@@ -26,9 +26,7 @@ export default {
 
   methods: {
     // chiamato la prima inizializzazione oppure quando ho perso e devo riiniziare
-
     startNewGame() {
-      console.log("vite nel multiplayer" + this.vite)
       this.isInitialized = true;
       this.gameOver = false;
       this.firstInitialization = true;
@@ -156,7 +154,6 @@ export default {
     this.startNewGame();
 
     socket.on("gameCanRestart", () => {
-      console.log("versusGameCanRestart");
       this.startNewGame();
     });
 
@@ -167,7 +164,6 @@ export default {
     });
     socket.emit('getPlayersOfGame', sessionStorage.getItem("lobbyCode"))
     socket.on('playersOfGame', players => {
-      console.log("ricevuti i players of game ", players)
       this.players = players;
       if(this.players.length === 0) {
         this.$router.push({name: 'Lobby'});
@@ -183,8 +179,6 @@ export default {
     });
 
     socket.on("teams", (data) => {
-      console.log("yell " + data.yellowTeam)
-      console.log(data.blueTeam);
       this.yellow.team = data.yellowTeam;
       this.blue.team = data.blueTeam;
     });

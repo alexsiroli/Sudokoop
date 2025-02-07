@@ -52,13 +52,9 @@ module.exports = (io) => {
 
                 // Togliamo l'utente da eventuali team
                 const removedFromTeam = gameController.removePlayerFromTeam(lobby.code, socket.username);
-                console.log("removedFRomTEam", removedFromTeam);
-
                 // Rimuoviamolo anche dal gioco (coop o versus) se in corso
                 if (gameController.removePlayerFromGame(lobby.code, socket.username)) {
-                    console.log("lo rimuovo dal gioco");
                     const players = gameController.getPlayersOfGame(lobby.code);
-                    console.log("mando i players of game", players);
                     io.to(lobby.code).emit("playersOfGame", players);
 
                     // Se era un VersusGame, aggiorniamo i team
@@ -70,10 +66,7 @@ module.exports = (io) => {
                     }
                 } else if (removedFromTeam) {
                     // Era solo nei team, non in partita
-                    console.log("rimosso dal team, mando ", removedFromTeam);
                     io.to(lobby.code).emit("onJoinTeam", removedFromTeam);
-                } else {
-                    console.log("non l'ho rimosso dal gioco");
                 }
 
                 // Aggiorniamo la lista players in lobby
