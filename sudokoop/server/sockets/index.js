@@ -12,26 +12,30 @@ module.exports = (io) => {
 
     io.on('connection', (socket) => {
         console.log("utente connesso");
-        // Ogni client, dopo il login REST, emette "username"
+
+        // Ogni client, dopo il login REST, emette "username" per comunicare chi è
         socket.on("username", (username) => {
             console.log("connected " + username);
             socket.username = username;
         });
 
-        // Registra i vari handler
+        // Registra i vari handler di lobby (create/join ecc.)
         registerLobbyHandlers(socket, io, lobbyController);
+
+        // Registra i vari handler di game (coop/versus ecc.)
         registerGameHandlers(socket, io, gameController);
 
         // Disconnessione
         socket.on('disconnect', async () => {
             console.log("utente disconnesso " + socket.username);
 
-            // Se non è definito socket.username, esci
+            // Se non sappiamo chi fosse lo user, usciamo
             if (!socket.username) return;
 
             try {
+                // Se l'utente esiste ed è ancora online, settiamo offline
                 const user = await User.findOne({ userName: socket.username });
-                if (user) {
+                if (user && user.isOnline) {
                     user.isOnline = false;
                     await user.save();
                 }
@@ -39,32 +43,40 @@ module.exports = (io) => {
                 console.error("Errore nel set isOnline=false:", err);
             }
 
+            // Rimuoviamo l'utente dalla lobby (se era in una)
             const lobby = lobbyController.findLobbyOfUser(socket.username);
             console.log("lobby ", lobby);
+
             if (lobby) {
                 lobbyController.removePlayerFromLobby(lobby.code, socket.username);
+
+                // Togliamo l'utente da eventuali team
                 const removedFromTeam = gameController.removePlayerFromTeam(lobby.code, socket.username);
                 console.log("removedFRomTEam", removedFromTeam);
 
+                // Rimuoviamolo anche dal gioco (coop o versus) se in corso
                 if (gameController.removePlayerFromGame(lobby.code, socket.username)) {
                     console.log("lo rimuovo dal gioco");
                     const players = gameController.getPlayersOfGame(lobby.code);
                     console.log("mando i players of game", players);
                     io.to(lobby.code).emit("playersOfGame", players);
 
+                    // Se era un VersusGame, aggiorniamo i team
                     if (gameController.getGameOfLobby(lobby.code) instanceof VersusGame) {
                         io.to(lobby.code).emit("teams", {
                             yellowTeam: gameController.getTeamsOfGame(lobby.code).yellowTeam,
-                            blueTeam: gameController.getTeamsOfGame(lobby.code).blueTeam
+                            blueTeam:   gameController.getTeamsOfGame(lobby.code).blueTeam
                         });
                     }
                 } else if (removedFromTeam) {
+                    // Era solo nei team, non in partita
                     console.log("rimosso dal team, mando ", removedFromTeam);
                     io.to(lobby.code).emit("onJoinTeam", removedFromTeam);
                 } else {
-                    console.log("non l ho rimosso dal gioco");
+                    console.log("non l'ho rimosso dal gioco");
                 }
 
+                // Aggiorniamo la lista players in lobby
                 io.to(lobby.code).emit("players", lobbyController.getPlayersOfLobby(lobby.code));
             }
         });

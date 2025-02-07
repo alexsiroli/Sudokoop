@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://mongo:27017/sudokoopDB', {
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://mongo:27017/sudokoopDB', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
