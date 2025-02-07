@@ -36,7 +36,6 @@ class Game {
         return {
             win: this.win,
             puzzle: this.sudoku.puzzle,
-            solution: this.sudoku.solution,
             message: message,
             gameOver: this.gameOver
         }

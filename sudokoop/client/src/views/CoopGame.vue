@@ -29,7 +29,6 @@ export default {
     restartNewGame() {
       // Se sono il master, creo il gioco
       //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-      socket.emit("startCoopGame", sessionStorage.getItem('lobbyCode'));
       socket.emit('checkMultiGameStart',
         {
           lobbyCode: sessionStorage.getItem('lobbyCode'),

@@ -94,6 +94,9 @@ class VersusGame {
             this.teamPlayerManager.setPlayerAsEliminated(username);
             result.message = this.checkForFinish(result) === "" ? result.message : this.checkForFinish(result);
             result.gameOver = this.gameOver;
+            if(this.gameOver) {
+                result.solution = this.game.sudoku.solution;
+            }
         }
         result.yellowPoint = this.yellow.points;
         result.bluePoint = this.blue.points;

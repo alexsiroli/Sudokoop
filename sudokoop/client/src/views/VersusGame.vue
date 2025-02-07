@@ -17,30 +17,23 @@ export default {
   },
   methods: {
     restartNewGame() {
-      socket.emit("startVersusGame", sessionStorage.getItem('lobbyCode'));
-
       // check
-
       socket.emit("checkRestartVersusGame",
         { lobbyCode: sessionStorage.getItem('lobbyCode'),
-          difficulty: this.difficulty
+          difficulty: this.difficulty,
+          username: sessionStorage.getItem('username'),
         });
+      socket.on("versusGameCanRestart", () => {
+        console.log("versusGameCanRestart");
+        socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
+
+      } )
 
     },
     getGameData() {
+      console.log("Getitng gameData")
       this.isInitialized = false;
       socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
-      socket.on("versusGame", (data) => {
-        const {sudoku, difficulty, yellowTeam, blueTeam} = data;
-        this.sudokuGrid = sudoku;
-        this.isInitialized = true;
-        this.difficulty = difficulty;
-        this.yellowTeam = yellowTeam;
-        this.blueTeam = blueTeam;
-        this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
-      });
-
-
     }
   },
   beforeUnmount() {
@@ -48,6 +41,17 @@ export default {
   },
   mounted() {
     this.getGameData();
+    socket.on("versusGame", (data) => {
+      console.log("ottenutoi versus game")
+      const {sudoku, difficulty, yellowTeam, blueTeam} = data;
+      this.sudokuGrid = sudoku;
+
+      this.difficulty = difficulty;
+      this.yellowTeam = yellowTeam;
+      this.blueTeam = blueTeam;
+      this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
+      this.isInitialized = true;
+    });
   },
 };
 </script>

@@ -9,6 +9,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("checkMultiGameStart", (data) => {
         const {lobbyCode, mode, difficulty} = data;
+        io.to(lobbyCode).emit("backToLobby");
         console.log("check multigame start")
         let check = gameController.multiPlayerGameCanStart(lobbyCode, mode, difficulty);
         if (check.res && mode === 'coop') {
@@ -55,13 +56,22 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("checkRestartVersusGame", (data) => {
-        const {lobbyCode, difficulty} = data;
+        const {lobbyCode, difficulty, username} = data;
         if (gameController.checkVersusGameCanRestart(lobbyCode)) {
             const check = gameController.versusGameCanStart(lobbyCode);
             if (check.res) {
                 gameController.createVersusGame(lobbyCode, difficulty);
+                io.to(lobbyCode).emit("versusGame",
+                    {
+                        sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
+                        difficulty: gameController.getGameOfLobby(lobbyCode).getDifficulty(),
+                        yellowTeam: gameController.getGameOfLobby(lobbyCode).getTeams().yellowTeam,
+                        blueTeam: gameController.getGameOfLobby(lobbyCode).getTeams().blueTeam
+                    });
+                io.to(lobbyCode).emit("versusGameCanRestart");
+
             }
-            io.to(lobbyCode).emit("versusGameCanStart", check);
+
         } else {
             io.to(lobbyCode).emit("gameCanStart", {
                 res: gameController.multiPlayerGameCanStart(lobbyCode, 'versus'),

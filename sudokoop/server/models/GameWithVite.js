@@ -15,6 +15,7 @@ class GameWithVite extends Game {
             this.vite--;
             if (this.vite === 0) {
                 this.gameOver = true;
+                result.solution =  this.sudoku.solution;
                 result.message = 'Hai perso! Vite terminate.'; // Gioco terminato
             }
         }
