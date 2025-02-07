@@ -89,7 +89,6 @@ export default {
   },
 };
 </script>
-
 <template>
   <div class="sudoku-grid">
     <table>
@@ -117,9 +116,6 @@ export default {
 </template>
 
 <style scoped>
-/**
- * Contenitore principale della griglia Sudoku.
- */
 .sudoku-grid {
   margin: 0 auto;
   max-width: 500px;
@@ -149,10 +145,18 @@ td {
   vertical-align: middle;
   box-sizing: border-box;
 }
+/* Per browser WebKit (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
-/**
- * Stili per la formattazione dell'input nelle celle.
- */
+/* Per Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 input {
   width: 100%;
   height: 100%;
@@ -168,9 +172,9 @@ input {
   transition: background-color var(--transition-speed);
 }
 
-/**
- * Bordi più spessi per evidenziare le sezioni 3x3.
- */
+
+
+/* Bordi più spessi per le sezioni sudoku */
 .cell-border-right {
   border-right: 2px solid var(--border-color);
 }
@@ -178,9 +182,7 @@ input {
   border-bottom: 2px solid var(--border-color);
 }
 
-/**
- * Classi per evidenziare le celle con colori specifici.
- */
+/* Vari colori per le selezioni di celle in multi */
 .cell-green-selected input {
   background-color: #c5f4d0;
   font-weight: bold;
@@ -194,6 +196,14 @@ input {
 }
 .cell-blue input {
   background-color: #cce6ff;
+}
+.cell-yellow-selected input {
+  background-color: #fef5b1;
+  font-weight: bold;
+}
+.cell-blue-selected input {
+  background-color: #aedaff;
+  font-weight: bold;
 }
 .cell-gray input {
   background-color: #b0bec5;
