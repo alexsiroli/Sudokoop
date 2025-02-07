@@ -4,23 +4,23 @@ const bcrypt = require("bcrypt");
 const userController = {
     // Registrazione
     register: async (req, res) => {
-        const {userName, password} = req.body;
+        const { userName, password } = req.body;
         try {
             // Verifica se l'utente esiste già
             const existingUser = await User.findOne({ userName });
             if (existingUser) {
-                return res.status(401).json({error: "Utente già presente. Effettua il login."});
+                return res.status(401).json({ error: "Utente già presente. Effettua il login." });
             }
 
-            // Hash della password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Imposta isOnline
-            await User.create({
+            const newUser = await User.create({
                 userName,
-                password: hashedPassword,
-                isOnline: true
+                password: hashedPassword
             });
+
+            newUser.isOnline = true;
+            await newUser.save();
 
             return res.status(200).json({ message: "Registrazione riuscita" });
         } catch (err) {
