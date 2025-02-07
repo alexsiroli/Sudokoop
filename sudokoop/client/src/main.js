@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import './assets/main.css';
 
-axios.defaults.baseURL = 'http://54.177.155.194:5001/api';
+axios.defaults.baseURL = 'http://localhost:5001/api';
 
 createApp(App).use(router).mount('#app');
 

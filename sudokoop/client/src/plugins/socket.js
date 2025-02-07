@@ -7,7 +7,7 @@
 import { io } from 'socket.io-client';
 
 // Inizializza la connessione WebSocket con il server remoto
-const socket = io('http://54.177.155.194:5001', {
+const socket = io('http://localhost:5001', {
   reconnection: true, // Abilita la riconnessione automatica in caso di disconnessione
 });
 

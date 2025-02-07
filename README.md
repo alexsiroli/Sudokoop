@@ -72,20 +72,13 @@ Include anche funzioni di login, registrazione, chat in lobby, leaderboard e sta
        git clone https://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-mastrilli-siroli-ay2223.git
        cd ds-project-mastrilli-siroli-ay2223/sudokoop
        ```
-    2. Verificare/aggiornare le configurazioni:
-       - Nel progetto, il `client` e il `server` fanno riferimento di default a http://54.177.155.194:5001 (per permettere l’accesso al server pubblico).
-       - Se vuoi eseguire tutto in locale, modifica:
-       - In client/src/main.js, imposta:
-           ```axios.defaults.baseURL = ‘http://localhost:5001/api’```
-       - In client/src/plugins/socket.js, sostituisci l’URL del server Socket con:
-            ```const socket = io(‘http://localhost:5001’, { … })```
-    3.	Avviare Docker Compose:
+    2. Avviare Docker Compose:
        ```docker-compose up –build```
        Questo comando crea e avvia i container:
           - mongo: database MongoDB su porta 27017
           - sudokoop-server (Node/Express) su porta 5001
           - sudokoop-client (Vue) su porta 8080
-	4.	Aprire il browser su:
+	3. Aprire il browser su:
        ```http://localhost:8080```
 
 ## Testing
