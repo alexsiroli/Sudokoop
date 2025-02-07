@@ -22,14 +22,6 @@ export default {
         { lobbyCode: sessionStorage.getItem('lobbyCode'),
           difficulty: this.difficulty,
         });
-/*      socket.on("versusGameCanRestart", () => {
-        console.log("versusGameCanRestart");
-        socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
-
-      } )
-
- */
-
     },
     getGameData() {
       console.log("Getitng gameData")
@@ -50,8 +42,9 @@ export default {
       this.difficulty = difficulty;
       this.yellowTeam = yellowTeam;
       this.blueTeam = blueTeam;
-      console.log("yellow " + yellowTeam);
-      console.log("blue " + blueTeam);
+
+      yellowTeam.forEach(a => console.log(a.username));
+      blueTeam.forEach(a => console.log(a.username));
       this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.isInitialized = true;
     });

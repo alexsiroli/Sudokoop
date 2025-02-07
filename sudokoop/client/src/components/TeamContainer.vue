@@ -14,10 +14,10 @@ export default {
     <h3>Squadra {{ this.teamName }}</h3>
     <ul>
       <li v-for="player in this.team.team">
-        <span :style="player.username.endsWith('-eliminated') ? 'text-decoration: line-through;' : ''">
-    {{ player.username.replace('-eliminated', '') }}
-  </span>
-        <span v-if="player.isMaster"> (Master)</span></li>
+<span :class="{'eliminated': player.username.endsWith('-eliminated')}">
+  {{ player.username.replace('-eliminated', '') }}
+</span>
+</li>
     </ul>
     <h6>Points: {{ this.team.point }}</h6>
   </div>
@@ -45,6 +45,10 @@ export default {
 .team-container h3 {
   color: black;
   margin: 10px 0;
+}
+
+.eliminated {
+  text-decoration: line-through;
 }
 
 .team-container ul {

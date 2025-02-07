@@ -93,6 +93,14 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                 mode: 'versus',
                 difficulty: difficulty,
             });
+            /*io.to(code).emit("teams",
+                {
+                    yellowTeam: gameController.getTeamsOfGame(code).yellowTeam,
+                    blueTeam: gameController.getTeamsOfGame(code).blueTeam
+                })
+
+             */
+
             return;
         }
         // verifica che non si è aggiunto alcun giocatore

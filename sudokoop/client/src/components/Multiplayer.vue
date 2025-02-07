@@ -39,6 +39,12 @@ export default {
           this.$refs.timer.startTimer();
         }
       });
+      if (this.mode === "versus" ) {
+        this.yellow.point = 0;
+        this.blue.point = 0;
+        this.yellow.team = this.yellowTeam;
+        this.blue.team = this.blueTeam;
+      }
       this.firstInitialization = false;
     },
 
