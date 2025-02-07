@@ -3,8 +3,8 @@
 Sudokoop è un progetto universitario scritto con **Vue 3** e **Node.js** (Express e Socket.IO) che permette di giocare a Sudoku in diverse modalità:
 
 - **Singleplayer**: partita singola con vite limitate e cronometro.
-- **Multiplayer Co-op**: partita collaborativa di squadra.
-- **Multiplayer Versus**: sfida tra due squadre.
+- **Multiplayer Co-op**: partita collaborativa tra più utenti.
+- **Multiplayer Versus**: artita competitiva tra due squadre (Gialla e Blu).
 
 Include anche funzioni di login, registrazione, chat in lobby, leaderboard e statistiche utente.
 
@@ -47,45 +47,46 @@ Include anche funzioni di login, registrazione, chat in lobby, leaderboard e sta
    - Vittorie / sconfitte memorizzate su DB.
    - Visualizzabili da overlay “Account” nel frontend.
 
-## Requisiti
+## Modalità di utilizzo
 
-- **Docker** e **docker-compose** installati.
-- Nessuna installazione separata di Node.js / MongoDB necessaria (il docker-compose si occuperà di tutto).
+1. ### Utilizzo su server pubblico AWS
 
-## Istruzioni di esecuzione su nuova macchina
+    La modalità più semplice per provare Sudokoop è visitare direttamente:
 
-1. Clonare questo repository:
+    ```
+    http://54.177.155.194:8080
+    ```
+    
+    Il server pubblico è attivo e ti permette di:
+    - Registrarti o effettuare il login
+    - Giocare in singleplayer
+    - Creare o unirti a una lobby multiplayer
+    - Testare la chat e le diverse modalità di gioco
 
-```bash
-git clonehttps://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-mastrilli-siroli-ay2223.git
-cd ds-project-mastrilli-siroli-ay2223
-```
+2. ### Esecuzione in locale (Docker)
 
-2. Verificare i file di configurazione:
-   - `docker-compose.yml` definisce i servizi (client, server, mongo)
-   - `Dockerfile.client` e `Dockerfile.server` per buildare le rispettive immagini Docker.
-
-3. Avviare Docker Compose:
-
-```bash
-docker-compose up --build
-```
-
-4. Attendere che i container si avviino:
-   - `sudokoop-server` in ascolto su porta `5001`
-   - `sudokoop-client` in ascolto su porta `8080`
-   - `sudoku-mongo` come database
-
-5. Aprire il browser all’indirizzo:
-
-```
-http://localhost:8080
-```
-
-6. Interagire con l’app:
-   - Registrarsi o fare login
-   - Scegliere Singleplayer o Lobby (multiplayer)
-   - Avviare partite, chattare, ecc.
+    In alternativa, è possibile eseguire Sudokoop in locale tramite Docker. I passaggi sono:
+    
+    1. Clonare il repository:
+       ```
+       git clone https://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-mastrilli-siroli-ay2223.git
+       cd ds-project-mastrilli-siroli-ay2223/sudokoop
+       ```
+    2. Verificare/aggiornare le configurazioni:
+       - Nel progetto, il `client` e il `server` fanno riferimento di default a http://54.177.155.194:5001 (per permettere l’accesso al server pubblico).
+       - Se vuoi eseguire tutto in locale, modifica:
+       - In client/src/main.js, imposta:
+           ```axios.defaults.baseURL = ‘http://localhost:5001/api’```
+       - In client/src/plugins/socket.js, sostituisci l’URL del server Socket con:
+            ```const socket = io(‘http://localhost:5001’, { … })```
+    3.	Avviare Docker Compose:
+       ```docker-compose up –build```
+       Questo comando crea e avvia i container:
+          - mongo: database MongoDB su porta 27017
+          - sudokoop-server (Node/Express) su porta 5001
+          - sudokoop-client (Vue) su porta 8080
+	4.	Aprire il browser su:
+       ```http://localhost:8080```
 
 ## Testing
 
@@ -94,12 +95,13 @@ http://localhost:8080
   cd server
   npm run test
 ```
+Esegue test unitari e d’integrazione, controllando controllers, models e rotte.
 
 ## Stack Tecnologico
 
 - **Vue 3** + **Vue Router** per il frontend SPA.
 - **Socket.IO** per comunicazioni real-time (chat, aggiornamenti Sudoku in multiplayer).
-- **Express** + **MongoDB** (Mongoose) per il backend.
+- **Express** + **MongoDB** (Mongoose) per API REST e persistenza dati.
 - **Docker** e **docker-compose** per gestire tutto in container.
 
-Buon divertimento con Sudokoop!
+Sudokoop può essere provato immediatamente visitando http://54.177.155.194 (server pubblico già avviato) oppure in locale tramite Docker o manualmente. Buon divertimento!
