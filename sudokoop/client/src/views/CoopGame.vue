@@ -29,7 +29,7 @@ export default {
     restartNewGame() {
       // Se sono il master, creo il gioco
       //faccio richiesta per nuovo gioco e torno indietro (sono il master)
-      socket.emit('checkMultiGameStart',
+      socket.emit('checkRestartCoopGame',
         {
           lobbyCode: sessionStorage.getItem('lobbyCode'),
           mode: 'coop',
@@ -41,15 +41,7 @@ export default {
       this.isInitialized = false;
       console.log("getting coop game ")
       socket.emit('getCoopGame', sessionStorage.getItem('lobbyCode'))
-      socket.on("coopGame", (data) => {
-        console.log("data " + data)
-        const {sudoku, vite, difficulty} = data;
-        console.log("vite  " + vite)
-        this.sudokuGrid = sudoku;
-        this.vite = vite;
-        this.difficulty = difficulty;
-        this.isInitialized = true;
-      })
+
     }
   },
   beforeUnmount() {
@@ -58,6 +50,15 @@ export default {
 
   mounted() {
     this.getGameData();
+    socket.on("coopGame", (data) => {
+      console.log("data " + data)
+      const {sudoku, vite, difficulty} = data;
+      console.log("vite  " + vite)
+      this.sudokuGrid = sudoku;
+      this.vite = vite;
+      this.difficulty = difficulty;
+      this.isInitialized = true;
+    })
   },
 };
 </script>

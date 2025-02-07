@@ -47,6 +47,34 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
         io.to(lobbyCode).emit("playersOfGame", players);
     });
 
+    socket.on("checkRestartCoopGame", (data) => {
+        const {lobbyCode,difficulty} = data;
+        if (gameController.getPlayersOfLobby(lobbyCode).length < 2) {
+            console.log("Vai in lobb ")
+            io.to(lobbyCode).emit("backToLobby")
+            io.to(lobbyCode).emit("gameCanStart", {
+                res: gameController.multiPlayerGameCanStart(lobbyCode, 'coop'),
+                mode: 'coop',
+                difficulty: difficulty,
+            });
+
+        } else {
+            gameController.createCoopGame(lobbyCode, difficulty);
+            io.to(lobbyCode).emit("coopGame",
+                {
+                    vite: gameController.getGameOfLobby(lobbyCode).getVite(),
+                    sudoku: gameController.getGameOfLobby(lobbyCode).getSudoku(),
+                    difficulty: gameController.getGameOfLobby(lobbyCode).getDifficulty(),
+                });
+            // avviso i giocatori in lobby se c'erano
+            io.to(lobbyCode).emit("gameCanStart", {
+                res: gameController.multiPlayerGameCanStart(lobbyCode, 'coop'),
+                mode: 'coop',
+                difficulty: difficulty,
+            });
+            io.to(lobbyCode).emit("gameCanRestart");
+        }
+    })
     socket.on("checkVersusGameCanStart", (lobbyCode) => {
         const check = gameController.versusGameCanStart(lobbyCode);
         if (check.res) {
@@ -79,7 +107,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                         yellowTeam: gameController.getGameOfLobby(lobbyCode).getTeams().yellowTeam,
                         blueTeam: gameController.getGameOfLobby(lobbyCode).getTeams().blueTeam
                     });
-                io.to(lobbyCode).emit("versusGameCanRestart");
+                io.to(lobbyCode).emit("gameCanRestart");
             }
         } // si è aggiunto un giocatore, vado in teamSelec
         else {console.log("gioca in lobb" + gameController.getPlayersOfLobby(lobbyCode).length)

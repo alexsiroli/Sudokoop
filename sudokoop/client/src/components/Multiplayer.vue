@@ -149,10 +149,12 @@ export default {
   mounted() {
     this.startNewGame();
 
-    socket.on("versusGameCanRestart", () => {
+    socket.on("gameCanRestart", () => {
       console.log("versusGameCanRestart");
       this.startNewGame();
     });
+
+
 
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
@@ -175,6 +177,8 @@ export default {
     });
 
     socket.on("teams", (data) => {
+      console.log("yell " + data.yellowTeam)
+      console.log(data.blueTeam);
       this.yellow.team = data.yellowTeam;
       this.blue.team = data.blueTeam;
     });
