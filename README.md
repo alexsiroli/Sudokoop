@@ -6,7 +6,7 @@ Sudokoop è un progetto universitario scritto con **Vue 3** e **Node.js** (Expre
 - **Multiplayer Co-op**: partita collaborativa di squadra.
 - **Multiplayer Versus**: sfida tra due squadre.
 
-Include anche funzioni di login, registrazione, chat in lobby, leaderboard, statistiche utente e molto altro.
+Include anche funzioni di login, registrazione, chat in lobby, leaderboard e statistiche utente.
 
 ## Struttura del progetto
 
