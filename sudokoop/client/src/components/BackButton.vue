@@ -1,7 +1,6 @@
 <template>
-  <!-- Emette un evento "click" quando l'utente preme il pulsante -->
   <button class="back-button" @click="$emit('click')" :title="title">
-    &#8592;
+    &#8592; Torna Indietro
   </button>
 </template>
 
@@ -19,18 +18,22 @@ export default {
 
 <style scoped>
 .back-button {
-  position: relative;
-  background: none;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color, #007bff);
+  border: 2px solid var(--primary-dark, #0056b3);
+  color: white;
+  font-size: 1rem;
+  padding: 10px 15px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1.5rem;
-  color: var(--primary-color);
-  transition: color 0.3s;
-  margin-right: 10px; /* Eventuale margine per distanziare se sta a sinistra di un titolo */
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
 }
 
 .back-button:hover {
-  color: var(--primary-dark);
-  transform: scale(1.1);
+  background: var(--primary-dark, #0056b3);
+  transform: scale(1.05);
 }
 </style>
