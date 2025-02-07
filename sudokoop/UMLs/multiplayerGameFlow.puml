@@ -4,10 +4,23 @@ participant "Client (Socket)" as C
 participant "Server (Game Controller)" as S
 participant "All Clients" as AC
 
+== Fase di selezione cella ==
+P -> C : Seleziona cella (focus)
+C -> S : Socket.emit("cellFocus", {rowIndex, colIndex, lobbyCode, color})
+S -> S : (Opzionale: memorizza info)
+S -> AC : Socket.emit("cellFocus", {rowIndex, colIndex, color})
+
+P -> C : Deseleziona cella (blur)
+C -> S : Socket.emit("cellDeselect", {rowIndex, colIndex, lobbyCode})
+S -> S : (Opzionale: rimuove info)
+S -> AC : Socket.emit("cellDeselect", {rowIndex, colIndex})
+
+== Fase di inserimento numero ==
 P -> C : Effettua una mossa (aggiornamento cella)
 C -> S : Socket.emit("cellUpdateMulti", {cellData, lobbyCode, username})
 S -> S : Elabora mossa, aggiorna stato partita e puzzle
 S -> AC : Socket.emit("afterUpdating", {result, username})
+
 alt Partita in corso
     S -> AC : Socket.emit("insertedNumber", updatedPartialPuzzle)
 else Partita terminata
