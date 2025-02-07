@@ -1,4 +1,3 @@
-const Game = require('../models/GameWithVite');
 const VersusGame = require("../models/VersusGame");
 
 module.exports = function registerGameHandlers(socket, io, gameController) {
