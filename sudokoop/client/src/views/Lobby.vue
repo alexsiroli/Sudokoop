@@ -91,6 +91,11 @@ export default {
       }
     });
 
+    socket.on("backToTeamSelection", () => {
+      this.$router.push({ name: "SelectTeamVersusGame" });
+
+    })
+
     socket.on("gameCanStart", (data) => {
       if (data.res.res) {
         if (data.mode === "coop") {

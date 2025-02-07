@@ -21,13 +21,14 @@ export default {
       socket.emit("checkRestartVersusGame",
         { lobbyCode: sessionStorage.getItem('lobbyCode'),
           difficulty: this.difficulty,
-          username: sessionStorage.getItem('username'),
         });
-      socket.on("versusGameCanRestart", () => {
+/*      socket.on("versusGameCanRestart", () => {
         console.log("versusGameCanRestart");
         socket.emit('getVersusGame', sessionStorage.getItem('lobbyCode'))
 
       } )
+
+ */
 
     },
     getGameData() {
@@ -49,10 +50,16 @@ export default {
       this.difficulty = difficulty;
       this.yellowTeam = yellowTeam;
       this.blueTeam = blueTeam;
+      console.log("yellow " + yellowTeam);
+      console.log("blue " + blueTeam);
       this.color = this.yellowTeam.some(p => p.username === sessionStorage.getItem('username')) ? 'yellow' : 'blue';
       this.isInitialized = true;
     });
+    socket.on("backToTeamSelection", () => {
+      this.$router.push({name: 'SelectTeamVersusGame'});
+    })
   },
+
 };
 </script>
 

@@ -63,6 +63,7 @@ class VersusGame {
     checkGameCanRestart() {
         console.log("players versus "+ this.getPlayers().length)
         console.log("players lobby " + this.teamPlayerManager.getPlayersOfLobby())
+
         return this.getPlayers().length === this.teamPlayerManager.getPlayersOfLobby().length
     }
 
@@ -100,7 +101,6 @@ class VersusGame {
         }
         result.yellowPoint = this.yellow.points;
         result.bluePoint = this.blue.points;
-        // TODO: devi ritornare i team con eliminated
         result.yellowTeam = this.yellow.team;
         result.blueTeam = this.blue.team;
         result.color = team === this.yellow ? 'yellow' : 'blue';

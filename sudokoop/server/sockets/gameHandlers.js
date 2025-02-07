@@ -9,7 +9,7 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
 
     socket.on("checkMultiGameStart", (data) => {
         const {lobbyCode, mode, difficulty} = data;
-        io.to(lobbyCode).emit("backToLobby");
+        //io.to(lobbyCode).emit("backToLobby");
         console.log("check multigame start")
         let check = gameController.multiPlayerGameCanStart(lobbyCode, mode, difficulty);
         if (check.res && mode === 'coop') {
@@ -56,7 +56,18 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
     });
 
     socket.on("checkRestartVersusGame", (data) => {
-        const {lobbyCode, difficulty, username} = data;
+        const {lobbyCode, difficulty} = data;
+        if (gameController.getPlayersOfLobby(lobbyCode).length < 2) {
+            console.log("Vai in lobb ")
+            io.to(lobbyCode).emit("backToLobby")
+            io.to(lobbyCode).emit("gameCanStart", {
+                res: gameController.multiPlayerGameCanStart(lobbyCode, 'versus'),
+                mode: 'versus',
+                difficulty: difficulty,
+            });
+            return;
+        }
+        // verifica che non si è aggiunto alcun giocatore
         if (gameController.checkVersusGameCanRestart(lobbyCode)) {
             const check = gameController.versusGameCanStart(lobbyCode);
             if (check.res) {
@@ -69,15 +80,10 @@ module.exports = function registerGameHandlers(socket, io, gameController) {
                         blueTeam: gameController.getGameOfLobby(lobbyCode).getTeams().blueTeam
                     });
                 io.to(lobbyCode).emit("versusGameCanRestart");
-
             }
-
-        } else {
-            io.to(lobbyCode).emit("gameCanStart", {
-                res: gameController.multiPlayerGameCanStart(lobbyCode, 'versus'),
-                mode: 'versus',
-                difficulty: difficulty,
-            });
+        } // si è aggiunto un giocatore, vado in teamSelec
+        else {console.log("gioca in lobb" + gameController.getPlayersOfLobby(lobbyCode).length)
+            io.to(lobbyCode).emit("backToTeamSelection");
         }
     })
 

@@ -26,10 +26,8 @@ export default {
 
   methods: {
     // chiamato la prima inizializzazione oppure quando ho perso e devo riiniziare
+
     startNewGame() {
-      if (this.gameOver && this.isMaster) {
-        this.restartNewGame();
-      }
       console.log("vite nel multiplayer" + this.vite)
       this.isInitialized = true;
       this.gameOver = false;
@@ -44,6 +42,9 @@ export default {
       this.firstInitialization = false;
     },
 
+    restartTheGame() {
+      this.restartNewGame();
+    },
     initializeGrid(puzzle) {
       let newGrid = [];
       for (let i = 0; i < 9; i++) {
@@ -148,6 +149,11 @@ export default {
   mounted() {
     this.startNewGame();
 
+    socket.on("versusGameCanRestart", () => {
+      console.log("versusGameCanRestart");
+      this.startNewGame();
+    });
+
     socket.on("backToLobby", () => {
       this.$router.push({name: 'Lobby'});
     });
@@ -155,7 +161,7 @@ export default {
     socket.on('playersOfGame', players => {
       console.log("ricevuti i players of game ", players)
       this.players = players;
-      if(this.players === []) {
+      if(this.players.length === 0) {
         this.$router.push({name: 'Lobby'});
       }
       players.forEach(player => {
@@ -171,10 +177,6 @@ export default {
     socket.on("teams", (data) => {
       this.yellow.team = data.yellowTeam;
       this.blue.team = data.blueTeam;
-    });
-
-    socket.on("startGame", () => {
-        this.$router.push({name: 'Lobby'});
     });
 
     // reagisco al focus di un utente
@@ -295,7 +297,7 @@ export default {
   <!-- Se il gioco è finito, mostra il messaggio e il pulsante per rigiocare -->
   <div v-if="gameOver && isMaster" class="game-over-container" style="margin-top: 20px;">
     <div class="buttons-row">
-      <button @click="startNewGame" class="button new-game-button">
+      <button @click="restartTheGame" class="button new-game-button">
         Inizia una Nuova Partita
       </button>
       <button @click="backToLobby" class="button new-game-button">

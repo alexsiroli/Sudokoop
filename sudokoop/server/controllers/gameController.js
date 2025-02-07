@@ -94,6 +94,7 @@ class GameController {
     removeTeam(lobbyCode) {
         this.lobbyTeams[lobbyCode] = null;
     }
+
     multiPlayerGameCanStart(lobbyCode, mode, difficulty) {
         if (lobbyPlayerManager.getPlayersOfLobby(lobbyCode).length < 2) {
             return {res: false, message: "Devono esserci almeno 2 giocatori per iniziare la partita"}
